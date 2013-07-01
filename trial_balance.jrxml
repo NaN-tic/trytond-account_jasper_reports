@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="901838a5-c3ed-4bbc-94e5-29788bc41da9">
+	<property name="ireport.zoom" value="1.1000000000000025"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<subDataset name="dataset1" uuid="a0e43402-0eae-4f3b-ac6f-f73084888591"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="STANDARD_DIR" class="java.lang.String"/>
+	<parameter name="SUBTITLE" class="java.lang.String"/>
+	<parameter name="HEADER_DS" class="java.lang.Object"/>
+	<queryString language="xPath">
+		<![CDATA[/data/record]]>
+	</queryString>
+	<field name="code" class="java.lang.String">
+		<fieldDescription><![CDATA[code]]></fieldDescription>
+	</field>
+	<field name="name" class="java.lang.String">
+		<fieldDescription><![CDATA[name]]></fieldDescription>
+	</field>
+	<field name="period_initial_balance" class="java.lang.Number">
+		<fieldDescription><![CDATA[period_initial_balance]]></fieldDescription>
+	</field>
+	<field name="period_credit" class="java.lang.Number">
+		<fieldDescription><![CDATA[period_credit]]></fieldDescription>
+	</field>
+	<field name="period_debit" class="java.lang.Number">
+		<fieldDescription><![CDATA[period_debit]]></fieldDescription>
+	</field>
+	<field name="period_balance" class="java.lang.Number">
+		<fieldDescription><![CDATA[period_balance]]></fieldDescription>
+	</field>
+	<field name="initial_balance" class="java.lang.Number">
+		<fieldDescription><![CDATA[initial_balance]]></fieldDescription>
+	</field>
+	<field name="credit" class="java.lang.Number">
+		<fieldDescription><![CDATA[credit]]></fieldDescription>
+	</field>
+	<field name="debit" class="java.lang.Number">
+		<fieldDescription><![CDATA[debit]]></fieldDescription>
+	</field>
+	<field name="balance" class="java.lang.Number">
+		<fieldDescription><![CDATA[balance]]></fieldDescription>
+	</field>
+	<field name="type" class="java.lang.String">
+		<fieldDescription><![CDATA[type]]></fieldDescription>
+	</field>
+	<field name="second_balance" class="java.lang.Boolean">
+		<fieldDescription><![CDATA[second_balance]]></fieldDescription>
+	</field>
+	<field name="period_add_initial_balance" class="java.lang.String">
+		<fieldDescription><![CDATA[period_add_initial_balance]]></fieldDescription>
+	</field>
+	<field name="add_initial_balance" class="java.lang.String">
+		<fieldDescription><![CDATA[add_initial_balance]]></fieldDescription>
+	</field>
+	<sortField name="code"/>
+	<variable name="total_initial_balance" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{type} == "view" || $F{initial_balance} == null ? 0.0 : $F{initial_balance}]]></variableExpression>
+	</variable>
+	<variable name="total_debit" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{type} == "view" || $F{debit} == null ? 0.0 : $F{debit}]]></variableExpression>
+	</variable>
+	<variable name="total_credit" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{type} == "view" || $F{credit} == null ? 0.0 : $F{credit}]]></variableExpression>
+	</variable>
+	<variable name="total_balance" class="java.lang.Number">
+		<variableExpression><![CDATA[$V{total_initial_balance} + $V{total_debit} - $V{total_credit}]]></variableExpression>
+	</variable>
+	<variable name="total_period_initial_balance" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{type} == "view" || $F{period_initial_balance} == null? 0.0 : $F{period_initial_balance}]]></variableExpression>
+	</variable>
+	<variable name="total_period_debit" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{type} == "view" || $F{period_debit} == null? 0.0 : $F{period_debit}]]></variableExpression>
+	</variable>
+	<variable name="total_period_credit" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{type} == "view" || $F{period_credit} == null ? 0.0 : $F{period_credit}]]></variableExpression>
+	</variable>
+	<variable name="total_period_balance" class="java.lang.Number">
+		<variableExpression><![CDATA[$V{total_period_initial_balance} + $V{total_period_debit} - $V{total_period_credit}]]></variableExpression>
+	</variable>
+	<variable name="L" class="java.util.Locale">
+		<variableExpression><![CDATA[$P{REPORT_LOCALE}]]></variableExpression>
+		<initialValueExpression><![CDATA[$P{REPORT_LOCALE}]]></initialValueExpression>
+	</variable>
+	<variable name="total_period_balance2" class="java.lang.Number">
+		<variableExpression><![CDATA[$V{total_period_debit} - $V{total_period_credit}]]></variableExpression>
+	</variable>
+	<variable name="total_balance2" class="java.lang.Number">
+		<variableExpression><![CDATA[$V{total_debit} - $V{total_credit}]]></variableExpression>
+	</variable>
+	<background>
+		<band/>
+	</background>
+	<title>
+		<band height="59">
+			<printWhenExpression><![CDATA[$P{IS_IGNORE_PAGINATION} == false]]></printWhenExpression>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="ba362ceb-b1ca-473a-bd7b-124882956b57" x="218" y="0" width="365" height="24"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L},"Trial Balance")]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<columnHeader>
+		<band height="47">
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="ff2bedbf-db28-41b6-a8fc-a243d8eeaa01" x="0" y="27" width="60" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L},"Account")]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="4844b3bb-9297-4b40-bc19-af5251e0502b" x="60" y="27" width="224" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L},"Account Name")]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="78619320-20b7-433f-b6b9-7d213c3d82a3" x="349" y="27" width="60" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L},"Debit")]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="105b8dfa-7b09-4cd6-aece-136d8168cc20" x="409" y="27" width="60" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L},"Credit")]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="d88c7728-e3a3-4e7c-87e8-02acef7d3cb1" x="469" y="27" width="60" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L},"Balance")]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="4dbd7977-dd96-4642-afd2-a9d6600d8f39" x="622" y="27" width="60" height="20">
+					<printWhenExpression><![CDATA[$F{second_balance}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L},"Debit")]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="fbc1996a-3892-4501-b2c1-74870b742184" x="682" y="27" width="60" height="20">
+					<printWhenExpression><![CDATA[$F{second_balance}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L},"Credit")]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="5ca28e32-bc7e-4838-8454-c67c37c2bce4" x="742" y="27" width="60" height="20">
+					<printWhenExpression><![CDATA[$F{second_balance}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L},"Balance")]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="31faaa49-4f0e-44b4-b2ea-c528e48f9ff3" x="284" y="7" width="245" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L},"First Balance")]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="e3f255f1-3133-40f5-9328-f17ef33e2c10" x="557" y="7" width="245" height="20">
+					<printWhenExpression><![CDATA[$F{second_balance}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L},"Second Balance")]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="b07d1a27-336e-4f12-bfae-17a8823ecfef" x="557" y="27" width="65" height="20">
+					<printWhenExpression><![CDATA[$F{second_balance}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L},"Initial")]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="7352c9eb-759f-4e46-b5c7-de08fedfbde6" x="284" y="27" width="65" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L},"Initial")]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="18">
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="a920a12b-6799-4461-b1aa-b654d826091e" x="0" y="3" width="60" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="a222f4f5-aa21-491a-9ec0-5e0c14c3d300" x="60" y="3" width="224" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="788b0189-7a01-4c89-bdc4-9c025ff0ba14" x="349" y="3" width="60" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{period_debit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="b15afd72-b1c9-44f1-8fe6-d349682650af" x="409" y="3" width="60" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{period_credit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="dcd6ff6a-aedc-4859-877e-7ca99736f9d1" x="469" y="3" width="60" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{period_balance}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="62feae50-4505-44f1-8c02-63834f98055d" x="622" y="3" width="60" height="12">
+					<printWhenExpression><![CDATA[$F{second_balance}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{debit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="ba3d3e4f-250f-42ca-ab37-f21aa1139a67" x="682" y="3" width="60" height="12">
+					<printWhenExpression><![CDATA[$F{second_balance}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{credit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="c3316792-bb1d-48ab-a9d8-b9f0d6575400" x="742" y="3" width="60" height="12">
+					<printWhenExpression><![CDATA[$F{second_balance}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{balance}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="f4460d78-4558-4ff7-a408-6c90bcacbb73" x="557" y="3" width="65" height="12">
+					<printWhenExpression><![CDATA[$F{second_balance}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{initial_balance}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="bbaa86ae-a75a-4ac1-a08c-7e90750d9090" x="284" y="3" width="65" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{period_initial_balance}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band height="11">
+			<textField evaluationTime="Report">
+				<reportElement uuid="20e06edd-7ff7-442e-be7e-9f32e2e0036b" x="401" y="1" width="40" height="10"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="5c453037-df29-4baf-9133-42c61376175f" x="370" y="1" width="31" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}+" /"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="54">
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement uuid="eb6c0538-9694-4cd5-97dc-1fb1df9755f3" x="469" y="4" width="60" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{period_add_initial_balance}
+?
+  $V{total_period_balance} == null ? 0.0 : $V{total_period_balance}
+:
+  $V{total_period_balance2} == null ? 0.0 : $V{total_period_balance2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement uuid="25e0af8c-234f-402e-80d4-d767fb0472a5" x="349" y="4" width="60" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_period_debit} == null ? 0.0 : $V{total_period_debit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement uuid="c9b967fc-7f1b-4285-99c5-7cef947f43c4" x="409" y="4" width="60" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_period_credit} == null ? 0.0 : $V{total_period_credit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement uuid="8540b9e6-ae6d-4ce3-beb6-fc19223eef67" x="622" y="4" width="60" height="12">
+					<printWhenExpression><![CDATA[$F{second_balance}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_debit} == null ? 0.0 : $V{total_debit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement uuid="fdd0e995-0765-46e6-92a7-3d0e37690115" x="742" y="4" width="60" height="12">
+					<printWhenExpression><![CDATA[$F{second_balance}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{add_initial_balance}
+?
+  $V{total_balance} == null ? 0.0 : $V{total_balance}
+:
+  $V{total_balance2} == null ? 0.0 : $V{total_balance2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement uuid="3e9154b2-fde9-426a-9a20-b8e4200d82db" x="682" y="4" width="60" height="12">
+					<printWhenExpression><![CDATA[$F{second_balance}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_credit} == null ? 0.0 : $V{total_credit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement uuid="557e70db-e781-48f0-bc90-cbdddceb8c62" x="557" y="4" width="65" height="12">
+					<printWhenExpression><![CDATA[$F{second_balance}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_initial_balance} == null ? 0.0 : $V{total_initial_balance}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement uuid="21dce043-2cb7-41eb-8ac5-259a9f84dfdb" x="284" y="4" width="65" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_period_initial_balance} == null ? 0.0 : $V{total_period_initial_balance}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

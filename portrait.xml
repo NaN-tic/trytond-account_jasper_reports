@@ -1,0 +1,11 @@
+<tryton>
+    <data>
+        <record model="ir.action.report" id="report_portrait_header">
+            <field name="name">Jasper Portrait Header</field>
+            <field name="report_name">jasper_reports.portrait_header</field>
+            <field name="report">jasper_reports/portrait_header.jrxml</field>
+            <field name="extension">pdf</field>
+        </record>
+    </data>
+</tryton>
+

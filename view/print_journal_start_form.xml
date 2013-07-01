@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+copyright notices and license terms. -->
+<form string="Journal Report">
+    <label name="company"/>
+    <field name="company"/>
+    <label name="fiscalyear"/>
+    <field name="fiscalyear"/>
+    <newline/>
+    <label name="start_period"/>
+    <field name="start_period"/>
+    <label name="end_period"/>
+    <field name="end_period"/>
+    <newline/>
+    <label name="all_journals"/>
+    <field name="all_journals"/>
+    <field name="journals" colspan="4"/>
+    <newline/>
+    <label name="output_type"/>
+    <field name="output_type"/>
+</form>
