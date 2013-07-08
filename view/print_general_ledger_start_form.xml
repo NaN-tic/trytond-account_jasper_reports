@@ -10,16 +10,10 @@ copyright notices and license terms. -->
     <field name="start_period"/>
     <label name="end_period"/>
     <field name="end_period"/>
-    <group id="group_parties" colspan="4">
-        <label name="all_parties"/>
-        <field name="all_parties"/>
-        <field name="parties" colspan="4"/>
-    </group>
-    <group id="group_accounts" colspan="4">
-        <label name="all_accounts"/>
-        <field name="all_accounts"/>
-        <field name="accounts" colspan="4"/>
-    </group>
+    <label string="Left empty to select all parties"/>
+    <field name="parties" colspan="4"/>
+    <label string="Left empty to select all accounts"/>
+    <field name="accounts" colspan="4"/>
     <label name="output_type"/>
     <field name="output_type"/>
 </form>

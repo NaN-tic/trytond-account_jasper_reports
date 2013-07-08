@@ -9,9 +9,12 @@ from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.pyson import Eval, Bool
 from trytond.modules.jasper_reports.jasper import JasperReport
+import logging
 
 __all__ = ['PrintTrialBalanceStart', 'PrintTrialBalance',
     'TrialBalanceReport']
+
+_ZERO = Decimal('0.00')
 
 
 class PrintTrialBalanceStart(ModelView):
@@ -78,6 +81,39 @@ class PrintTrialBalanceStart(ModelView):
             Transaction().context.get('company'), exception=False)
 
     @staticmethod
+    def default_start_period():
+        FiscalYear = Pool().get('account.fiscalyear')
+        Period = Pool().get('account.period')
+        fiscalyear = FiscalYear.find(
+            Transaction().context.get('company'), exception=False)
+        clause = [
+            ('fiscalyear', '=', fiscalyear),
+            ('type', '=', 'adjustment'),
+            ]
+        period, = Period.search(clause, order=[('start_date', 'ASC')],
+            limit=1)
+        return period.id
+
+    @staticmethod
+    def default_end_period():
+        FiscalYear = Pool().get('account.fiscalyear')
+        Period = Pool().get('account.period')
+        fiscalyear = FiscalYear.find(
+            Transaction().context.get('company'), exception=False)
+
+        Date = Pool().get('ir.date')
+        date = Date.today()
+
+        clause = [
+            ('fiscalyear', '=', fiscalyear),
+            ('start_date', '<=', date),
+            ('end_date', '>=', date),
+            ]
+        period, = Period.search(clause, order=[('start_date', 'ASC')],
+            limit=1)
+        return period.id
+
+    @staticmethod
     def default_company():
         return Transaction().context.get('company')
 
@@ -93,8 +129,8 @@ class PrintTrialBalanceStart(ModelView):
 
     def on_change_comparison_fiscalyear(self):
         return {
-            'start_period': None,
-            'end_period': None,
+            'comparison_start_period': None,
+            'comparison_end_period': None,
             }
 
 
@@ -134,8 +170,6 @@ class PrintTrialBalance(Wizard):
             'output_type': self.start.output_type,
             }
 
-        print "a:", data
-        print "action:", action
         return action, data
 
     def transition_print_(self):
@@ -184,13 +218,48 @@ class TrialBalanceReport(JasperReport):
 
     @classmethod
     def execute(cls, ids, data):
+        def _amounts(account, init_vals, vals):
+            initial = init_vals.get(account.id, {}).get('balance') or _ZERO
+            credit = vals.get(account.id, {}).get('credit') or _ZERO
+            debit = vals.get(account.id, {}).get('debit') or _ZERO
+            balance = vals.get(account.id, {}).get('balance') or _ZERO
+            return initial, credit, debit, balance
+
+        def _party_amounts(account, party, init_vals, vals):
+            iac_vals = init_vals.get(account.id, {})
+            ac_vals = vals.get(account.id, {})
+            initial = iac_vals.get(party.id, {}).get('balance') or _ZERO
+            credit = ac_vals.get(party.id, {}).get('credit') or _ZERO
+            debit = ac_vals.get(party.id, {}).get('debit') or _ZERO
+            balance = ac_vals.get(party.id, {}).get('balance') or _ZERO
+            return initial, credit, debit, balance
+
+        def _record(account, party, vals, comp):
+            init, credit, debit, balance = vals
+            init_comp, credit_comp, debit_comp, balance_comp = comp
+            return {
+                'code': account.code,
+                'name': party and party.name or account.name,
+                'type': account.type,
+                'period_initial_balance': init,
+                'period_credit': credit,
+                'period_debit': debit,
+                'period_balance': balance,
+                'initial_balance': init_comp,
+                'credit': credit_comp,
+                'debit': debit_comp,
+                'balance': balance_comp,
+            }
+        logger = logging.getLogger('account_jasper_reports')
+        logger.info('Start Trial Balance')
+
+
         pool = Pool()
         FiscalYear = pool.get('account.fiscalyear')
         Period = pool.get('account.period')
         Account = pool.get('account.account')
         Party = pool.get('party.party')
 
-        print "data:", data
         fiscalyear = FiscalYear(data['fiscalyear'])
         comparison_fiscalyear = None
         if data['comparison_fiscalyear']:
@@ -239,19 +308,11 @@ class TrialBalanceReport(JasperReport):
             domain += parties_domain
 
         accounts.append(('parent', '!=', None))
+        logger.info('Search accounts')
         accounts = Account.search(accounts, order=[('code', 'ASC')])
-        #TODO:: constraint, start period cannot be period of pyg or close
-        #if first_period.special and first_period.date_start[8:10] != '01':
-            ## It's a 'Closing period'
-            #raise osv.except_osv(
-                    #_("Periods Selection Warning!"),
-                    #_("The Trial Balance report is not supported for "
-                      #"selection of periods starting with a "
-                      #"'Closing Period'."))
-        #if not start_period.special:
 
+        logger.info('Calc amounts')
         # Calc first period values
-        #first_dict = {}.fromkeys(accounts, Decimal('0.00'))
         with Transaction().set_context(fiscalyear=fiscalyear.id,
                 date=None, periods=periods):
             values = cls.read_account_vals(accounts)
@@ -263,16 +324,21 @@ class TrialBalanceReport(JasperReport):
                 ('end_date', '<', start_period.end_date),
             ])
 
-        with Transaction().set_context(fiscalyear=fiscalyear.id,
-                date=None, periods=initial_periods):
-            init_values = cls.read_account_vals(accounts)
+        init_values = {}
+        if initial_periods:
+            logger.info('Calc Initial Balance')
+            with Transaction().set_context(fiscalyear=fiscalyear.id,
+                    date=None, periods=initial_periods):
+                init_values = cls.read_account_vals(accounts)
 
         # Calc comparison period values.
         comparison_initial_values = {}.fromkeys(accounts, Decimal('0.00'))
         comparison_values = {}.fromkeys(accounts, Decimal('0.00'))
+        initial_comparison_periods = []
 
         if comparison_fiscalyear:
         #    second_dict = {}.fromkeys(accounts, Decimal('0.00'))
+            logger.info('Calc initial vals for comparison period')
             with Transaction().set_context(fiscalyear=comparison_fiscalyear.id,
                     date=None, periods=comparison_periods):
                 comparison_values = cls.read_account_vals(accounts)
@@ -284,261 +350,171 @@ class TrialBalanceReport(JasperReport):
                     ('end_date', '<', comparison_end_period.end_date),
                 ])
 
+            logger.info('Calc vals for comparison period')
             with Transaction().set_context(fiscalyear=fiscalyear.id,
                     date=None, periods=initial_comparison_periods):
                 comparison_initial_values.update(
                     cls.read_account_vals(accounts))
 
-        init_partners_values = {}
-        partner_values = {}
-        init_comparision_partner_values = {}
-        comparison_partner_values = {}
-
         if split_parties:
             if not parties:
+                logger.info('Search parties')
                 parties = Party.search([])
 
+            logger.info('Calc initial values for parties')
             with Transaction().set_context(fiscalyear=fiscalyear.id,
                     date=None, periods=initial_periods):
-                init_party_values = cls.get_account_values_by_party(
+                init_party_values = Party.get_account_values_by_party(
                     parties, accounts)
 
+            logger.info('Calc  values for parties')
             with Transaction().set_context(fiscalyear=fiscalyear.id,
                     date=None, periods=periods):
-                party_values = cls.get_account_values_by_party(
+                party_values = Party.get_account_values_by_party(
                     parties, accounts)
 
+            init_comparison_party_values = {}
+            comparison_party_values = {}
             if comparison_fiscalyear:
+                logger.info('Calc initial values for comparsion for parties')
                 with Transaction().set_context(fiscalyear=fiscalyear.id,
                         date=None, periods=initial_comparison_periods):
                     init_comparison_party_values = \
                         cls.get_account_values_by_party(parties, accounts)
 
+                logger.info('Calc values for comparsion for parties')
                 with Transaction().set_context(fiscalyear=fiscalyear.id,
                         date=None, periods=comparison_periods):
                     comparison_party_values = \
                         cls.get_account_values_by_party(parties, accounts)
 
         records = []
-        if digits is None:
-            offset = 3000
-            index = 0
-            while index * offset < len(accounts):
-                chunk = accounts[index * offset: (index + 1) * offset]
-                index += 1
-                for account in chunk:
-                    print account
-                    initial_balance = init_values[account.id]['balance']
-                    credit = values[account.id]['credit']
-                    debit = values[account.id]['debit']
-                    balance = values[account.id]['balance']
+        virt_records = {}
+        ok_records = []
+        offset = 3000
+        index = 0
+        while index * offset < len(accounts):
+            chunk = accounts[index * offset: (index + 1) * offset]
+            index += 1
+            for account in chunk:
+                logger.info('Calc values for account:' + account.code)
+                if digits and len(account.code.strip()) < digits:
+                    continue
 
-                    # Only print accounts that have moves or initial balance
-                    if with_moves_only and not debit and not credit and \
-                            not initial_balance:
+                vals = _amounts(account, init_values, values)
+                initial, credit, debit, balance = vals
+                # Only print accounts that have moves or initial balance
+                if with_moves_only and not debit and not credit and \
+                        not initial and not balance:
+                    continue
+
+                comp_vals = _amounts(account,
+                    comparison_initial_values,  comparison_values)
+                comp_initial, comp_credit, comp_debit, comp_balance = \
+                    comp_vals
+
+                if digits and len(account.code.strip()) != digits:
+                    virt_code = account.code[:digits]
+                    if virt_code in ok_records:
                         continue
+                    record = virt_records.get(virt_code)
+                    vr = virt_records.get(virt_code, {})
+                    initial += vr.get('period_initial_balance', _ZERO)
+                    comp_initial += vr.get('initial_balance', _ZERO)
+                    balance += initial + vr.get('period_balance', _ZERO)
+                    comp_balance += comp_initial + vr.get('balance', _ZERO)
+                    credit += vr.get('period_credit', _ZERO)
+                    debit += vr.get('period_debit', _ZERO)
+                    comp_credit += vr.get('credit', _ZERO)
+                    comp_debit += vr.get('debit', _ZERO)
 
-                    comparison_initial_balance = \
-                        comparison_initial_values.get(account.id) and \
-                        comparison_initial_values[account.id]['balance'] or \
-                        Decimal('0.00')
-                    comparison_credit = comparison_values.get(account.id) and\
-                        comparison_values[account.id]['credit'] or \
-                        Decimal('0.00')
-                    comparison_debit = comparison_values.get(account.id) and\
-                        comparison_values[account.id]['debit'] or \
-                        Decimal('0.00')
-                    comparison_balance = comparison_values.get(account.id) and\
-                        comparison_values[account.id]['balance'] or\
-                        Decimal('0.00')
+                    record = {
+                        'code': virt_code,
+                        'name': '',
+                        'type': 'fix',
+                        'period_initial_balance': initial,
+                        'period_credit': credit,
+                        'period_debit': debit,
+                        'period_balance': balance,
+                        'initial_balance': comp_initial,
+                        'credit': comp_credit,
+                        'debit': comp_debit,
+                        'balance': comp_balance,
+                    }
+                    virt_records[virt_code] = record
 
-                    if split_parties and parties and \
-                            account.type in ['payable', 'receivable']:
-                        for party in parties:
-                            period_initial_balance = init_party_values.get(
-                                account.id, {}).get(party.id, {}).get(
-                                'balance', Decimal('0.00'))
-                            period_vals = party_values.get(account.id, {}
-                                ).get(party.id, {})
-                            period_credit = period_vals.get('credit',
-                                Decimal('0.00'))
-                            period_debit = period_vals.get('debit',
-                                Decimal('0.00'))
-                            period_balance = period_initial_balance + \
-                                period_vlas.get('balance', Decimal('0.00'))
+                    continue
+                if split_parties and parties and \
+                   account.type in ['payable', 'receivable']:
+                    for party in parties:
+                        logger.info('Calc values for account %s and party %s'%(account.code, party.name))
+                        party_vals = _party_amounts(account,
+                                party, init_party_values, party_values)
+                        party_comp_vals = _party_amounts(account,
+                                party, init_comparison_party_values,
+                                comparison_party_values)
+                        init, credit, debit, balance = party_vals
 
-                            if with_moves_only and not period_debit and not\
-                               period_credit and not period_initial_balance:
-                                continue
-
-                            comp_initial_balance = \
-                                init_comparison_party_values.get(
-                                    account.id, {}).get(party.id, {}).get(
-                                    'balance', Decimal('0.00'))
-                            comp_period_vals = comparison_party_values.get(
-                                account.id, {}).get(party.id, {})
-                            comp_period_credit = comparison_party_vals.get(
-                                'credit' ,Decimal('0.00'))
-                            comp_period_debit = comparison_period_vals.get(
-                                'debit', Decimal('0.00'))
-
-                            comp_period_balance = com_initial_balance + \
-                                comparison_period_vals.get('balance',
-                                    Decimal('0.00'))
-
-                            record = {
-                                'code': account.code,
-                                'name': partner.name,
-                                'type': account.type, # Useful for the report designer so accounts of type 'view' may be discarded in aggregation.
-#                                'second_balance': second_balance,
-                                'period_initial_balance': period_initial_balance,
-                                'period_credit': period_credit,
-                                'period_debit': period_debit,
-                                'period_balance': period_balance,
-                                'initial_balance': comp_initial_balance,
-                                'credit': comp_period_credit,
-                                'debit': comp_period_debit,
-                                'balance': comp_balance,
-                                }
-                            records.append(record)
-                    else:
-                        period_balance = initial_balance + balance
-                        comp_period_balance = comparison_initial_balance + \
-                                comparison_balance
-                        record = {
-                            'code': account.code,
-                            'name': account.name,
-                            'type': account.type, # Useful for the report designer so accounts of type 'view' may be discarded in aggregation.
-#                            'second_balance': second_balance,
-                            'period_initial_balance': initial_balance,
-                            'period_credit': credit,
-                            'period_debit': debit,
-                            'period_balance': period_balance,
-#                           'period_add_initial_balance': add_initial_balance,
-                            'initial_balance': comparison_initial_balance,
-                            'credit': comparison_credit,
-                            'debit': comparison_debit,
-                            'balance': comp_period_balance,
-                            'second_balance': False if comparison_fiscalyear \
-                                    is None else True
-#                            'add_initial_balance': comparison_add_initial_balance,
-                            }
-                        records.append(record)
-        else: #LIMIT DIGITS!
-            virt_records ={}
-            ok_records =[]
-            offset = 3000
-            index = 0
-            while index * offset < len(accountIds):
-                chunk = accountIds[index * offset: (index+1) * offset]
-                index += 1
-                for account in pool.get('account.account').browse(cr, uid, chunk, periodContext):
-                    initial_balance = initial_balance_dict[account.id]
-                    # Only print accounts that have moves or initial balance and avoid codes with less digits
-                    if (with_moves_only and not account.debit and not account.credit and not initial_balance)\
-                            or len(account.code.strip()) < digits:
-                        continue
-                    comparison_values = comparison_dict.get(account.id)
-                    comparison_initial_balance = comparison_initial_balance_dict.get(account.id, 0)
-                    if len(account.code.strip()) == digits:
-                        if split_partners and partners and account.type in ['payable','receivable']:
-                            for partner in pool.get('res.partner').browse(cr, uid, partners, context):
-                                period_initial_balance = accountPartnersInitial\
-                                        .get(account.id, {}).get(partner.id, {})\
-                                        .get('balance', 0)
-                                period_credit = accountPartners.get(account.id, {}).get(partner.id, {}).get('credit', 0)
-                                period_debit = accountPartners.get(account.id, {}).get(partner.id, {}).get('debit', 0)
-                                if with_moves_only and not period_debit and not period_credit and not period_initial_balance:
-                                    continue
-                                comp_initial_balance = accountPartnersCompInitial\
-                                        .get(account.id, {}).get(partner.id, {})\
-                                        .get('balance', 0)
-                                period_balance = (add_initial_balance and period_initial_balance or 0) +\
-                                            (accountPartners.get(account.id, {})\
-                                                    .get(partner.id, {})\
-                                                    .get('balance', 0))
-                                comp_balance = (comparison_add_initial_balance and comp_initial_balance or 0) +\
-                                            (accountPartnersComparison.get(account.id, {})\
-                                            .get(partner.id, {}).get('balance', 0))
-                                record = {
-                                    'code': account.code,
-                                    'name': partner.name,
-                                    'type': 'fix', # Useful for the report designer so accounts of type 'view' may be discarded in aggregation.
-                                    'second_balance': second_balance,
-                                    'period_initial_balance': period_initial_balance,
-                                    'period_credit': period_credit,
-                                    'period_debit': period_debit,
-                                    'period_balance': period_balance,
-                                    'period_add_initial_balance': add_initial_balance,
-                                    'initial_balance': comp_initial_balance,
-                                    'credit': accountPartnersComparison.get(account.id, {}).get(partner.id, {}).get('credit', 0),
-                                    'debit': accountPartnersComparison.get(account.id, {}).get(partner.id, {}).get('debit', 0),
-                                    'balance': comp_balance,
-                                    'add_initial_balance': comparison_add_initial_balance,
-                                }
-                                ok_records.append(account.code)
-                                records.append(record)
-                        else:
-                            period_balance = (add_initial_balance and initial_balance or 0) + account.balance
-                            comp_balance = comparison_values and\
-                                    ((comparison_add_initial_balance and comparison_initial_balance or 0) +\
-                                    comparison_values['balance']) or 0
-                            record = {
-                                'code': account.code,
-                                'name': account.name,
-                                'type': 'fix', # Useful for the report designer so accounts of type 'view' may be discarded in aggregation.
-                                'second_balance': second_balance,
-                                'period_initial_balance': initial_balance,
-                                'period_credit': account.credit,
-                                'period_debit': account.debit,
-                                'period_balance': period_balance,
-                                'period_add_initial_balance': add_initial_balance,
-                                'initial_balance': comparison_initial_balance,
-                                'credit': comparison_values and comparison_values['credit'] or 0,
-                                'debit': comparison_values and comparison_values['debit'] or 0,
-                                'balance': comp_balance,
-                                'add_initial_balance': comparison_add_initial_balance,
-                            }
-                            ok_records.append(account.code)
-                            records.append(record)
-                    else:
-                        virt_code = account.code[:digits]
-                        # We can make this comparation because records are
-                        # sorted by code. Account with larger codes comes later
-                        # than shorter
-                        if virt_code in ok_records:
+                        print "moves:", init, credit, debit, balance
+                        if with_moves_only and not debit and not credit and \
+                           not balance:
                             continue
-                        record = virt_records.get(virt_code)
-                        initial_balance += virt_records.get(virt_code, {}).get('period_initial_balance',0)
-                        comparison_initial_balance += virt_records.get( virt_code, {} ).get('initial_balance',0)
-                        period_balance = (add_initial_balance and initial_balance or 0) +\
-                                account.balance +\
-                                virt_records.get(virt_code, {}).get('period_balance',0)
-                        comp_balance = comparison_values and\
-                                ((comparison_add_initial_balance and comparison_initial_balance or 0) +\
-                                comparison_values['balance'] + virt_records.get(virt_code, {}).get('balance',0)) or 0
-                        record = {
-                                'code': virt_code,
-                                'name': " ",
-                                'type': 'fix', # Useful for the report designer so accounts of type 'view' may be discarded in aggregation.
-                                'second_balance': second_balance,
-                                'period_initial_balance': initial_balance,
-                                'period_credit': account.credit  + virt_records.get( virt_code, {} ).get('period_credit',0),
-                                'period_debit': account.debit + virt_records.get( virt_code, {} ).get('period_debit',0),
-                                'period_balance': period_balance,
-                                'period_add_initial_balance': add_initial_balance,
-                                'initial_balance': comparison_initial_balance,
-                                'credit': comparison_values and comparison_values['credit'] + virt_records.get( virt_code, {} ).get('credit',0) or 0,
-                                'debit': comparison_values and comparison_values['debit'] + virt_records.get( virt_code, {} ).get('debit',0) or 0,
-                                'balance': comp_balance,
-                                'add_initial_balance': comparison_add_initial_balance,
-                        }
-                        virt_records[virt_code] = record
+
+                        record = _record(account, party,
+                            party_vals, party_comp_vals)
+
+                        records.append(record)
+                        ok_records.append(account.code)
+                else:
+                    record = _record(account, None, vals, comp_vals)
+                    records.append(record)
+                    ok_records.append(account.code)
 
             for record in virt_records:
-                records.append( virt_records[record] )
+                records.append(virt_records[record])
 
-        parameters=[]
+        logger.info('Records:' + str(len(records)))
+
+        parameters = {}
+        parameters['SECOND_BALANCE'] = comparison_fiscalyear and True or False
+        parameters['fiscalyear'] = fiscalyear.name
+        parameters['comparison_fiscalyear'] = comparison_fiscalyear and \
+            comparison_fiscalyear.name or ''
+        parameters['start_period'] = start_period and start_period.name or ''
+        parameters['end_period'] = end_period and end_period.name or ''
+        parameters['comparison_start_period'] = comparison_start_period and\
+            comparison_start_period.name or ''
+        parameters['comparisonend_period'] = comparison_end_period and\
+                comparison_end_period.name or ''
+        parameters['digits'] = digits or ''
+        parameters['with_moves_only'] = with_moves_only or ''
+        parameters['split_parties'] = split_parties or ''
+
+        if accounts:
+            accounts_subtitle = []
+            for x in accounts:
+                if len(accounts_subtitle) > 4:
+                    accounts_subtitle.append('...')
+                    break
+                accounts_subtitle.append(x.code)
+            accounts_subtitle = ', '.join(accounts_subtitle)
+        else:
+            accounts_subtitle = ''
+
+        if parties:
+            parties_subtitle = []
+            for x in paries:
+                if len(parties_subtitle) > 4:
+                    parties_subtitle.append('...')
+                    break
+                parties_subtitle.append(x.name)
+            parties_subtitle = '; '.join(parties_subtitle)
+        else:
+            parties_subtitle = ''
+
+        parameters['accounts'] = accounts_subtitle
+        parameters['parties'] = parties_subtitle
+
         return super(TrialBalanceReport, cls).execute(ids, {
                 'name': 'account_jasper_reports.trial_balance',
                 'model': 'account.move.line',
@@ -548,6 +524,4 @@ class TrialBalanceReport(JasperReport):
                 'output_format': data['output_type'],
 
             })
-
-
 

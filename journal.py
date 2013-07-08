@@ -18,22 +18,19 @@ class PrintJournalStart(ModelView):
     fiscalyear = fields.Many2One('account.fiscalyear', 'Fiscal Year',
             required=True, on_change=['fiscalyear'])
     start_period = fields.Many2One('account.period', 'Start Period',
+        required=True,
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
             ('start_date', '<=', (Eval('end_period'), 'start_date')),
             ], depends=['fiscalyear', 'end_period'])
     end_period = fields.Many2One('account.period', 'End Period',
+        required=True,
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
             ('start_date', '>=', (Eval('start_period'), 'start_date'))
             ],
         depends=['fiscalyear', 'start_period'])
-    all_journals = fields.Boolean('All Journals')
-    journals = fields.Many2Many('account.journal', None, None, 'Journals',
-        states={
-            'invisible': Bool(Eval('all_journals')),
-            'required': ~Bool(Eval('all_journals')),
-            }, depends=['all_journals'])
+    journals = fields.Many2Many('account.journal', None, None, 'Journals')
     output_type = fields.Selection([
             ('pdf', 'PDF'),
             ('xls', 'XLS'),
@@ -49,10 +46,6 @@ class PrintJournalStart(ModelView):
     @staticmethod
     def default_company():
         return Transaction().context.get('company')
-
-    @staticmethod
-    def default_all_journals():
-        return True
 
     @staticmethod
     def default_output_type():
@@ -88,10 +81,7 @@ class PrintJournal(Wizard):
             'end_period': end_period,
             'journals': [x.id for x in self.start.journals],
             'output_type': self.start.output_type,
-            'all_journals': self.start.all_journals,
             }
-        print "action:",action
-        print "data:", data
         return action, data
 
     def transition_print_(self):

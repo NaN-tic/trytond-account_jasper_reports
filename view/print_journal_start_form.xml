@@ -12,8 +12,7 @@ copyright notices and license terms. -->
     <label name="end_period"/>
     <field name="end_period"/>
     <newline/>
-    <label name="all_journals"/>
-    <field name="all_journals"/>
+    <label string="Left empty to select all journals by default"/>
     <field name="journals" colspan="4"/>
     <newline/>
     <label name="output_type"/>

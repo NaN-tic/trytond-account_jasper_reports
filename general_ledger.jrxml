@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="account_movements2.jrxml" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7e6f5ed5-9314-4647-bc83-20dadb015d73">
 	<property name="ireport.zoom" value="1.771561000000003"/>
-	<property name="ireport.x" value="28"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="HEADER_DS" class="java.lang.Object"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -207,7 +207,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{accounts}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{accounts}==""?tr($V{L},"All Accounts"):$P{accounts}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement uuid="0b2e0fc4-de8a-43cf-930d-89fd89001125" x="10" y="27" width="533" height="16"/>
@@ -221,7 +221,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{parties}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{parties}==""?tr($V{L},"All Parties"):$P{parties}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

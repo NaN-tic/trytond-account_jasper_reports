@@ -55,10 +55,10 @@ class Party:
         line_query, _ = MoveLine.query_get()
 
         cursor.execute('SELECT l.party, '
-                'a.id ',
-                'SUM((COALESCE(l.debit, 0)) as credit ,'
-                'SUM((COALESCE(.credit, 0)) ad debit ,'
-                'SUM((COALESCE(l.debit, 0) - COALESCE(l.credit, 0))) '
+                'l.account ,'
+                'SUM((COALESCE(l.debit, 0))) as debit ,'
+                'SUM((COALESCE(l.credit, 0))) as credit ,'
+                'SUM((COALESCE(l.debit, 0) - COALESCE(l.credit, 0))) as balance '
             'FROM account_move_line AS l, account_account AS a '
             'WHERE a.id = l.account '
                 'AND a.active '

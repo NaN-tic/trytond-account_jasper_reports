@@ -7,7 +7,7 @@ from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateAction, Button
-from trytond.pyson import Eval, Bool
+from trytond.pyson import Eval
 from trytond.modules.jasper_reports.jasper import JasperReport
 
 __all__ = ['PrintGeneralLedgerStart', 'PrintGeneralLedger',
@@ -20,28 +20,20 @@ class PrintGeneralLedgerStart(ModelView):
     fiscalyear = fields.Many2One('account.fiscalyear', 'Fiscal Year',
             required=True, on_change=['fiscalyear'])
     start_period = fields.Many2One('account.period', 'Start Period',
+        required=True,
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
             ('start_date', '<=', (Eval('end_period'), 'start_date')),
             ], depends=['fiscalyear', 'end_period'])
     end_period = fields.Many2One('account.period', 'End Period',
+        required=True,
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
             ('start_date', '>=', (Eval('start_period'), 'start_date'))
             ],
         depends=['fiscalyear', 'start_period'])
-    all_accounts = fields.Boolean('All Accounts')
-    accounts = fields.Many2Many('account.account', None, None, 'Accounts',
-        states={
-            'invisible': Bool(Eval('all_accounts')),
-            'required': ~Bool(Eval('all_accounts')),
-            }, depends=['all_accounts'])
-    all_parties = fields.Boolean('All Parties')
-    parties = fields.Many2Many('party.party', None, None, 'Parties',
-        states={
-            'invisible': Bool(Eval('all_parties')),
-            'required': ~Bool(Eval('all_parties')),
-            }, depends=['all_parties'])
+    accounts = fields.Many2Many('account.account', None, None, 'Accounts')
+    parties = fields.Many2Many('party.party', None, None, 'Parties')
     output_type = fields.Selection([
             ('pdf', 'PDF'),
             ('xls', 'XLS'),
@@ -57,18 +49,6 @@ class PrintGeneralLedgerStart(ModelView):
     @staticmethod
     def default_company():
         return Transaction().context.get('company')
-
-    @staticmethod
-    def default_all_accounts():
-        return True
-
-    @staticmethod
-    def default_all_parties():
-        #TODO: Check that the wizard works if executed from party view
-        print "CONTEXT: ", Transaction().context
-        if Transaction().context.get('model') == 'party.party':
-            return False
-        return True
 
     @staticmethod
     def default_output_type():
@@ -124,9 +104,7 @@ class PrintGeneralLedger(Wizard):
                     account_ids.append(party.account_receivable.id)
                 party_ids.append(party.id)
         return {
-            'all_accounts': not account_ids,
             'accounts': account_ids,
-            'all_parties': not party_ids,
             'parties': party_ids,
             }
 
@@ -194,11 +172,11 @@ class GeneralLedgerReport(JasperReport):
         if parties:
             parties_domain = [
                 'OR', [
-                    ('account.kind', 'not in', ['receivable', 'payable']),
-                ], [
                     ('account.kind', 'in', ['receivable', 'payable']),
-                    ('party', 'in', parties)]
-                ]
+                    ('party', 'in', parties)],
+                [
+                    ('account.kind', 'not in', ['receivable', 'payable'])
+                ]]
             domain += parties_domain
 
         visible_ids = Line.search(domain)

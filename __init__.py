@@ -9,11 +9,11 @@ from .trial_balance import *
 
 def register():
     Pool.register(
+        Party,
         PrintJournalStart,
         PrintGeneralLedgerStart,
         PrintTrialBalanceStart,
         FiscalYear,
-        Party,
         module='account_jasper_reports', type_='model')
     Pool.register(
         PrintJournal,

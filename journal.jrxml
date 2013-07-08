@@ -33,7 +33,6 @@
 	<parameter name="start_period" class="java.lang.String"/>
 	<parameter name="end_period" class="java.lang.String"/>
 	<parameter name="journals" class="java.lang.String"/>
-	<parameter name="all_journals" class="java.lang.Boolean"/>
 	<queryString language="xPath">
 		<![CDATA[/data/record]]>
 	</queryString>
@@ -119,6 +118,20 @@
 	<title>
 		<band height="76">
 			<textField>
+				<reportElement uuid="2924b266-8c5f-4a29-95ce-716893b1e31e" x="0" y="43" width="555" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year: ") + $P{fiscal_year} + tr($V{L}," From: ") + $P{start_period} + tr($V{L}, "  To: ") + $P{end_period}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="8ce40734-2999-42b2-a0cf-b71f5882af33" x="0" y="59" width="554" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{journals}==""?tr($V{L},"All Journals"):$P{journals}]]></textFieldExpression>
+			</textField>
+			<textField>
 				<reportElement uuid="1c5d69f6-2c21-4835-a766-f7c5f5073beb" x="467" y="-1" width="88" height="15"/>
 				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[new Date()]]></textFieldExpression>
@@ -130,30 +143,6 @@
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Journal")]]></textFieldExpression>
 			</textField>
-			<frame>
-				<reportElement uuid="d7c602eb-f631-4c5b-a32f-6492e9e59818" x="3" y="25" width="550" height="43"/>
-				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
-					<pen lineWidth="0.25" lineColor="#CCCCCC"/>
-					<topPen lineWidth="0.25" lineColor="#CCCCCC"/>
-					<leftPen lineWidth="0.25" lineColor="#CCCCCC"/>
-					<bottomPen lineWidth="0.25" lineColor="#CCCCCC"/>
-					<rightPen lineWidth="0.25" lineColor="#CCCCCC"/>
-				</box>
-				<textField>
-					<reportElement uuid="8ce40734-2999-42b2-a0cf-b71f5882af33" x="10" y="19" width="533" height="12"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="7"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$P{journals}]]></textFieldExpression>
-				</textField>
-				<textField>
-					<reportElement uuid="2924b266-8c5f-4a29-95ce-716893b1e31e" x="10" y="3" width="533" height="16"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="8"/>
-					</textElement>
-					<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year: ") + $P{fiscal_year} + tr($V{L}," From: ") + $P{start_period} + tr($V{L}, "  To: ") + $P{end_period}]]></textFieldExpression>
-				</textField>
-			</frame>
 		</band>
 	</title>
 	<pageHeader>

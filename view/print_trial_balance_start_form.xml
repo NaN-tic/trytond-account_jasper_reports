@@ -14,26 +14,20 @@ copyright notices and license terms. -->
     <label name="split_parties"/>
     <field name="split_parties"/>
     <newline/>
-    <group id="group_parties" colspan="2">
-        <!--        <label string="All parties if Empty" colspan="4"/> -->
-        <field name="parties" colspan="4"/>
-    </group>
-    <group id="group_accounts" colspan="2">
-        <!--        <label string="All accounts if Empty" colspan="4"/> -->
-        <field name="accounts" colspan="4"/>
-    </group>
+    <label string="All parties if Empty" colspan="4"/> 
+    <field name="parties" colspan="4"/>
+    <label string="All accounts if Empty" colspan="4"/> -->
+    <field name="accounts" colspan="4"/>
 
-    <group id="first_balance" colspan="2">
-        <label name="fiscalyear"/>
-        <field name="fiscalyear"/>
-        <newline/>
-        <label name="start_period"/>
-        <field name="start_period"/>
-        <label name="end_period"/>
-        <field name="end_period"/>
-    </group>
+    <label name="fiscalyear"/>
+    <field name="fiscalyear"/>
+    <newline/>
+    <label name="start_period"/>
+    <field name="start_period"/>
+    <label name="end_period"/>
+    <field name="end_period"/>
     
-    <group id="second_balance" colspan="2">
+    <group id="second_balance" string="Comparison Period" colspan="4">
         <label name="comparison_fiscalyear"/>
         <field name="comparison_fiscalyear"/>
         <newline/>
