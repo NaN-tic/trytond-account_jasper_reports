@@ -42,7 +42,7 @@ setup(name='%s_%s' % (PREFIX, MODULE),
     long_description=read('README'),
     author='NaN·tic',
     url='http://www.nan-tic.com/',
-    download_url="https://bitbucket.org/trytonspain/trytond-account_jasper_report",
+    download_url="https://bitbucket.org/trytonspain/trytond-account_jasper_reports",
     package_dir={'trytond.modules.%s' % MODULE: '.'},
     packages=[
         'trytond.modules.%s' % MODULE,
