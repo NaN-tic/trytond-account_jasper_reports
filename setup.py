@@ -5,7 +5,7 @@ import re
 import os
 import ConfigParser
 
-MODULE = 'account_jasper_report'
+MODULE = 'account_jasper_reports'
 PREFIX = 'trytonspain'
 MODULE2PREFIX = {}
 
