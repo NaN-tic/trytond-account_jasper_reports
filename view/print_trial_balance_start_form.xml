@@ -14,9 +14,9 @@ copyright notices and license terms. -->
     <label name="split_parties"/>
     <field name="split_parties"/>
     <newline/>
-    <label string="All parties if Empty" colspan="4"/> 
+    <label id="all_parties" string="All parties if Empty" colspan="4"/>
     <field name="parties" colspan="4"/>
-    <label string="All accounts if Empty" colspan="4"/> -->
+    <label id="all_accounts" string="All accounts if Empty" colspan="4"/>
     <field name="accounts" colspan="4"/>
 
     <label name="fiscalyear"/>
@@ -26,7 +26,7 @@ copyright notices and license terms. -->
     <field name="start_period"/>
     <label name="end_period"/>
     <field name="end_period"/>
-    
+
     <group id="second_balance" string="Comparison Period" colspan="4">
         <label name="comparison_fiscalyear"/>
         <field name="comparison_fiscalyear"/>
