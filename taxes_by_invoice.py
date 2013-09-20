@@ -23,8 +23,6 @@ class PrintTaxesByInvoiceAndPeriodStart(ModelView):
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
             ], depends=['fiscalyear'])
-    report_type = fields.Selection([('taxes-by-invoice', 'Taxes by Invoice')],
-        'Report', required=True)
     partner_type = fields.Selection([
             ('customers', 'Customers'),
             ('suppliers', 'Suppliers'),
@@ -40,10 +38,6 @@ class PrintTaxesByInvoiceAndPeriodStart(ModelView):
             ('xls', 'XLS'),
             ], 'Output Type', required=True)
     company = fields.Many2One('company.company', 'Company', required=True)
-
-    @staticmethod
-    def default_report_type():
-        return 'taxes-by-invoice'
 
     @staticmethod
     def default_partner_type():
@@ -88,7 +82,6 @@ class PrintTaxesByInvoiceAndPeriod(Wizard):
             'periods': [x.id for x in self.start.periods],
             'parties': [x.id for x in self.start.parties],
             'output_type': self.start.output_type,
-            'report_type': self.start.report_type,
             'partner_type': self.start.partner_type,
             'totals_only': self.start.totals_only,
             'grouping': self.start.grouping,
@@ -127,14 +120,24 @@ class TaxesByInvoiceReport(JasperReport):
         periods = Period.browse(data.get('periods', []))
         parties = Party.browse(data.get('parties', []))
 
+        if periods:
+            periods_subtitle = []
+            for x in periods:
+                if len(periods_subtitle) > 8:
+                    periods_subtitle.append('...')
+                    break
+                periods_subtitle.append(x.rec_name)
+            periods_subtitle = '; '.join(periods_subtitle)
+        else:
+            periods_subtitle = ''
+
         if parties:
-            js = Party.search([('id', 'in', [x.id for x in parties])])
             parties_subtitle = []
-            for x in js:
+            for x in parties:
                 if len(parties_subtitle) > 4:
                     parties_subtitle.append('...')
                     break
-                parties_subtitle.append(x.name)
+                parties_subtitle.append(x.rec_name)
             parties_subtitle = '; '.join(parties_subtitle)
         else:
             parties_subtitle = ''
@@ -142,6 +145,7 @@ class TaxesByInvoiceReport(JasperReport):
         parameters = {}
         parameters['fiscal_year'] = fiscalyear.rec_name
         parameters['parties'] = parties_subtitle
+        parameters['periods'] = periods_subtitle
         parameters['TOTALS_ONLY'] = data['totals_only'] and True or False
 
         domain = []

@@ -4,8 +4,7 @@ copyright notices and license terms. -->
 <form string="Taxes By Invoice">
     <label name="company"/>
     <field name="company"/>
-    <label name="report_type"/>
-    <field name="report_type"/>
+    <newline/>
     <label name="partner_type"/>
     <field name="partner_type"/>
     <label name="grouping"/>
