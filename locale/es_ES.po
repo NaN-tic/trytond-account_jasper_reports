@@ -1,0 +1,377 @@
+# 
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "field:account_jasper_reports.print_general_ledger.start,accounts:"
+msgid "Accounts"
+msgstr "Cuentas"
+
+msgctxt "field:account_jasper_reports.print_general_ledger.start,company:"
+msgid "Company"
+msgstr "Empresa"
+
+msgctxt "field:account_jasper_reports.print_general_ledger.start,end_period:"
+msgid "End Period"
+msgstr "Período final"
+
+msgctxt "field:account_jasper_reports.print_general_ledger.start,fiscalyear:"
+msgid "Fiscal Year"
+msgstr "Ejercicio fiscal"
+
+msgctxt "field:account_jasper_reports.print_general_ledger.start,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:account_jasper_reports.print_general_ledger.start,output_type:"
+msgid "Output Type"
+msgstr "Tipo de fichero"
+
+msgctxt "field:account_jasper_reports.print_general_ledger.start,parties:"
+msgid "Parties"
+msgstr "Terceros"
+
+msgctxt ""
+"field:account_jasper_reports.print_general_ledger.start,start_period:"
+msgid "Start Period"
+msgstr "Período inicial"
+
+msgctxt "field:account_jasper_reports.print_journal.start,company:"
+msgid "Company"
+msgstr "Empresa"
+
+msgctxt "field:account_jasper_reports.print_journal.start,end_period:"
+msgid "End Period"
+msgstr "Período final"
+
+msgctxt "field:account_jasper_reports.print_journal.start,fiscalyear:"
+msgid "Fiscal Year"
+msgstr "Ejercicio fiscal"
+
+msgctxt "field:account_jasper_reports.print_journal.start,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:account_jasper_reports.print_journal.start,journals:"
+msgid "Journals"
+msgstr "Diarios"
+
+msgctxt "field:account_jasper_reports.print_journal.start,output_type:"
+msgid "Output Type"
+msgstr "Tipo de fichero"
+
+msgctxt "field:account_jasper_reports.print_journal.start,start_period:"
+msgid "Start Period"
+msgstr "Período inicial"
+
+msgctxt "field:account_jasper_reports.print_taxes_by_invoice.start,company:"
+msgid "Company"
+msgstr "Empresa"
+
+msgctxt ""
+"field:account_jasper_reports.print_taxes_by_invoice.start,fiscalyear:"
+msgid "Fiscal Year"
+msgstr "Ejercicio fiscal"
+
+msgctxt "field:account_jasper_reports.print_taxes_by_invoice.start,grouping:"
+msgid "Grouping"
+msgstr "Agrupación"
+
+msgctxt "field:account_jasper_reports.print_taxes_by_invoice.start,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt ""
+"field:account_jasper_reports.print_taxes_by_invoice.start,output_type:"
+msgid "Output Type"
+msgstr "Tipo de fichero"
+
+msgctxt "field:account_jasper_reports.print_taxes_by_invoice.start,parties:"
+msgid "Parties"
+msgstr "Terceros"
+
+msgctxt ""
+"field:account_jasper_reports.print_taxes_by_invoice.start,partner_type:"
+msgid "Partner Type"
+msgstr "Tipo de tercero"
+
+msgctxt "field:account_jasper_reports.print_taxes_by_invoice.start,periods:"
+msgid "Periods"
+msgstr "Períodos"
+
+msgctxt ""
+"field:account_jasper_reports.print_taxes_by_invoice.start,report_type:"
+msgid "Report"
+msgstr "Informe"
+
+msgctxt ""
+"field:account_jasper_reports.print_taxes_by_invoice.start,totals_only:"
+msgid "Totals Only"
+msgstr "Solo totales"
+
+msgctxt "field:account_jasper_reports.print_trial_balance.start,accounts:"
+msgid "Accounts"
+msgstr "Cuentas"
+
+msgctxt "field:account_jasper_reports.print_trial_balance.start,company:"
+msgid "Company"
+msgstr "Empresa"
+
+msgctxt ""
+"field:account_jasper_reports.print_trial_balance.start,comparison_end_period:"
+msgid "End Period"
+msgstr "Período final"
+
+msgctxt ""
+"field:account_jasper_reports.print_trial_balance.start,comparison_fiscalyear:"
+msgid "Fiscal Year"
+msgstr "Ejercicio fiscal"
+
+msgctxt ""
+"field:account_jasper_reports.print_trial_balance.start,comparison_start_period:"
+msgid "Start Period"
+msgstr "Período inicial"
+
+msgctxt "field:account_jasper_reports.print_trial_balance.start,end_period:"
+msgid "End Period"
+msgstr "Período final"
+
+msgctxt "field:account_jasper_reports.print_trial_balance.start,fiscalyear:"
+msgid "Fiscal Year"
+msgstr "Ejercicio fiscal"
+
+msgctxt "field:account_jasper_reports.print_trial_balance.start,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:account_jasper_reports.print_trial_balance.start,output_type:"
+msgid "Output Type"
+msgstr "Tipo de fichero"
+
+msgctxt "field:account_jasper_reports.print_trial_balance.start,parties:"
+msgid "Parties"
+msgstr "Terceros"
+
+msgctxt "field:account_jasper_reports.print_trial_balance.start,show_digits:"
+msgid "Digits"
+msgstr "Dígitos"
+
+msgctxt ""
+"field:account_jasper_reports.print_trial_balance.start,split_parties:"
+msgid "Split Parties"
+msgstr "Separar terceros"
+
+msgctxt "field:account_jasper_reports.print_trial_balance.start,start_period:"
+msgid "Start Period"
+msgstr "Período inicial"
+
+msgctxt ""
+"field:account_jasper_reports.print_trial_balance.start,with_move_only:"
+msgid "Only Accounts With Move"
+msgstr "Solo cuentas con apuntes"
+
+msgctxt "model:account_jasper_reports.print_general_ledger.start,name:"
+msgid "Print General Ledger"
+msgstr "Imprimir libro mayor"
+
+msgctxt "model:account_jasper_reports.print_journal.start,name:"
+msgid "Print Journal"
+msgstr "Imprimir Diario"
+
+msgctxt "model:account_jasper_reports.print_taxes_by_invoice.start,name:"
+msgid "Print Taxes by Invoice and Period"
+msgstr "Imprimir impuestos por factura i período"
+
+msgctxt "model:account_jasper_reports.print_trial_balance.start,name:"
+msgid "Print Trial Balance Start"
+msgstr "Inicio Imprimir balance de sumas y saldos"
+
+msgctxt "model:ir.action,name:report_general_ledger"
+msgid "General Ledger"
+msgstr "Libro mayor"
+
+msgctxt "model:ir.action,name:report_journal"
+msgid "Journal"
+msgstr "Diario"
+
+msgctxt "model:ir.action,name:report_taxes_by_invoice"
+msgid "Taxes by Invoice and Period"
+msgstr "Impuestos por factura y período"
+
+msgctxt "model:ir.action,name:report_taxes_by_invoice_and_period"
+msgid "Taxes by Invoice and Period"
+msgstr "Impuestos por factura y período"
+
+msgctxt "model:ir.action,name:report_trial_balance"
+msgid "Trial Balance"
+msgstr "Balance de sumas y saldos"
+
+msgctxt "model:ir.action,name:wizard_print_general_ledger"
+msgid "Print General Ledger"
+msgstr "Imprimir libro mayor"
+
+msgctxt "model:ir.action,name:wizard_print_journal"
+msgid "Print Journal"
+msgstr "Imprimir Diario"
+
+msgctxt "model:ir.action,name:wizard_print_taxes_by_invoice"
+msgid "Print Taxes by Invoice and Period"
+msgstr "Imprimir impuestos por factura i período"
+
+msgctxt "model:ir.action,name:wizard_print_trial_balance"
+msgid "Print Trial Balance"
+msgstr "Imprimir balance de sumas y saldos"
+
+msgctxt "model:ir.action.report,name:report_general_ledger"
+msgid "General Ledger"
+msgstr "Libro mayor"
+
+msgctxt "model:ir.action.report,name:report_journal"
+msgid "Journal"
+msgstr "Diario"
+
+msgctxt "model:ir.action.report,name:report_taxes_by_invoice"
+msgid "Taxes by Invoice and Period"
+msgstr "Impuestos por factura y período"
+
+msgctxt "model:ir.action.report,name:report_taxes_by_invoice_and_period"
+msgid "Taxes by Invoice and Period"
+msgstr "Impuestos por factura y período"
+
+msgctxt "model:ir.action.report,name:report_trial_balance"
+msgid "Trial Balance"
+msgstr "Balance de sumas y saldos"
+
+msgctxt "model:ir.action.wizard,name:wizard_print_general_ledger"
+msgid "Print General Ledger"
+msgstr "Imprimir libro mayor"
+
+msgctxt "model:ir.action.wizard,name:wizard_print_journal"
+msgid "Print Journal"
+msgstr "Imprimir Diario"
+
+msgctxt "model:ir.action.wizard,name:wizard_print_taxes_by_invoice"
+msgid "Print Taxes by Invoice and Period"
+msgstr "Imprimir impuestos por factura i período"
+
+msgctxt "model:ir.action.wizard,name:wizard_print_trial_balance"
+msgid "Print Trial Balance"
+msgstr "Imprimir balance de sumas y saldos"
+
+msgctxt "model:ir.ui.menu,name:menu_print_general_ledger"
+msgid "Print General Ledger"
+msgstr "Imprimir libro mayor"
+
+msgctxt "model:ir.ui.menu,name:menu_print_journal"
+msgid "Print Journal"
+msgstr "Imprimir Diario"
+
+msgctxt "model:ir.ui.menu,name:menu_print_taxes_by_invoice"
+msgid "Print Taxes by Invoice and Period"
+msgstr "Imprimir impuestos por factura i período"
+
+msgctxt "model:ir.ui.menu,name:menu_print_trial_balance"
+msgid "Print Trial Balance"
+msgstr "Imprimir balance de sumas y saldos"
+
+msgctxt "model:ir.ui.menu,name:menu_reporting_es"
+msgid "Informes ES"
+msgstr "Informes ES"
+
+msgctxt ""
+"selection:account_jasper_reports.print_general_ledger.start,output_type:"
+msgid "PDF"
+msgstr "PDF"
+
+msgctxt ""
+"selection:account_jasper_reports.print_general_ledger.start,output_type:"
+msgid "XLS"
+msgstr "XLS"
+
+msgctxt "selection:account_jasper_reports.print_journal.start,output_type:"
+msgid "PDF"
+msgstr "PDF"
+
+msgctxt "selection:account_jasper_reports.print_journal.start,output_type:"
+msgid "XLS"
+msgstr "XLS"
+
+msgctxt ""
+"selection:account_jasper_reports.print_taxes_by_invoice.start,grouping:"
+msgid "Base Tax Code"
+msgstr "Codigos de Impuestos"
+
+msgctxt ""
+"selection:account_jasper_reports.print_taxes_by_invoice.start,grouping:"
+msgid "Invoice"
+msgstr "Factura"
+
+msgctxt ""
+"selection:account_jasper_reports.print_taxes_by_invoice.start,output_type:"
+msgid "PDF"
+msgstr "PDF"
+
+msgctxt ""
+"selection:account_jasper_reports.print_taxes_by_invoice.start,output_type:"
+msgid "XLS"
+msgstr "XLS"
+
+msgctxt ""
+"selection:account_jasper_reports.print_taxes_by_invoice.start,partner_type:"
+msgid "Customers"
+msgstr "Clientes"
+
+msgctxt ""
+"selection:account_jasper_reports.print_taxes_by_invoice.start,partner_type:"
+msgid "Suppliers"
+msgstr "Proveedores"
+
+msgctxt ""
+"selection:account_jasper_reports.print_taxes_by_invoice.start,report_type:"
+msgid "Taxes by Invoice"
+msgstr "Impuestos por factura"
+
+msgctxt ""
+"selection:account_jasper_reports.print_trial_balance.start,output_type:"
+msgid "PDF"
+msgstr "PDF"
+
+msgctxt ""
+"selection:account_jasper_reports.print_trial_balance.start,output_type:"
+msgid "XLS"
+msgstr "XLS"
+
+msgctxt "wizard_button:account_jasper_reports.print_general_ledger,start,end:"
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgctxt ""
+"wizard_button:account_jasper_reports.print_general_ledger,start,print_:"
+msgid "Print"
+msgstr "Imprimir"
+
+msgctxt "wizard_button:account_jasper_reports.print_journal,start,end:"
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgctxt "wizard_button:account_jasper_reports.print_journal,start,print_:"
+msgid "Print"
+msgstr "Imprimir"
+
+msgctxt ""
+"wizard_button:account_jasper_reports.print_taxes_by_invoice,start,end:"
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgctxt ""
+"wizard_button:account_jasper_reports.print_taxes_by_invoice,start,print_:"
+msgid "Print"
+msgstr "Imprimir"
+
+msgctxt "wizard_button:account_jasper_reports.print_trial_balance,start,end:"
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgctxt ""
+"wizard_button:account_jasper_reports.print_trial_balance,start,print_:"
+msgid "Print"
+msgstr "Imprimir"
