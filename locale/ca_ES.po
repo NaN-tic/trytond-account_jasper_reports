@@ -2,6 +2,33 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
+msgctxt "field:account_jasper_reports.print_abreviated_journal.start,company:"
+msgid "Company"
+msgstr "Empresa"
+
+msgctxt ""
+"field:account_jasper_reports.print_abreviated_journal.start,display_account:"
+msgid "Display Accounts"
+msgstr "Mostra comptes"
+
+msgctxt ""
+"field:account_jasper_reports.print_abreviated_journal.start,fiscalyear:"
+msgid "Fiscal Year"
+msgstr "Exercici fiscal"
+
+msgctxt "field:account_jasper_reports.print_abreviated_journal.start,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:account_jasper_reports.print_abreviated_journal.start,level:"
+msgid "Level"
+msgstr "Nivell"
+
+msgctxt ""
+"field:account_jasper_reports.print_abreviated_journal.start,output_type:"
+msgid "Output Type"
+msgstr "Tipus de fitxer"
+
 msgctxt "field:account_jasper_reports.print_general_ledger.start,accounts:"
 msgid "Accounts"
 msgstr "Comptes"
@@ -169,6 +196,14 @@ msgctxt ""
 msgid "Only Accounts With Move"
 msgstr "Nomes comptes amb apunts"
 
+msgctxt "help:account_jasper_reports.print_abreviated_journal.start,level:"
+msgid "Display accounts of this level"
+msgstr "Mostra comptes d'aquest nivell"
+
+msgctxt "model:account_jasper_reports.print_abreviated_journal.start,name:"
+msgid "Print Abreviated Journal"
+msgstr "Imprimeix diari reduït"
+
 msgctxt "model:account_jasper_reports.print_general_ledger.start,name:"
 msgid "Print General Ledger"
 msgstr "Imprimeix llibre major"
@@ -184,6 +219,10 @@ msgstr "Imprmeix Impostos per factura i període"
 msgctxt "model:account_jasper_reports.print_trial_balance.start,name:"
 msgid "Print Trial Balance Start"
 msgstr "Inici Imprimeix balanç de sumes i saldos"
+
+msgctxt "model:ir.action,name:report_abreviated_journal"
+msgid "Abreviated Journal"
+msgstr "Diari Abreviat"
 
 msgctxt "model:ir.action,name:report_general_ledger"
 msgid "General Ledger"
@@ -205,6 +244,10 @@ msgctxt "model:ir.action,name:report_trial_balance"
 msgid "Trial Balance"
 msgstr "Balanç de sumes i saldos"
 
+msgctxt "model:ir.action,name:wizard_print_abreviated_journal"
+msgid "Print Abreviated Journal"
+msgstr "Imprimeix diari abreviat"
+
 msgctxt "model:ir.action,name:wizard_print_general_ledger"
 msgid "Print General Ledger"
 msgstr "Imprimeix llibre major"
@@ -220,6 +263,10 @@ msgstr "Imprmeix Impostos per factura i període"
 msgctxt "model:ir.action,name:wizard_print_trial_balance"
 msgid "Print Trial Balance"
 msgstr "Imprimeix balanç de sumes i saldos"
+
+msgctxt "model:ir.action.report,name:report_abreviated_journal"
+msgid "Abreviated Journal"
+msgstr "Diari Abreviat"
 
 msgctxt "model:ir.action.report,name:report_general_ledger"
 msgid "General Ledger"
@@ -241,6 +288,10 @@ msgctxt "model:ir.action.report,name:report_trial_balance"
 msgid "Trial Balance"
 msgstr "Balanç de sumes i saldos"
 
+msgctxt "model:ir.action.wizard,name:wizard_print_abreviated_journal"
+msgid "Print Abreviated Journal"
+msgstr "Imprimeix diari abreviat"
+
 msgctxt "model:ir.action.wizard,name:wizard_print_general_ledger"
 msgid "Print General Ledger"
 msgstr "Imprimeix llibre major"
@@ -256,6 +307,10 @@ msgstr "Imprimeix Impostos per factura i període"
 msgctxt "model:ir.action.wizard,name:wizard_print_trial_balance"
 msgid "Print Trial Balance"
 msgstr "Imprimeix balanç de sumes i saldos"
+
+msgctxt "model:ir.ui.menu,name:menu_print_abreviated_journal"
+msgid "Print Abreviated Journal"
+msgstr "Imprimeix diari abreviat"
 
 msgctxt "model:ir.ui.menu,name:menu_print_general_ledger"
 msgid "Print General Ledger"
@@ -276,6 +331,26 @@ msgstr "Imprimeix balanç de sumes i saldos"
 msgctxt "model:ir.ui.menu,name:menu_reporting_es"
 msgid "Informes ES"
 msgstr "Informes ES"
+
+msgctxt ""
+"selection:account_jasper_reports.print_abreviated_journal.start,display_account:"
+msgid "All"
+msgstr "Tots"
+
+msgctxt ""
+"selection:account_jasper_reports.print_abreviated_journal.start,display_account:"
+msgid "With movements"
+msgstr "Amb moviments"
+
+msgctxt ""
+"selection:account_jasper_reports.print_abreviated_journal.start,output_type:"
+msgid "PDF"
+msgstr "PDF"
+
+msgctxt ""
+"selection:account_jasper_reports.print_abreviated_journal.start,output_type:"
+msgid "XLS"
+msgstr "XLS"
 
 msgctxt ""
 "selection:account_jasper_reports.print_general_ledger.start,output_type:"
@@ -339,6 +414,16 @@ msgctxt ""
 "selection:account_jasper_reports.print_trial_balance.start,output_type:"
 msgid "XLS"
 msgstr "XLS"
+
+msgctxt ""
+"wizard_button:account_jasper_reports.print_abreviated_journal,start,end:"
+msgid "Cancel"
+msgstr "Cancel·la"
+
+msgctxt ""
+"wizard_button:account_jasper_reports.print_abreviated_journal,start,print_:"
+msgid "Print"
+msgstr "Imprimir"
 
 msgctxt "wizard_button:account_jasper_reports.print_general_ledger,start,end:"
 msgid "Cancel"
