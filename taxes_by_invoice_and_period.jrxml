@@ -59,6 +59,7 @@
 	<field name="invoice_total_amount" class="java.lang.Number">
 		<fieldDescription><![CDATA[invoice-invoice/total_amount-total_amount]]></fieldDescription>
 	</field>
+	<sortField name="base_code_name"/>
 	<sortField name="period"/>
 	<sortField name="number"/>
 	<variable name="L" class="java.util.Locale">

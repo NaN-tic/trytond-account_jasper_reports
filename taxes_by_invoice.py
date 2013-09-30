@@ -163,7 +163,8 @@ class TaxesByInvoiceReport(JasperReport):
         if parties:
             domain += [('invoice.party', 'in', parties)],
 
-        report_ids = [x.id for x in AccountInvoiceTax.search(domain)]
+        report_ids = [x.id for x in AccountInvoiceTax.search(domain,
+            order=[('account', 'ASC')])]
         return super(TaxesByInvoiceReport, cls).execute(report_ids, {
                 'name': cls.__name__,
                 'parameters': parameters,
