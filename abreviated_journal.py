@@ -97,7 +97,8 @@ class AbreviatedJournalReport(JasperReport):
         # Calculate the account level
         account_ids = []
         level = data['level']
-        for account in Account.search([('company', '=', data['company'])]):
+        for account in Account.search([('company', '=', data['company'])],
+                order=[('code', 'ASC')]):
             if len(account.code) == level or \
                 account.kind != 'view' and len(account.childs) == 0 and \
                     len(account.code) < level:

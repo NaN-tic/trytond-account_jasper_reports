@@ -117,20 +117,18 @@ class TaxesByInvoiceReport(JasperReport):
         Party = pool.get('party.party')
         AccountInvoiceTax = pool.get('account.invoice.tax')
         fiscalyear = FiscalYear(data['fiscalyear'])
-        periods = Period.browse(data.get('periods', []))
-        parties = Party.browse(data.get('parties', []))
-
-        if periods:
+        periods = []
+        if data.get('periods'):
+            periods = Period.browse(data.get('periods', []))
             periods_subtitle = []
             for x in periods:
-                if len(periods_subtitle) > 8:
-                    periods_subtitle.append('...')
-                    break
                 periods_subtitle.append(x.rec_name)
             periods_subtitle = '; '.join(periods_subtitle)
         else:
+            periods = Period.search([('fiscalyear', '=', fiscalyear.id)])
             periods_subtitle = ''
 
+        parties = Party.browse(data.get('parties', []))
         if parties:
             parties_subtitle = []
             for x in parties:
