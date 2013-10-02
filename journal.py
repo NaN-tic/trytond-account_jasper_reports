@@ -4,9 +4,8 @@
 from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.model import ModelView, fields
-from trytond.wizard import Wizard, StateView, StateAction, StateTransition, \
-    Button
-from trytond.pyson import Eval, Bool
+from trytond.wizard import Wizard, StateView, StateAction, Button
+from trytond.pyson import Eval
 from trytond.modules.jasper_reports.jasper import JasperReport
 
 __all__ = ['PrintJournalStart', 'PrintJournal', 'JournalReport']

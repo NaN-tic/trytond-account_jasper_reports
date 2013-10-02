@@ -503,7 +503,7 @@ class TrialBalanceReport(JasperReport):
 
         if parties:
             parties_subtitle = []
-            for x in paries:
+            for x in parties:
                 if len(parties_subtitle) > 4:
                     parties_subtitle.append('...')
                     break
