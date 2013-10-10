@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="diary" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a2e6542d-192c-4c06-aba2-26e19b94d2f3">
 	<property name="ireport.zoom" value="1.7715610000000026"/>
-	<property name="ireport.x" value="111"/>
-	<property name="ireport.y" value="48"/>
+	<property name="ireport.x" value="68"/>
+	<property name="ireport.y" value="81"/>
 	<property name="ireport.layers" value="##Tue Jun 25 17:11:49 CEST 2013\nlayer.0.name=Background\nlayer.0.visible=true\nlayer.0.id=0"/>
 	<style name="table">
 		<box>
@@ -51,6 +51,8 @@
 	<field name="month" class="java.lang.String">
 		<fieldDescription><![CDATA[month]]></fieldDescription>
 	</field>
+	<sortField name="month"/>
+	<sortField name="code"/>
 	<variable name="debit_1" class="java.lang.Number" resetType="Group" resetGroup="mes" calculation="Sum">
 		<variableExpression><![CDATA[$F{debit}]]></variableExpression>
 	</variable>
