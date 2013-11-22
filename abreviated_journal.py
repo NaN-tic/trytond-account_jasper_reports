@@ -2,10 +2,16 @@
 #This file is part of account_jasper_reports for tryton.  The COPYRIGHT file
 #at the top level of this repository contains the full copyright notices and
 #license terms.
+from decimal import Decimal
+from sql.aggregate import Sum
+from sql.conditionals import Coalesce
+from sql.operators import In
+
 from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateAction, Button
+from trytond.tools import reduce_ids
 from trytond.modules.jasper_reports.jasper import JasperReport
 
 __all__ = ['PrintAbreviatedJournalStart', 'PrintAbreviatedJournal',
@@ -84,16 +90,27 @@ class AbreviatedJournalReport(JasperReport):
 
         pool = Pool()
         Account = pool.get('account.account')
+        Move = pool.get('account.move')
+        MoveLine = pool.get('account.move.line')
         Period = pool.get('account.period')
         FiscalYear = pool.get('account.fiscalyear')
+        line = MoveLine.__table__()
+        move = Move.__table__()
+        table_a = Account.__table__()
+        table_c = Account.__table__()
 
         fiscalyear = FiscalYear(data['fiscalyear'])
         transaction = Transaction()
+        cursor = transaction.cursor
+        in_max = cursor.IN_MAX
 
         res = []
         parameters = {}
         parameters['fiscal_year'] = fiscalyear.rec_name
 
+        move_join = 'LEFT'
+        if data['display_account'] == 'bal_movement':
+            move_join = 'INNER'
         # Calculate the account level
         account_ids = []
         level = data['level']
@@ -103,26 +120,39 @@ class AbreviatedJournalReport(JasperReport):
                 account.kind != 'view' and len(account.childs) == 0 and \
                     len(account.code) < level:
                 account_ids.append(account.id)
-
+        group_by = (table_a.id, table_a.kind, table_a.code, table_a.name)
+        columns = (group_by + (Sum(Coalesce(line.debit, 0)).as_('debit'),
+                Sum(Coalesce(line.credit, 0)).as_('credit')))
         periods = Period.search([('fiscalyear', '=', fiscalyear)])
         for period in periods:
-            with transaction.set_context(periods=[period.id]):
-                for account in Account.read(account_ids,
-                        ['kind', 'code', 'name', 'debit', 'credit']):
+            all_accounts = []
+            for i in range(0, len(account_ids), in_max):
+                sub_ids = account_ids[i:i + in_max]
+                red_sql = reduce_ids(table_a.id, sub_ids)
+                cursor.execute(*table_a.join(table_c,
+                        condition=(table_c.left >= table_a.left)
+                        & (table_c.right <= table_a.right)
+                        ).join(line, move_join,
+                            condition=line.account == table_c.id
+                        ).join(move, move_join,
+                            condition=move.id == line.move
+                        ).select(
+                            *columns,
+                            where=red_sql &
+                            (Coalesce(move.period, period.id) == period.id),
+                            group_by=group_by))
 
-                    display = data['display_account']
-                    # Check if we need to include this account
-                    if display == 'bal_all' or display == 'bal_movement' and \
-                            (account['debit'] != 0.0 or
-                            account['credit'] != 0.0):
-                        res.append({
-                                'month': period.rec_name,
-                                'type': account['kind'],
-                                'code': account['code'],
-                                'name': account['name'],
-                                'debit': account['debit'],
-                                'credit': account['credit'],
-                            })
+                result = cursor.dictfetchall()
+                all_accounts.extend(result)
+            for account in all_accounts:
+                    res.append({
+                            'month': period.rec_name,
+                            'type': account['kind'],
+                            'code': account['code'],
+                            'name': account['name'],
+                            'debit': account['debit'],
+                            'credit': account['credit'],
+                        })
 
         return super(AbreviatedJournalReport, cls).execute(ids, {
                 'name': 'account_jasper_reports.journal',
