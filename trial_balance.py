@@ -57,7 +57,7 @@ class PrintTrialBalanceStart(ModelView):
     comparison_start_period = fields.Many2One('account.period', 'Start Period',
         domain=[
             ('fiscalyear', '=', Eval('comparison_fiscalyear')),
-            ('start_date', '<=', (Eval('comparision_end_period'),
+            ('start_date', '<=', (Eval('comparison_end_period'),
                     'start_date')),
             ],
         states={
@@ -67,7 +67,7 @@ class PrintTrialBalanceStart(ModelView):
     comparison_end_period = fields.Many2One('account.period', 'End Period',
         domain=[
             ('fiscalyear', '=', Eval('comparison_fiscalyear')),
-            ('start_date', '>=', (Eval('comparision_start_period'),
+            ('start_date', '>=', (Eval('comparison_start_period'),
                     'start_date'))
             ],
         states={
