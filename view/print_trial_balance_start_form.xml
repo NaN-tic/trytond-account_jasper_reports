@@ -37,6 +37,6 @@ copyright notices and license terms. -->
         <field name="comparison_end_period"/>
     </group>
 
-    <label name="output_type"/>
-    <field name="output_type"/>
+    <label name="output_format"/>
+    <field name="output_format"/>
 </form>

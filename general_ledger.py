@@ -34,10 +34,10 @@ class PrintGeneralLedgerStart(ModelView):
         depends=['fiscalyear', 'start_period'])
     accounts = fields.Many2Many('account.account', None, None, 'Accounts')
     parties = fields.Many2Many('party.party', None, None, 'Parties')
-    output_type = fields.Selection([
+    output_format = fields.Selection([
             ('pdf', 'PDF'),
             ('xls', 'XLS'),
-            ], 'Output Type', required=True)
+            ], 'Output Format', required=True)
     company = fields.Many2One('company.company', 'Company', required=True)
 
     @staticmethod
@@ -51,7 +51,7 @@ class PrintGeneralLedgerStart(ModelView):
         return Transaction().context.get('company')
 
     @staticmethod
-    def default_output_type():
+    def default_output_format():
         return 'pdf'
 
     def on_change_fiscalyear(self):
@@ -85,7 +85,7 @@ class PrintGeneralLedger(Wizard):
             'end_period': end_period,
             'accounts': [x.id for x in self.start.accounts],
             'parties': [x.id for x in self.start.parties],
-            'output_type': self.start.output_type,
+            'output_format': self.start.output_format,
             }
         return action, data
 
@@ -244,5 +244,5 @@ class GeneralLedgerReport(JasperReport):
                 'data_source': 'records',
                 'records': records,
                 'parameters': parameters,
-                'output_format': data['output_type'],
+                'output_format': data['output_format'],
                 })

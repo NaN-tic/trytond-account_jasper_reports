@@ -30,10 +30,10 @@ class PrintJournalStart(ModelView):
             ],
         depends=['fiscalyear', 'start_period'])
     journals = fields.Many2Many('account.journal', None, None, 'Journals')
-    output_type = fields.Selection([
+    output_format = fields.Selection([
             ('pdf', 'PDF'),
             ('xls', 'XLS'),
-            ], 'Output Type', required=True)
+            ], 'Output Format', required=True)
     company = fields.Many2One('company.company', 'Company', required=True)
 
     @staticmethod
@@ -47,7 +47,7 @@ class PrintJournalStart(ModelView):
         return Transaction().context.get('company')
 
     @staticmethod
-    def default_output_type():
+    def default_output_format():
         return 'pdf'
 
     def on_change_fiscalyear(self):
@@ -79,7 +79,7 @@ class PrintJournal(Wizard):
             'start_period': start_period,
             'end_period': end_period,
             'journals': [x.id for x in self.start.journals],
-            'output_type': self.start.output_type,
+            'output_format': self.start.output_format,
             }
         return action, data
 
@@ -152,5 +152,5 @@ class JournalReport(JasperReport):
                 'model': 'account.move.line',
                 'data_source': 'model',
                 'parameters': parameters,
-                'output_format': data['output_type'],
+                'output_format': data['output_format'],
                 })

@@ -26,17 +26,17 @@ class PrintTaxesByInvoiceAndPeriodStart(ModelView):
     partner_type = fields.Selection([
             ('customers', 'Customers'),
             ('suppliers', 'Suppliers'),
-            ], 'Partner Type', required=True)
+            ], 'Party Type', required=True)
     grouping = fields.Selection([
             ('base_tax_code', 'Base Tax Code'),
             ('invoice', 'Invoice'),
             ], 'Grouping', required=True)
     totals_only = fields.Boolean('Totals Only')
     parties = fields.Many2Many('party.party', None, None, 'Parties')
-    output_type = fields.Selection([
+    output_format = fields.Selection([
             ('pdf', 'PDF'),
             ('xls', 'XLS'),
-            ], 'Output Type', required=True)
+            ], 'Output Format', required=True)
     company = fields.Many2One('company.company', 'Company', required=True)
 
     @staticmethod
@@ -58,7 +58,7 @@ class PrintTaxesByInvoiceAndPeriodStart(ModelView):
         return Transaction().context.get('company')
 
     @staticmethod
-    def default_output_type():
+    def default_output_format():
         return 'pdf'
 
     def on_change_fiscalyear(self):
@@ -81,7 +81,7 @@ class PrintTaxesByInvoiceAndPeriod(Wizard):
             'fiscalyear': self.start.fiscalyear.id,
             'periods': [x.id for x in self.start.periods],
             'parties': [x.id for x in self.start.parties],
-            'output_type': self.start.output_type,
+            'output_format': self.start.output_format,
             'partner_type': self.start.partner_type,
             'totals_only': self.start.totals_only,
             'grouping': self.start.grouping,
@@ -166,7 +166,7 @@ class TaxesByInvoiceReport(JasperReport):
         return super(TaxesByInvoiceReport, cls).execute(report_ids, {
                 'name': cls.__name__,
                 'parameters': parameters,
-                'output_format': data['output_type'],
+                'output_format': data['output_format'],
                 })
 
 

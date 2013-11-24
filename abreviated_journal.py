@@ -23,10 +23,10 @@ class PrintAbreviatedJournalStart(ModelView):
     __name__ = 'account_jasper_reports.print_abreviated_journal.start'
     fiscalyear = fields.Many2One('account.fiscalyear', 'Fiscal Year',
             required=True)
-    output_type = fields.Selection([
+    output_format = fields.Selection([
             ('pdf', 'PDF'),
             ('xls', 'XLS'),
-            ], 'Output Type', required=True)
+            ], 'Output Format', required=True)
     display_account = fields.Selection([
             ('bal_all', 'All'),
             ('bal_movement', 'With movements'),
@@ -46,7 +46,7 @@ class PrintAbreviatedJournalStart(ModelView):
         return Transaction().context.get('company')
 
     @staticmethod
-    def default_output_type():
+    def default_output_format():
         return 'pdf'
 
     @staticmethod
@@ -74,7 +74,7 @@ class PrintAbreviatedJournal(Wizard):
             'fiscalyear': self.start.fiscalyear.id,
             'display_account': self.start.display_account,
             'level': self.start.level,
-            'output_type': self.start.output_type,
+            'output_format': self.start.output_format,
             }
         return action, data
 
@@ -159,5 +159,5 @@ class AbreviatedJournalReport(JasperReport):
                 'data_source': 'records',
                 'records': res,
                 'parameters': parameters,
-                'output_format': data['output_type'],
+                'output_format': data['output_format'],
                 })

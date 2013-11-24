@@ -267,7 +267,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="8" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
-				<textFieldExpression><![CDATA[tr($V{L},"Partner")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[tr($V{L},"Party")]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement uuid="747b1b2a-9b54-4d44-ae6d-a04f294d18e6" x="10" y="7" width="48" height="12"/>

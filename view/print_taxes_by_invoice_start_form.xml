@@ -17,6 +17,6 @@ copyright notices and license terms. -->
     <field name="periods" colspan="4"/>
     <label id="select_parties" string="Left empty to select all parties"/>
     <field name="parties" colspan="4"/>
-    <label name="output_type"/>
-    <field name="output_type"/>
+    <label name="output_format"/>
+    <field name="output_format"/>
 </form>

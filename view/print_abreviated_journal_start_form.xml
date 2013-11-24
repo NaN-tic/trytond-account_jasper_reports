@@ -10,6 +10,6 @@ copyright notices and license terms. -->
     <field name="display_account"/>
     <label name="level"/>
     <field name="level"/>
-    <label name="output_type"/>
-    <field name="output_type"/>
+    <label name="output_format"/>
+    <field name="output_format"/>
 </form>
