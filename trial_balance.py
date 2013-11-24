@@ -94,11 +94,11 @@ class PrintTrialBalanceStart(ModelView):
             Transaction().context.get('company'), exception=False)
         clause = [
             ('fiscalyear', '=', fiscalyear),
-            ('type', '=', 'adjustment'),
             ]
-        period, = Period.search(clause, order=[('start_date', 'ASC')],
+        periods = Period.search(clause, order=[('start_date', 'ASC')],
             limit=1)
-        return period.id
+        if periods:
+            return periods[0].id
 
     @staticmethod
     def default_end_period():
@@ -115,9 +115,10 @@ class PrintTrialBalanceStart(ModelView):
             ('start_date', '<=', date),
             ('end_date', '>=', date),
             ]
-        period, = Period.search(clause, order=[('start_date', 'ASC')],
+        periods = Period.search(clause, order=[('start_date', 'ASC')],
             limit=1)
-        return period.id
+        if periods:
+            return periods[0].id
 
     @staticmethod
     def default_company():
