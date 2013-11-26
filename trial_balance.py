@@ -274,7 +274,7 @@ class TrialBalanceReport(JasperReport):
             return {
                 'code': account.code,
                 'name': party and party.name or account.name,
-                'type': account.type,
+                'type': account.kind,
                 'period_initial_balance': init,
                 'period_credit': credit,
                 'period_debit': debit,
@@ -420,12 +420,17 @@ class TrialBalanceReport(JasperReport):
             chunk = accounts[index * offset: (index + 1) * offset]
             index += 1
             for account in chunk:
-                logger.info('Calc values for account:' + account.code)
-                if digits and len(account.code.strip()) < digits:
-                    continue
+                if digits:
+                    if len(account.code.strip()) < digits:
+                        continue
+                    elif len(account.code) == digits and account.kind == 'view':
+                        account.kind = 'other'
 
                 vals = _amounts(account, init_values, values)
                 initial, credit, debit, balance = vals
+
+                if with_moves and credit == 0 and debit == 0:
+                    continue
 
                 comp_vals = _amounts(account,
                     comparison_initial_values,  comparison_values)
@@ -464,7 +469,7 @@ class TrialBalanceReport(JasperReport):
 
                     continue
                 if split_parties and parties and \
-                        account.type in ['payable', 'receivable']:
+                        account.kind in ['payable', 'receivable']:
                     for party in parties:
                         logger.info('Calc values for account %s and party %s' %
                             (account.code, party.name))

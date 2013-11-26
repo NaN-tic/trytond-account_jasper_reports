@@ -19,7 +19,9 @@ class FiscalYear:
         domain = [('fiscalyear', '=', self)]
         if start_period:
             domain += [('start_date', '>=', start_period.start_date)]
+            domain += [('end_date', '>=', start_period.end_date)]
         if end_period:
+            domain += [('start_date', '<=', end_period.start_date)]
             domain += [('end_date', '<=', end_period.end_date)]
 
         periods = Period.search(domain)
