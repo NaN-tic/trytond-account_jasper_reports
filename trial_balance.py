@@ -33,6 +33,7 @@ class PrintTrialBalanceStart(ModelView):
     with_move_only = fields.Boolean('Only Accounts With Move')
     accounts = fields.Many2Many('account.account', None, None, 'Accounts')
     split_parties = fields.Boolean('Split Parties')
+    add_initial_balance = fields.Boolean('Add Initial Balance')
     parties = fields.Many2Many('party.party', None, None, 'Parties')
     start_period = fields.Many2One('account.period', 'Start Period',
         domain=[
@@ -170,6 +171,7 @@ class PrintTrialBalance(Wizard):
             'comparison_end_period': self.start.comparison_end_period and
                 self.start.comparison_end_period.id or None,
             'digits': self.start.show_digits or None,
+            'add_initial_balance': self.start.add_initial_balance,
             'with_move_only': self.start.with_move_only,
             'split_parties': self.start.split_parties,
             'accounts': [x.id for x in self.start.accounts],
@@ -268,9 +270,12 @@ class TrialBalanceReport(JasperReport):
             balance = ac_vals.get(party.id, {}).get('balance') or _ZERO
             return initial, credit, debit, balance
 
-        def _record(account, party, vals, comp):
+        def _record(account, party, vals, comp, add_initial_balance):
             init, credit, debit, balance = vals
             init_comp, credit_comp, debit_comp, balance_comp = comp
+            if add_initial_balance:
+                balance += init
+                balance_comp += init_comp
             return {
                 'code': account.code,
                 'name': party and party.name or account.name,
@@ -315,6 +320,7 @@ class TrialBalanceReport(JasperReport):
         accounts = data['accounts']
         parties = data['parties']
         digits = data['digits']
+        add_initial_balance = data['add_initial_balance']
         with_moves = data['with_move_only']
 
         periods = [x.id for x in fiscalyear.get_periods(start_period,
@@ -485,12 +491,13 @@ class TrialBalanceReport(JasperReport):
                             continue
 
                         record = _record(account, party,
-                            party_vals, party_comp_vals)
+                            party_vals, party_comp_vals, add_initial_balance)
 
                         records.append(record)
                         ok_records.append(account.code)
                 else:
-                    record = _record(account, None, vals, comp_vals)
+                    record = _record(account, None, vals, comp_vals,
+                        add_initial_balance)
                     records.append(record)
                     ok_records.append(account.code)
 

@@ -14,6 +14,9 @@ copyright notices and license terms. -->
     <label name="split_parties"/>
     <field name="split_parties"/>
     <newline/>
+    <label name="add_initial_balance"/>
+    <field name="add_initial_balance"/>
+    <newline/>
     <label id="all_parties" string="All parties if Empty" colspan="4"/>
     <field name="parties" colspan="4"/>
     <label id="all_accounts" string="All accounts if Empty" colspan="4"/>

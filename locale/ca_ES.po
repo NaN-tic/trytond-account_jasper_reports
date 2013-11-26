@@ -49,7 +49,8 @@ msgctxt "field:account_jasper_reports.print_general_ledger.start,id:"
 msgid "ID"
 msgstr "ID"
 
-msgctxt "field:account_jasper_reports.print_general_ledger.start,output_format:"
+msgctxt ""
+"field:account_jasper_reports.print_general_ledger.start,output_format:"
 msgid "Output Format"
 msgstr "Tipus de fitxer"
 
@@ -117,6 +118,11 @@ msgid "Parties"
 msgstr "Tercers"
 
 msgctxt ""
+"field:account_jasper_reports.print_taxes_by_invoice.start,partner_type:"
+msgid "Party Type"
+msgstr "Tipus de Tercer"
+
+msgctxt ""
 "field:account_jasper_reports.print_taxes_by_invoice.start,party_type:"
 msgid "Party Type"
 msgstr "Tipus de Tercer"
@@ -138,6 +144,11 @@ msgstr "Només totals"
 msgctxt "field:account_jasper_reports.print_trial_balance.start,accounts:"
 msgid "Accounts"
 msgstr "Comptes"
+
+msgctxt ""
+"field:account_jasper_reports.print_trial_balance.start,add_initial_balance:"
+msgid "Add Initial Balance"
+msgstr "Afegir balanç inicial"
 
 msgctxt "field:account_jasper_reports.print_trial_balance.start,company:"
 msgid "Company"
@@ -170,7 +181,8 @@ msgctxt "field:account_jasper_reports.print_trial_balance.start,id:"
 msgid "ID"
 msgstr "ID"
 
-msgctxt "field:account_jasper_reports.print_trial_balance.start,output_format:"
+msgctxt ""
+"field:account_jasper_reports.print_trial_balance.start,output_format:"
 msgid "Output Format"
 msgstr "Tipus de fitxer"
 
@@ -233,8 +245,8 @@ msgid "Journal"
 msgstr "Diari"
 
 msgctxt "model:ir.action,name:report_taxes_by_invoice"
-msgid "Taxes by Invoice and Period"
-msgstr "Impostos per factura i període"
+msgid "Taxes by Invoice"
+msgstr "Impostos per factura"
 
 msgctxt "model:ir.action,name:report_taxes_by_invoice_and_period"
 msgid "Taxes by Invoice and Period"
@@ -391,6 +403,16 @@ msgid "XLS"
 msgstr "XLS"
 
 msgctxt ""
+"selection:account_jasper_reports.print_taxes_by_invoice.start,partner_type:"
+msgid "Customers"
+msgstr "Clients"
+
+msgctxt ""
+"selection:account_jasper_reports.print_taxes_by_invoice.start,partner_type:"
+msgid "Suppliers"
+msgstr "Proveïdors"
+
+msgctxt ""
 "selection:account_jasper_reports.print_taxes_by_invoice.start,party_type:"
 msgid "Customers"
 msgstr "Clients"
@@ -414,6 +436,58 @@ msgctxt ""
 "selection:account_jasper_reports.print_trial_balance.start,output_format:"
 msgid "XLS"
 msgstr "XLS"
+
+msgctxt "view:account_jasper_reports.print_abreviated_journal.start:"
+msgid "Journal Report"
+msgstr "Informe Diari"
+
+msgctxt "view:account_jasper_reports.print_general_ledger.start:"
+msgid "General Ledger Report"
+msgstr "Informe de llibre al major"
+
+msgctxt "view:account_jasper_reports.print_general_ledger.start:"
+msgid "Left empty to select all accounts"
+msgstr "Deixar en blanc per seleccionar tots els comptes"
+
+msgctxt "view:account_jasper_reports.print_general_ledger.start:"
+msgid "Left empty to select all parties"
+msgstr "Deixar en blanc per seleccionar tots els tercers"
+
+msgctxt "view:account_jasper_reports.print_journal.start:"
+msgid "Journal Report"
+msgstr "Informe Diari"
+
+msgctxt "view:account_jasper_reports.print_journal.start:"
+msgid "Left empty to select all journals by default"
+msgstr "Deixar en blanc per seleccionar tots els diaris"
+
+msgctxt "view:account_jasper_reports.print_taxes_by_invoice.start:"
+msgid "Left empty to select all parties"
+msgstr "Deixar en blanc per seleccionar tots els tercers"
+
+msgctxt "view:account_jasper_reports.print_taxes_by_invoice.start:"
+msgid "Left empty to select all periods"
+msgstr "Deixar en blanc per seleccionar tots els perídoes"
+
+msgctxt "view:account_jasper_reports.print_taxes_by_invoice.start:"
+msgid "Taxes By Invoice"
+msgstr "Impostos per factura"
+
+msgctxt "view:account_jasper_reports.print_trial_balance.start:"
+msgid "All accounts if Empty"
+msgstr "Totes les comptes si es deixa en blanc"
+
+msgctxt "view:account_jasper_reports.print_trial_balance.start:"
+msgid "All parties if Empty"
+msgstr "Tots els tercers si es deixa buit"
+
+msgctxt "view:account_jasper_reports.print_trial_balance.start:"
+msgid "Comparison Period"
+msgstr "Període comparacio"
+
+msgctxt "view:account_jasper_reports.print_trial_balance.start:"
+msgid "Trial Balance Report"
+msgstr "Informe balanç de sumes i saldos"
 
 msgctxt ""
 "wizard_button:account_jasper_reports.print_abreviated_journal,start,end:"
