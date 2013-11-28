@@ -1,6 +1,8 @@
 #This file is part of account_jasper_reports for tryton.  The COPYRIGHT file
 #at the top level of this repository contains the full copyright notices and
 #license terms.
+from sql.aggregate import Sum
+from sql.conditionals import Coalesce
 from decimal import Decimal
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
@@ -40,42 +42,34 @@ class Party:
         res = {}
         pool = Pool()
         MoveLine = pool.get('account.move.line')
-        User = pool.get('res.user')
-        cursor = Transaction().cursor
+        Account = pool.get('account.account')
+        transaction = Transaction()
+        cursor = transaction.cursor
 
-        for name in [('credit', 'debit', 'balance')]:
-            res[name] = dict((p.id, Decimal('0.0')) for p in parties)
+        line = MoveLine.__table__()
+        account = Account.__table__()
 
-        user_id = Transaction().user
-        if user_id == 0 and 'user' in Transaction().context:
-            user_id = Transaction().context['user']
-        user = User(user_id)
-        if not user.company:
+        company = transaction.context.get('company')
+        if not company:
             return res
-        company_id = user.company.id
 
-        line_query, _ = MoveLine.query_get()
+        group_by = (line.party, line.account,)
+        columns = (group_by + (Sum(Coalesce(line.debit, 0)).as_('debit'),
+                Sum(Coalesce(line.credit, 0)).as_('credit'),
+                (Sum(Coalesce(line.debit, 0)) -
+                    Sum(Coalesce(line.credit, 0))).as_('balance')))
+        line_query, _ = MoveLine.query_get(line)
+        where = (line_query & account.active &
+            (account.company == company))
+        if accounts:
+            where = where & line.account.in_([a.id for a in accounts])
+        if parties:
+            where = where & line.party.in_([p.id for p in parties])
+        cursor.execute(*line.join(account,
+                condition=(line.account == account.id)
+                ).select(*columns, where=where, group_by=group_by))
 
-        cursor.execute('SELECT l.party, '
-                'l.account ,'
-                'SUM((COALESCE(l.debit, 0))) as debit ,'
-                'SUM((COALESCE(l.credit, 0))) as credit ,'
-                'SUM((COALESCE(l.debit, 0) - COALESCE(l.credit, 0))) as balance '
-            'FROM account_move_line AS l, account_account AS a '
-            'WHERE a.id = l.account '
-                'AND a.active '
-                'AND a.id IN '
-                    '(' + ','.join(('%s',) * len(accounts)) + ') '
-
-                'AND l.party IN '
-                    '(' + ','.join(('%s',) * len(parties)) + ') '
-                'AND l.reconciliation IS NULL '
-                'AND ' + line_query + ' '
-                'AND a.company = %s '
-            'GROUP BY l.account,l.party', [a.id for a in accounts] +
-                [p.id for p in parties] + [company_id])
-
-        for account_id, party_id, credit, debit, balance in cursor.fetchall():
+        for party, account, credit, debit, balance in cursor.fetchall():
             # SQLite uses float for SUM
             if not isinstance(credit, Decimal):
                 credit = Decimal(str(credit))
@@ -84,12 +78,11 @@ class Party:
             if not isinstance(balance, Decimal):
                 balance = Decimal(str(balance))
 
-            res[account_id] = {
-                party_id: {
+            if account not in res:
+                res[account] = {}
+            res[account][party] = {
                     'credit': credit,
                     'debit': debit,
                     'balance': balance,
-                },
-            }
-
+                }
         return res

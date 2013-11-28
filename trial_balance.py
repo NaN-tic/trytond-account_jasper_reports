@@ -331,9 +331,39 @@ class TrialBalanceReport(JasperReport):
                     comparison_end_period)]
 
         domain = [('parent', '!=', None)]
+        accounts_title = False
         if accounts:
+            accounts_title = True
             domain += [('id', 'in', accounts)]
 
+        parameters = {}
+        parameters['SECOND_BALANCE'] = comparison_fiscalyear and True or False
+        parameters['fiscalyear'] = fiscalyear.name
+        parameters['comparison_fiscalyear'] = comparison_fiscalyear and \
+            comparison_fiscalyear.name or ''
+        parameters['start_period'] = start_period and start_period.name or ''
+        parameters['end_period'] = end_period and end_period.name or ''
+        parameters['comparison_start_period'] = comparison_start_period and\
+            comparison_start_period.name or ''
+        parameters['comparisonend_period'] = comparison_end_period and\
+            comparison_end_period.name or ''
+        parameters['digits'] = digits or ''
+        parameters['with_moves_only'] = with_moves or ''
+        parameters['split_parties'] = split_parties or ''
+
+        if parties:
+            parties = Party.browse(parties)
+            parties_subtitle = []
+            for x in parties:
+                if len(parties_subtitle) > 4:
+                    parties_subtitle.append('...')
+                    break
+                parties_subtitle.append(x.name)
+            parties_subtitle = '; '.join(parties_subtitle)
+        else:
+            parties_subtitle = ''
+
+        parameters['parties'] = parties_subtitle
         logger.info('Search accounts')
         accounts = []
         for account in Account.search(domain, order=[('code', 'ASC')]):
@@ -341,6 +371,18 @@ class TrialBalanceReport(JasperReport):
                 account.kind != 'view' and len(account.childs) == 0 and \
                     len(account.code) < (digits or 9999):
                 accounts.append(account)
+
+        if accounts_title:
+            accounts_subtitle = []
+            for x in accounts:
+                if len(accounts_subtitle) > 4:
+                    accounts_subtitle.append('...')
+                    break
+                accounts_subtitle.append(x.code)
+            accounts_subtitle = ', '.join(accounts_subtitle)
+        else:
+            accounts_subtitle = ''
+        parameters['accounts'] = accounts_subtitle
 
         logger.info('Calc amounts')
         # Calc first period values
@@ -386,9 +428,6 @@ class TrialBalanceReport(JasperReport):
                 comparison_initial_values.update(
                     cls.read_account_vals(accounts, with_moves=with_moves))
         if split_parties:
-            if not parties:
-                logger.info('Search parties')
-                parties = Party.search([])
 
             logger.info('Calc initial values for parties')
             with Transaction().set_context(fiscalyear=fiscalyear.id,
@@ -409,13 +448,13 @@ class TrialBalanceReport(JasperReport):
                 with Transaction().set_context(fiscalyear=fiscalyear.id,
                         periods=initial_comparison_periods):
                     init_comparison_party_values = \
-                        cls.get_account_values_by_party(parties, accounts)
+                        Party.get_account_values_by_party(parties, accounts)
 
                 logger.info('Calc values for comparsion for parties')
                 with Transaction().set_context(fiscalyear=fiscalyear.id,
                         periods=comparison_periods):
                     comparison_party_values = \
-                        cls.get_account_values_by_party(parties, accounts)
+                        Party.get_account_values_by_party(parties, accounts)
 
         records = []
         virt_records = {}
@@ -472,13 +511,19 @@ class TrialBalanceReport(JasperReport):
                         'balance': comp_balance,
                     }
                     virt_records[virt_code] = record
-
                     continue
-                if split_parties and parties and \
-                        account.kind in ['payable', 'receivable']:
-                    for party in parties:
-                        logger.info('Calc values for account %s and party %s' %
-                            (account.code, party.name))
+
+                if split_parties and account.kind in ['payable', 'receivable']:
+                    account_parties = parties
+                    if not account_parties:
+                        pids = set()
+                        if account.id in party_values:
+                            pids |= set(party_values[account.id].keys())
+                        if account.id in init_party_values:
+                            pids |= set(init_party_values[account.id].keys())
+                        pids = [p for p in pids if p]
+                        account_parties = Party.browse(list(pids))
+                    for party in account_parties:
                         party_vals = _party_amounts(account,
                                 party, init_party_values, party_values)
                         party_comp_vals = _party_amounts(account,
@@ -505,46 +550,6 @@ class TrialBalanceReport(JasperReport):
                 records.append(virt_records[record])
 
         logger.info('Records:' + str(len(records)))
-
-        parameters = {}
-        parameters['SECOND_BALANCE'] = comparison_fiscalyear and True or False
-        parameters['fiscalyear'] = fiscalyear.name
-        parameters['comparison_fiscalyear'] = comparison_fiscalyear and \
-            comparison_fiscalyear.name or ''
-        parameters['start_period'] = start_period and start_period.name or ''
-        parameters['end_period'] = end_period and end_period.name or ''
-        parameters['comparison_start_period'] = comparison_start_period and\
-            comparison_start_period.name or ''
-        parameters['comparisonend_period'] = comparison_end_period and\
-            comparison_end_period.name or ''
-        parameters['digits'] = digits or ''
-        parameters['with_moves_only'] = with_moves or ''
-        parameters['split_parties'] = split_parties or ''
-
-        if accounts:
-            accounts_subtitle = []
-            for x in accounts:
-                if len(accounts_subtitle) > 4:
-                    accounts_subtitle.append('...')
-                    break
-                accounts_subtitle.append(x.code)
-            accounts_subtitle = ', '.join(accounts_subtitle)
-        else:
-            accounts_subtitle = ''
-
-        if parties:
-            parties_subtitle = []
-            for x in parties:
-                if len(parties_subtitle) > 4:
-                    parties_subtitle.append('...')
-                    break
-                parties_subtitle.append(x.name)
-            parties_subtitle = '; '.join(parties_subtitle)
-        else:
-            parties_subtitle = ''
-
-        parameters['accounts'] = accounts_subtitle
-        parameters['parties'] = parties_subtitle
 
         return super(TrialBalanceReport, cls).execute(ids, {
                 'name': 'account_jasper_reports.trial_balance',
