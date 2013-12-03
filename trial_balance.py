@@ -63,7 +63,7 @@ class PrintTrialBalanceStart(ModelView):
             ],
         states={
             'required': Bool(Eval('comparison_fiscalyear'))
-        }, depends=['comparison_fiscalyear', 'end_period'])
+        }, depends=['comparison_fiscalyear', 'comparison_end_period'])
 
     comparison_end_period = fields.Many2One('account.period', 'End Period',
         domain=[
@@ -74,7 +74,7 @@ class PrintTrialBalanceStart(ModelView):
         states={
             'required': Bool(Eval('comparison_fiscalyear'))
         },
-        depends=['comparison_fiscalyear', 'start_period'])
+        depends=['comparison_fiscalyear', 'comparison_start_period'])
     output_format = fields.Selection([
             ('pdf', 'PDF'),
             ('xls', 'XLS'),
