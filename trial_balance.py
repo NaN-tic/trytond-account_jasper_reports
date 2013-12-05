@@ -522,7 +522,10 @@ class TrialBalanceReport(JasperReport):
                         if account.id in init_party_values:
                             pids |= set(init_party_values[account.id].keys())
                         pids = [p for p in pids if p]
-                        account_parties = Party.browse(list(pids))
+                        #Using search insted of browse to get ordered records
+                        account_parties = Party.search([
+                                ('id', 'in', pids)
+                                ])
                     for party in account_parties:
                         party_vals = _party_amounts(account,
                                 party, init_party_values, party_values)
