@@ -110,7 +110,7 @@ class TaxesByInvoiceReport(JasperReport):
     __name__ = 'account_jasper_reports.taxes_by_invoice'
 
     @classmethod
-    def execute(cls, ids, data):
+    def prepare(cls, data):
         pool = Pool()
         FiscalYear = pool.get('account.fiscalyear')
         Period = pool.get('account.period')
@@ -163,6 +163,11 @@ class TaxesByInvoiceReport(JasperReport):
 
         report_ids = [x.id for x in AccountInvoiceTax.search(domain,
             order=[('account', 'ASC')])]
+        return report_ids, parameters
+
+    @classmethod
+    def execute(cls, ids, data):
+        report_ids, parameters = cls.prepare(data)
         return super(TaxesByInvoiceReport, cls).execute(report_ids, {
                 'name': cls.__name__,
                 'parameters': parameters,

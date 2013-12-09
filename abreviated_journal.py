@@ -86,8 +86,7 @@ class AbreviatedJournalReport(JasperReport):
     __name__ = 'account_jasper_reports.abreviated_journal'
 
     @classmethod
-    def execute(cls, ids, data):
-
+    def prepare(cls, data):
         pool = Pool()
         Account = pool.get('account.account')
         Move = pool.get('account.move')
@@ -116,16 +115,19 @@ class AbreviatedJournalReport(JasperReport):
         level = data['level']
         for account in Account.search([('company', '=', data['company'])],
                 order=[('code', 'ASC')]):
+            if not account.code:
+                continue
             if len(account.code) == level or \
                 account.kind != 'view' and len(account.childs) == 0 and \
                     len(account.code) < level:
                 account_ids.append(account.id)
-        group_by = (table_a.id, table_a.kind, table_a.code, table_a.name)
+        group_by = (table_a.id,)
         columns = (group_by + (Sum(Coalesce(line.debit, 0)).as_('debit'),
                 Sum(Coalesce(line.credit, 0)).as_('credit')))
         periods = Period.search([('fiscalyear', '=', fiscalyear)])
+        accounts = Account.browse(account_ids)
         for period in periods:
-            all_accounts = []
+            all_accounts = {}
             for i in range(0, len(account_ids), in_max):
                 sub_ids = account_ids[i:i + in_max]
                 red_sql = reduce_ids(table_a.id, sub_ids)
@@ -142,18 +144,32 @@ class AbreviatedJournalReport(JasperReport):
                             (Coalesce(move.period, period.id) == period.id),
                             group_by=group_by))
 
-                result = cursor.dictfetchall()
-                all_accounts.extend(result)
-            for account in all_accounts:
+                for row in cursor.fetchall():
+                    all_accounts[row[0]] = {'debit': row[1], 'credit': row[2]}
+            for account in accounts:
+                if account.id in all_accounts:
                     res.append({
                             'month': period.rec_name,
-                            'type': account['kind'],
-                            'code': account['code'],
-                            'name': account['name'],
-                            'debit': account['debit'],
-                            'credit': account['credit'],
+                            'type': account.kind,
+                            'code': account.code,
+                            'name': account.name,
+                            'debit': all_accounts[account.id]['debit'],
+                            'credit': all_accounts[account.id]['credit'],
                         })
+                elif data['display_account'] == 'bal_all':
+                    res.append({
+                            'month': period.rec_name,
+                            'type': account.kind,
+                            'code': account.code,
+                            'name': account.name,
+                            'debit': 0.0,
+                            'credit': 0.0,
+                        })
+        return res, parameters
 
+    @classmethod
+    def execute(cls, ids, data):
+        res, parameters = cls.prepare(data)
         return super(AbreviatedJournalReport, cls).execute(ids, {
                 'name': 'account_jasper_reports.journal',
                 'data_source': 'records',

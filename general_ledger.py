@@ -113,7 +113,7 @@ class GeneralLedgerReport(JasperReport):
     __name__ = 'account_jasper_reports.general_ledger'
 
     @classmethod
-    def execute(cls, ids, data):
+    def prepare(cls, data):
         pool = Pool()
         FiscalYear = pool.get('account.fiscalyear')
         Period = pool.get('account.period')
@@ -177,7 +177,7 @@ class GeneralLedgerReport(JasperReport):
                 [
                     ('account.kind', 'not in', ['receivable', 'payable'])
                 ]]
-            domain += parties_domain
+            domain.append(parties_domain)
 
         visible_ids = Line.search(domain)
         line_domain = accounts
@@ -231,13 +231,18 @@ class GeneralLedgerReport(JasperReport):
                         'account_type': line.account.kind,
                         'date': line.date.strftime('%d/%m/%Y'),
                         'move_line_name': line.description,
-                        'ref': line.origin,
+                        'ref': line.origin or '',
                         'move_name': line.move.description,
                         'party_name': line.party and line.party.name or '',
                         'credit': line.credit,
                         'debit': line.debit,
                         'balance': balance,
                         })
+        return records, parameters
+
+    @classmethod
+    def execute(cls, ids, data):
+        records, parameters = cls.prepare(data)
         return super(GeneralLedgerReport, cls).execute(ids, {
                 'name': 'account_jasper_reports.general_ledger',
                 'model': 'account.move.line',

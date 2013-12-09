@@ -253,7 +253,7 @@ class TrialBalanceReport(JasperReport):
         return values
 
     @classmethod
-    def execute(cls, ids, data):
+    def prepare(cls, data):
         def _amounts(account, init_vals, vals):
             initial = init_vals.get(account.id, {}).get('balance') or _ZERO
             credit = vals.get(account.id, {}).get('credit') or _ZERO
@@ -277,7 +277,7 @@ class TrialBalanceReport(JasperReport):
                 balance += init
                 balance_comp += init_comp
             return {
-                'code': account.code,
+                'code': account.code or '',
                 'name': party and party.name or account.name,
                 'type': account.kind,
                 'period_initial_balance': init,
@@ -367,7 +367,10 @@ class TrialBalanceReport(JasperReport):
         logger.info('Search accounts')
         accounts = []
         for account in Account.search(domain, order=[('code', 'ASC')]):
-            if not digits or len(account.code) == digits or \
+            if not account.code:
+                if not digits:
+                    accounts.append(account)
+            elif not digits or len(account.code) == digits or \
                 account.kind != 'view' and len(account.childs) == 0 and \
                     len(account.code) < (digits or 9999):
                 accounts.append(account)
@@ -465,7 +468,7 @@ class TrialBalanceReport(JasperReport):
             chunk = accounts[index * offset: (index + 1) * offset]
             index += 1
             for account in chunk:
-                if digits:
+                if digits and account.code:
                     if len(account.code.strip()) < digits:
                         continue
                     elif len(account.code) == digits and account.kind == 'view':
@@ -481,37 +484,6 @@ class TrialBalanceReport(JasperReport):
                     comparison_initial_values,  comparison_values)
                 comp_initial, comp_credit, comp_debit, comp_balance = \
                     comp_vals
-
-                if digits and len(account.code.strip()) != digits:
-                    virt_code = account.code[:digits]
-                    if virt_code in ok_records:
-                        continue
-                    record = virt_records.get(virt_code)
-                    vr = virt_records.get(virt_code, {})
-                    initial += vr.get('period_initial_balance', _ZERO)
-                    comp_initial += vr.get('initial_balance', _ZERO)
-                    balance += initial + vr.get('period_balance', _ZERO)
-                    comp_balance += comp_initial + vr.get('balance', _ZERO)
-                    credit += vr.get('period_credit', _ZERO)
-                    debit += vr.get('period_debit', _ZERO)
-                    comp_credit += vr.get('credit', _ZERO)
-                    comp_debit += vr.get('debit', _ZERO)
-
-                    record = {
-                        'code': virt_code,
-                        'name': '',
-                        'type': 'fix',
-                        'period_initial_balance': initial,
-                        'period_credit': credit,
-                        'period_debit': debit,
-                        'period_balance': balance,
-                        'initial_balance': comp_initial,
-                        'credit': comp_credit,
-                        'debit': comp_debit,
-                        'balance': comp_balance,
-                    }
-                    virt_records[virt_code] = record
-                    continue
 
                 if split_parties and account.kind in ['payable', 'receivable']:
                     account_parties = parties
@@ -553,7 +525,11 @@ class TrialBalanceReport(JasperReport):
                 records.append(virt_records[record])
 
         logger.info('Records:' + str(len(records)))
+        return records, parameters
 
+    @classmethod
+    def execute(cls, ids, data):
+        records, parameters = cls.prepare(data)
         return super(TrialBalanceReport, cls).execute(ids, {
                 'name': 'account_jasper_reports.trial_balance',
                 'model': 'account.move.line',
@@ -561,5 +537,4 @@ class TrialBalanceReport(JasperReport):
                 'records': records,
                 'parameters': parameters,
                 'output_format': data['output_format'],
-
             })

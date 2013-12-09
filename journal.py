@@ -86,11 +86,12 @@ class PrintJournal(Wizard):
     def transition_print_(self):
         return 'end'
 
+
 class JournalReport(JasperReport):
     __name__ = 'account_jasper_reports.journal'
 
     @classmethod
-    def execute(cls, ids, data):
+    def prepare(cls, data):
         pool = Pool()
         FiscalYear = pool.get('account.fiscalyear')
         Journal = pool.get('account.journal')
@@ -146,7 +147,12 @@ class JournalReport(JasperReport):
                 ))
         ids = [x[0] for x in cursor.fetchall()]
         # Pass through access rights and rules
-        ids = [x.id for x in Line.browse(ids)]
+        records = [x.id for x in Line.browse(ids)]
+        return records, parameters
+
+    @classmethod
+    def execute(cls, ids, data):
+        ids, parameters = cls.prepare(data)
         return super(JournalReport, cls).execute(ids, {
                 'name': 'account_jasper_reports.journal',
                 'model': 'account.move.line',
