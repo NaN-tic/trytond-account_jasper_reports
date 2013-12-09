@@ -69,7 +69,7 @@ class Party:
                 condition=(line.account == account.id)
                 ).select(*columns, where=where, group_by=group_by))
 
-        for party, account, credit, debit, balance in cursor.fetchall():
+        for party, account, debit, credit, balance in cursor.fetchall():
             # SQLite uses float for SUM
             if not isinstance(credit, Decimal):
                 credit = Decimal(str(credit))
