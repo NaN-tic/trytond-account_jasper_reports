@@ -109,7 +109,7 @@
 						<font size="8" isBold="true" pdfFontName="Helvetica"/>
 					</textElement>
 					<textFieldExpression><![CDATA[tr($V{L},"Total") + ($F{base_code_name} == null || $F{base_code_name}.equalsIgnoreCase("") ?
-    tr($V{L}, "Without taxes") : $F{base_code_name} ) ]]></textFieldExpression>
+    tr($V{L}, "Without taxes") : $F{base_code_name} )]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
 					<reportElement uuid="1ef2d9a7-d9da-49a9-bc37-eaf0a7343d00" x="571" y="0" width="98" height="16"/>
@@ -182,7 +182,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year: ") + $P{fiscal_year} + tr($V{L},"Periods: ") +($P{periods}==""?tr($V{L},"All Periods"):$P{periods})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year: ") + $P{fiscal_year} +" "+ tr($V{L},"Periods: ") +($P{periods}==""?tr($V{L},"All Periods"):$P{periods})]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

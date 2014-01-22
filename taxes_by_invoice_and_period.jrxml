@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d6f9a712-83ca-4bb9-a7ca-fa195ab39a4f">
 	<property name="TRYTON_RELATIONS" value="[&apos;invoice&apos;,&apos;invoice/move&apos;,&apos;invoice/move/period&apos;,&apos;tax&apos;,&apos;account&apos;]"/>
-	<property name="ireport.zoom" value="1.1000000000000016"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.zoom" value="1.7715610000000035"/>
+	<property name="ireport.x" value="48"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="STANDARD_DIR" class="java.lang.String"/>
@@ -59,7 +59,6 @@
 	<field name="invoice_total_amount" class="java.lang.Number">
 		<fieldDescription><![CDATA[invoice-invoice/total_amount-total_amount]]></fieldDescription>
 	</field>
-	<sortField name="base_code_name"/>
 	<sortField name="period"/>
 	<sortField name="number"/>
 	<variable name="L" class="java.util.Locale">
@@ -177,7 +176,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year: ") + $P{fiscal_year} + tr($V{L},"Periods: ") +($P{periods}==""?tr($V{L},"All Periods"):$P{periods})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year: ") + $P{fiscal_year} +" "+ tr($V{L},"Periods: ") +($P{periods}==""?tr($V{L},"All Periods"):$P{periods})]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement uuid="cd8183d5-fad7-47e3-8840-30ab55b1206e" x="721" y="4" width="80" height="12"/>

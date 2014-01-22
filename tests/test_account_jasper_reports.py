@@ -226,8 +226,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
         '''
         Test journal
         '''
-        with Transaction().start(DB_NAME, USER,
-                context=CONTEXT) as transaction:
+        with Transaction().start(DB_NAME, USER, context=CONTEXT):
             company, = self.company.search([('rec_name', '=', 'B2CK')])
             fiscalyear, = self.fiscalyear.search([])
             period = fiscalyear.periods[0]
@@ -302,14 +301,12 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             debit = sum([m.debit for m in records])
             self.assertEqual(credit, debit)
             self.assertEqual(credit, Decimal('380.0'))
-            transaction.cursor.rollback()
 
     def test0030abreviated_journal(self):
         '''
         Test journal
         '''
-        with Transaction().start(DB_NAME, USER,
-                context=CONTEXT) as transaction:
+        with Transaction().start(DB_NAME, USER, context=CONTEXT):
             company, = self.company.search([('rec_name', '=', 'B2CK')])
             fiscalyear, = self.fiscalyear.search([])
             period = fiscalyear.periods[0]
@@ -375,14 +372,12 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             _, data = print_abreviated_journal.do_print_(None)
             records, parameters = self.abreviated_journal_report.prepare(data)
             self.assertEqual(len(records), 4 * 2)
-            transaction.cursor.rollback()
 
     def test0040general_ledger(self):
         '''
         Test General Ledger
         '''
-        with Transaction().start(DB_NAME, USER,
-                context=CONTEXT) as transaction:
+        with Transaction().start(DB_NAME, USER, context=CONTEXT):
             company, = self.company.search([('rec_name', '=', 'B2CK')])
             fiscalyear, = self.fiscalyear.search([])
             period = fiscalyear.periods[0]
@@ -490,7 +485,30 @@ class AccountJasperReportsTestCase(unittest.TestCase):
                     if m['party_name'] != ''])
             self.assertEqual(credit, Decimal('0.0'))
             self.assertEqual(debit, Decimal('100.0'))
-            transaction.cursor.rollback()
+            #Filter by parties and accounts
+            receivable, = self.account.search([
+                    ('kind', '=', 'receivable'),
+                    ])
+            session_id, _, _ = self.print_general_ledger.create()
+            print_general_ledger = self.print_general_ledger(session_id)
+            print_general_ledger.start.company = company
+            print_general_ledger.start.fiscalyear = fiscalyear
+            print_general_ledger.start.start_period = period
+            print_general_ledger.start.end_period = last_period
+            print_general_ledger.start.parties = [customer1.id]
+            print_general_ledger.start.accounts = [receivable.id]
+            print_general_ledger.start.output_format = 'pdf'
+            _, data = print_general_ledger.do_print_(None)
+            records, parameters = self.general_ledger_report.prepare(data)
+            self.assertEqual(parameters['parties'], customer1.rec_name)
+            self.assertEqual(parameters['accounts'], receivable.code)
+            self.assertEqual(len(records), 1)
+            credit = sum([m['credit'] for m in records])
+            debit = sum([m['debit'] for m in records])
+            self.assertEqual(credit, Decimal('0.0'))
+            self.assertEqual(debit, Decimal('100.0'))
+            self.assertEqual(True, all(m['party_name'] != ''
+                    for m in records))
 
     def test0050trial_balance(self):
         '''
@@ -660,7 +678,6 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             balance = sum([Decimal(str(m['period_balance'])) for m in records])
             self.assertEqual(credit, Decimal('80.0'))
             self.assertEqual(debit, Decimal('300.0'))
-            transaction.cursor.rollback()
             session_id, _, _ = self.print_trial_balance.create()
             print_trial_balance = self.print_trial_balance(session_id)
             print_trial_balance.start.company = company
@@ -824,7 +841,6 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             self.assertEqual(credit, debit)
             self.assertEqual(debit, Decimal('380.0'))
             self.assertEqual(balance, Decimal('0.0'))
-            transaction.cursor.rollback()
 
     def test0060taxes_by_invoice(self):
         '''
@@ -1062,7 +1078,6 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             self.assertEqual(parameters['periods'], last_period.rec_name)
             records = self.invoice_tax.browse(ids)
             self.assertEqual(len(records), 0)
-            transaction.cursor.rollback()
 
 
 def suite():

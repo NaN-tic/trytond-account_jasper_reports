@@ -173,17 +173,13 @@ class GeneralLedgerReport(JasperReport):
             parties_domain = [
                 'OR', [
                     ('account.kind', 'in', ['receivable', 'payable']),
-                    ('party', 'in', parties)],
+                    ('party', 'in', [p.id for p in parties])],
                 [
                     ('account.kind', 'not in', ['receivable', 'payable'])
                 ]]
             domain.append(parties_domain)
 
-        visible_ids = Line.search(domain)
-        line_domain = accounts
-        line_domain += parties_domain
-        line_domain += [('period', 'in', filter_periods)]
-        lines = Line.search(line_domain)
+        lines = Line.search(domain)
         line_ids = []
         if lines:
             cursor = Transaction().cursor
@@ -221,23 +217,22 @@ class GeneralLedgerReport(JasperReport):
                 lastKey = currentKey
                 balance = Decimal('0.00')
             balance += line.debit - line.credit
-            if line in visible_ids:
-                sequence += 1
-                records.append({
-                        'sequence': sequence,
-                        'key': str(currentKey),
-                        'account_code': line.account.code,
-                        'account_name': line.account.name,
-                        'account_type': line.account.kind,
-                        'date': line.date.strftime('%d/%m/%Y'),
-                        'move_line_name': line.description,
-                        'ref': line.origin or '',
-                        'move_name': line.move.description,
-                        'party_name': line.party and line.party.name or '',
-                        'credit': line.credit,
-                        'debit': line.debit,
-                        'balance': balance,
-                        })
+            sequence += 1
+            records.append({
+                    'sequence': sequence,
+                    'key': str(currentKey),
+                    'account_code': line.account.code or '',
+                    'account_name': line.account.name or '',
+                    'account_type': line.account.kind,
+                    'date': line.date.strftime('%d/%m/%Y'),
+                    'move_line_name': line.description or '',
+                    'ref': line.origin.rec_name if line.origin else '',
+                    'move_name': line.move.rec_name,
+                    'party_name': line.party.name if line.party else '',
+                    'credit': line.credit,
+                    'debit': line.debit,
+                    'balance': balance,
+                    })
         return records, parameters
 
     @classmethod
