@@ -227,7 +227,7 @@ msgid "Total Period: "
 msgstr "Total període:"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
-msgid " From: "
+msgid " From"
 msgstr "De:"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
@@ -283,11 +283,15 @@ msgid "Reference"
 msgstr "Referència"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
+msgid "To"
+msgstr "a"
+
+msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "Total"
 msgstr "Total"
 
 msgctxt "jasper:account_jasper_reports.journal:"
-msgid " From: "
+msgid " From"
 msgstr "De:"
 
 msgctxt "jasper:account_jasper_reports.journal:"
@@ -329,6 +333,11 @@ msgstr "Assentament"
 msgctxt "jasper:account_jasper_reports.journal:"
 msgid "Party"
 msgstr "Tercer"
+
+#, fuzzy
+msgctxt "jasper:account_jasper_reports.journal:"
+msgid "To"
+msgstr "Per a"
 
 msgctxt "jasper:account_jasper_reports.taxes_by_invoice:"
 msgid "Account"
@@ -463,10 +472,6 @@ msgid "VAT"
 msgstr "NIF"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
-msgid " From: "
-msgstr "De:"
-
-msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Account"
 msgstr "Compte"
 
@@ -507,12 +512,20 @@ msgid "Fiscal Year: "
 msgstr "Exercici fiscal:"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
+msgid "From"
+msgstr "De:"
+
+msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Initial"
 msgstr "Inicial"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Second Balance"
 msgstr "Segon balanç"
+
+msgctxt "jasper:account_jasper_reports.trial_balance:"
+msgid "To"
+msgstr "a"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Trial Balance"

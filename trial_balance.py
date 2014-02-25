@@ -345,7 +345,7 @@ class TrialBalanceReport(JasperReport):
         parameters['end_period'] = end_period and end_period.name or ''
         parameters['comparison_start_period'] = comparison_start_period and\
             comparison_start_period.name or ''
-        parameters['comparisonend_period'] = comparison_end_period and\
+        parameters['comparison_end_period'] = comparison_end_period and\
             comparison_end_period.name or ''
         parameters['digits'] = digits or ''
         parameters['with_moves_only'] = with_moves or ''

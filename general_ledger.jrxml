@@ -214,7 +214,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year: ") + $P{fiscal_year} + tr($V{L}," From: ") + $P{start_period} + tr($V{L}, "  To: ") + $P{end_period}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year: ") + $P{fiscal_year} +" "+ tr($V{L}," From") +": "+$P{start_period} +" "+ tr($V{L},"To") +": "+ $P{end_period}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement uuid="4928ddc3-3ffa-43fc-ab3a-728ebf0b2893" x="10" y="56" width="534" height="12"/>

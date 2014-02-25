@@ -558,7 +558,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             self.assertEqual(parameters['SECOND_BALANCE'], False)
             self.assertEqual(parameters['comparison_fiscalyear'], '')
             self.assertEqual(parameters['comparison_start_period'], '')
-            self.assertEqual(parameters['comparisonend_period'], '')
+            self.assertEqual(parameters['comparison_end_period'], '')
             credit = sum([Decimal(str(m['period_credit'])) for m in records])
             debit = sum([Decimal(str(m['period_debit'])) for m in records])
             balance = sum([Decimal(str(m['period_balance'])) for m in records])
@@ -825,7 +825,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
                 fiscalyear.rec_name)
             self.assertEqual(parameters['comparison_start_period'],
                 period.rec_name)
-            self.assertEqual(parameters['comparisonend_period'],
+            self.assertEqual(parameters['comparison_end_period'],
                 period.rec_name)
             self.assertEqual(len(records), 4)
             credit = sum([Decimal(str(m['period_credit'])) for m in records])
@@ -924,13 +924,13 @@ class AccountJasperReportsTestCase(unittest.TestCase):
                     ])
             customer_address, = self.party_address.search([
                     ('party', '=', customer.id),
-                    ])
+                    ], limit=1)
             supplier, = self.party.search([
                     ('name', '=', 'supplier1'),
                     ])
             supplier_address, = self.party_address.search([
                     ('party', '=', supplier.id),
-                    ])
+                    ], limit=1)
             supplier2, = self.party.search([
                     ('name', '=', 'supplier2'),
                     ])
@@ -940,7 +940,6 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             journal_expense, = self.journal.search([
                     ('code', '=', 'EXP'),
                     ])
-            #import pdb; pdb.set_trace()
             invoices = self.invoice.create([{
                         'number': '1',
                         'invoice_date': period.start_date,

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="901838a5-c3ed-4bbc-94e5-29788bc41da9">
-	<property name="ireport.zoom" value="1.1000000000000025"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.zoom" value="1.7715610000000048"/>
+	<property name="ireport.x" value="55"/>
+	<property name="ireport.y" value="17"/>
 	<subDataset name="dataset1" uuid="a0e43402-0eae-4f3b-ac6f-f73084888591"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="STANDARD_DIR" class="java.lang.String"/>
@@ -125,7 +125,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year: ") + $P{fiscalyear} + tr($V{L}," From: ") + $P{start_period} + tr($V{L}, "  To: ") + $P{end_period}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year: ") + $P{fiscalyear} +" "+tr($V{L},"From") +": "+ $P{start_period} +"  "+tr($V{L},"To") +": "+ $P{end_period}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement uuid="3f831c81-35d5-4777-9498-562215b8a8ef" x="1" y="67" width="802" height="12"/>
@@ -139,7 +139,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[tr($V{L},"Comparison Fiscal Year: ") + $P{comparison_fiscalyear} + tr($V{L}," From: ") + $P{comparison_start_period} + tr($V{L}, "  To: ") + $P{comparison_end_period}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[tr($V{L},"Comparison Fiscal Year: ") + $P{comparison_fiscalyear} +" "+ tr($V{L},"From") +": "+ $P{comparison_start_period} +" "+tr($V{L},"To") +": "+ $P{comparison_end_period}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -354,8 +354,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{total_period_balance} == null ? 0.0 : $V{total_period_balance}
-]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{total_period_balance} == null ? 0.0 : $V{total_period_balance}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
 				<reportElement uuid="25e0af8c-234f-402e-80d4-d767fb0472a5" x="349" y="4" width="60" height="12"/>
@@ -387,8 +386,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{total_balance} == null ? 0.0 : $V{total_balance}
-]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{total_balance} == null ? 0.0 : $V{total_balance}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
 				<reportElement uuid="3e9154b2-fde9-426a-9a20-b8e4200d82db" x="682" y="4" width="60" height="12">

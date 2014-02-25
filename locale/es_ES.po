@@ -216,7 +216,7 @@ msgstr "Haber"
 
 msgctxt "jasper:account_jasper_reports.abreviated_journal:"
 msgid "Debit"
-msgstr "Débito"
+msgstr "Debe"
 
 msgctxt "jasper:account_jasper_reports.abreviated_journal:"
 msgid "Fiscal Year: "
@@ -227,8 +227,8 @@ msgid "Total Period: "
 msgstr "Total Período:"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
-msgid " From: "
-msgstr " De:"
+msgid " From"
+msgstr " De"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "All Accounts"
@@ -252,7 +252,7 @@ msgstr "Fecha"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "Debit"
-msgstr "Débito"
+msgstr "Debe"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "Description"
@@ -283,12 +283,16 @@ msgid "Reference"
 msgstr "Referencia"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
+msgid "To"
+msgstr "Hasta"
+
+msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "Total"
 msgstr "Total"
 
 msgctxt "jasper:account_jasper_reports.journal:"
-msgid " From: "
-msgstr " De:"
+msgid " From"
+msgstr " De"
 
 msgctxt "jasper:account_jasper_reports.journal:"
 msgid "Account"
@@ -308,7 +312,7 @@ msgstr "Fecha"
 
 msgctxt "jasper:account_jasper_reports.journal:"
 msgid "Debit"
-msgstr "Débito"
+msgstr "Debe"
 
 msgctxt "jasper:account_jasper_reports.journal:"
 msgid "Description"
@@ -329,6 +333,10 @@ msgstr "Asiento"
 msgctxt "jasper:account_jasper_reports.journal:"
 msgid "Party"
 msgstr "Tercero"
+
+msgctxt "jasper:account_jasper_reports.journal:"
+msgid "To"
+msgstr "Hasta"
 
 msgctxt "jasper:account_jasper_reports.taxes_by_invoice:"
 msgid "Account"
@@ -463,10 +471,6 @@ msgid "VAT"
 msgstr "NIF"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
-msgid " From: "
-msgstr " De:"
-
-msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Account"
 msgstr "Cuenta"
 
@@ -496,7 +500,7 @@ msgstr "Haber"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Debit"
-msgstr "Débito"
+msgstr "Debe"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "First Balance"
@@ -507,12 +511,20 @@ msgid "Fiscal Year: "
 msgstr "Ejercicio fiscal:"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
+msgid "From"
+msgstr " De"
+
+msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Initial"
 msgstr "Inicial"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Second Balance"
 msgstr "Segundo balance"
+
+msgctxt "jasper:account_jasper_reports.trial_balance:"
+msgid "To"
+msgstr "Hasta"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Trial Balance"

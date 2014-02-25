@@ -111,7 +111,7 @@ class JournalReport(JasperReport):
         parameters['end_period'] = end_period and end_period.name or ''
         parameters['fiscal_year'] = fiscalyear.name
         if journals:
-            parameters['journals'] = ','.join([str(x.name) for x in journals])
+            parameters['journals'] = ','.join([x.name for x in journals])
         else:
             parameters['journals'] = ''
 
