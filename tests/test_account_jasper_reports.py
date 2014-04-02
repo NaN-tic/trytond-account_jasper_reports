@@ -671,13 +671,13 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             _, data = print_trial_balance.do_print_(None)
             #With 2 digits and splited with parties
             records, parameters = self.trial_balance_report.prepare(data)
-            self.assertEqual(len(records), 4)
+            self.assertEqual(len(records), 6)
             self.assertEqual(parameters['split_parties'], True)
             credit = sum([Decimal(str(m['period_credit'])) for m in records])
             debit = sum([Decimal(str(m['period_debit'])) for m in records])
             balance = sum([Decimal(str(m['period_balance'])) for m in records])
-            self.assertEqual(credit, Decimal('80.0'))
-            self.assertEqual(debit, Decimal('300.0'))
+            self.assertEqual(credit, Decimal('130.0'))
+            self.assertEqual(debit, Decimal('600.0'))
             session_id, _, _ = self.print_trial_balance.create()
             print_trial_balance = self.print_trial_balance(session_id)
             print_trial_balance.start.company = company
@@ -697,13 +697,13 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             _, data = print_trial_balance.do_print_(None)
             #Full splited with parties
             records, parameters = self.trial_balance_report.prepare(data)
-            self.assertEqual(len(records), 9)
+            self.assertEqual(len(records), 11)
             self.assertEqual(parameters['split_parties'], True)
             credit = sum([Decimal(str(m['period_credit'])) for m in records])
             debit = sum([Decimal(str(m['period_debit'])) for m in records])
             balance = sum([Decimal(str(m['period_balance'])) for m in records])
-            self.assertEqual(credit, Decimal('680.0'))
-            self.assertEqual(debit, Decimal('430.0'))
+            self.assertEqual(credit, Decimal('730.0'))
+            self.assertEqual(debit, Decimal('730.0'))
             customer1, = self.party.search([
                     ('name', '=', 'customer1'),
                     ])
@@ -841,6 +841,36 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             self.assertEqual(credit, debit)
             self.assertEqual(debit, Decimal('380.0'))
             self.assertEqual(balance, Decimal('0.0'))
+            receivable, = self.account.search([
+                    ('kind', '=', 'receivable'),
+                    ])
+            session_id, _, _ = self.print_trial_balance.create()
+            print_trial_balance = self.print_trial_balance(session_id)
+            print_trial_balance.start.company = company
+            print_trial_balance.start.fiscalyear = fiscalyear
+            print_trial_balance.start.start_period = last_period
+            print_trial_balance.start.end_period = last_period
+            print_trial_balance.start.parties = []
+            print_trial_balance.start.accounts = [receivable.id]
+            print_trial_balance.start.show_digits = None
+            print_trial_balance.start.with_move_only = True
+            print_trial_balance.start.split_parties = True
+            print_trial_balance.start.add_initial_balance = False
+            print_trial_balance.start.comparison_fiscalyear = None
+            print_trial_balance.start.comparison_start_period = None
+            print_trial_balance.start.comparison_end_period = None
+            print_trial_balance.start.output_format = 'pdf'
+            _, data = print_trial_balance.do_print_(None)
+            #Splited by parties but move doesn't have any party defined
+            records, parameters = self.trial_balance_report.prepare(data)
+            self.assertEqual(len(records), 1)
+            self.assertEqual(parameters['accounts'], receivable.code)
+            credit = sum([Decimal(str(m['period_credit'])) for m in records])
+            debit = sum([Decimal(str(m['period_debit'])) for m in records])
+            balance = sum([Decimal(str(m['period_balance'])) for m in records])
+            self.assertEqual(debit, Decimal('300.0'))
+            self.assertEqual(credit, Decimal('0.0'))
+            self.assertEqual(balance, Decimal('300.0'))
 
     def test0060taxes_by_invoice(self):
         '''

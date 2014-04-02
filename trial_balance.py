@@ -261,13 +261,13 @@ class TrialBalanceReport(JasperReport):
             balance = vals.get(account.id, {}).get('balance') or _ZERO
             return initial, credit, debit, balance
 
-        def _party_amounts(account, party, init_vals, vals):
+        def _party_amounts(account, party_id, init_vals, vals):
             iac_vals = init_vals.get(account.id, {})
             ac_vals = vals.get(account.id, {})
-            initial = iac_vals.get(party.id, {}).get('balance') or _ZERO
-            credit = ac_vals.get(party.id, {}).get('credit') or _ZERO
-            debit = ac_vals.get(party.id, {}).get('debit') or _ZERO
-            balance = ac_vals.get(party.id, {}).get('balance') or _ZERO
+            initial = iac_vals.get(party_id, {}).get('balance') or _ZERO
+            credit = ac_vals.get(party_id, {}).get('credit') or _ZERO
+            debit = ac_vals.get(party_id, {}).get('debit') or _ZERO
+            balance = ac_vals.get(party_id, {}).get('balance') or _ZERO
             return initial, credit, debit, balance
 
         def _record(account, party, vals, comp, add_initial_balance):
@@ -493,16 +493,17 @@ class TrialBalanceReport(JasperReport):
                             pids |= set(party_values[account.id].keys())
                         if account.id in init_party_values:
                             pids |= set(init_party_values[account.id].keys())
-                        pids = [p for p in pids if p]
+                        account_parties = [None] if None in pids else []
                         #Using search insted of browse to get ordered records
-                        account_parties = Party.search([
-                                ('id', 'in', pids)
+                        account_parties += Party.search([
+                                ('id', 'in', [p for p in pids if p])
                                 ])
                     for party in account_parties:
+                        party_key = party.id if party else None
                         party_vals = _party_amounts(account,
-                                party, init_party_values, party_values)
+                                party_key, init_party_values, party_values)
                         party_comp_vals = _party_amounts(account,
-                                party, init_comparison_party_values,
+                                party_key, init_comparison_party_values,
                                 comparison_party_values)
                         init, credit, debit, balance = party_vals
 
