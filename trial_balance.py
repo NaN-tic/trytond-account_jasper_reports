@@ -297,6 +297,7 @@ class TrialBalanceReport(JasperReport):
         Period = pool.get('account.period')
         Account = pool.get('account.account')
         Party = pool.get('party.party')
+        transaction = Transaction()
 
         fiscalyear = FiscalYear(data['fiscalyear'])
         comparison_fiscalyear = None
@@ -389,7 +390,7 @@ class TrialBalanceReport(JasperReport):
 
         logger.info('Calc amounts')
         # Calc first period values
-        with Transaction().set_context(fiscalyear=fiscalyear.id,
+        with transaction.set_context(fiscalyear=fiscalyear.id,
                 periods=periods):
             values = cls.read_account_vals(accounts, with_moves=with_moves)
 
@@ -403,7 +404,7 @@ class TrialBalanceReport(JasperReport):
         init_values = {}
         if initial_periods:
             logger.info('Calc Initial Balance')
-            with Transaction().set_context(periods=initial_periods):
+            with transaction.set_context(periods=initial_periods):
                 init_values = cls.read_account_vals(accounts,
                     with_moves=with_moves)
 
@@ -415,7 +416,7 @@ class TrialBalanceReport(JasperReport):
         if comparison_fiscalyear:
         #    second_dict = {}.fromkeys(accounts, Decimal('0.00'))
             logger.info('Calc initial vals for comparison period')
-            with Transaction().set_context(periods=comparison_periods):
+            with transaction.set_context(periods=comparison_periods):
                 comparison_values = cls.read_account_vals(accounts,
                     with_moves=with_moves)
 
@@ -427,19 +428,19 @@ class TrialBalanceReport(JasperReport):
                 ])
 
             logger.info('Calc vals for comparison period')
-            with Transaction().set_context(periods=initial_comparison_periods):
+            with transaction.set_context(periods=initial_comparison_periods):
                 comparison_initial_values.update(
                     cls.read_account_vals(accounts, with_moves=with_moves))
         if split_parties:
 
             logger.info('Calc initial values for parties')
-            with Transaction().set_context(fiscalyear=fiscalyear.id,
+            with transaction.set_context(fiscalyear=fiscalyear.id,
                     periods=initial_periods):
                 init_party_values = Party.get_account_values_by_party(
                     parties, accounts)
 
             logger.info('Calc  values for parties')
-            with Transaction().set_context(fiscalyear=fiscalyear.id,
+            with transaction.set_context(fiscalyear=fiscalyear.id,
                     periods=periods):
                 party_values = Party.get_account_values_by_party(
                     parties, accounts)
@@ -448,13 +449,13 @@ class TrialBalanceReport(JasperReport):
             comparison_party_values = {}
             if comparison_fiscalyear:
                 logger.info('Calc initial values for comparsion for parties')
-                with Transaction().set_context(fiscalyear=fiscalyear.id,
+                with transaction.set_context(fiscalyear=fiscalyear.id,
                         periods=initial_comparison_periods):
                     init_comparison_party_values = \
                         Party.get_account_values_by_party(parties, accounts)
 
                 logger.info('Calc values for comparsion for parties')
-                with Transaction().set_context(fiscalyear=fiscalyear.id,
+                with transaction.set_context(fiscalyear=fiscalyear.id,
                         periods=comparison_periods):
                     comparison_party_values = \
                         Party.get_account_values_by_party(parties, accounts)
@@ -495,9 +496,10 @@ class TrialBalanceReport(JasperReport):
                             pids |= set(init_party_values[account.id].keys())
                         account_parties = [None] if None in pids else []
                         #Using search insted of browse to get ordered records
-                        account_parties += Party.search([
-                                ('id', 'in', [p for p in pids if p])
-                                ])
+                        with transaction.set_context(active_test=False):
+                            account_parties += Party.search([
+                                    ('id', 'in', [p for p in pids if p])
+                                    ])
                     for party in account_parties:
                         party_key = party.id if party else None
                         party_vals = _party_amounts(account,

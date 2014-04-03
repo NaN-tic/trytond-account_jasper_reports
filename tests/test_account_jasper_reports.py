@@ -871,6 +871,36 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             self.assertEqual(debit, Decimal('300.0'))
             self.assertEqual(credit, Decimal('0.0'))
             self.assertEqual(balance, Decimal('300.0'))
+            #Inactive customers should always apear on trial balance
+            self.party.write([customer1], {
+                    'active': False,
+                    })
+            session_id, _, _ = self.print_trial_balance.create()
+            print_trial_balance = self.print_trial_balance(session_id)
+            print_trial_balance.start.company = company
+            print_trial_balance.start.fiscalyear = fiscalyear
+            print_trial_balance.start.start_period = period
+            print_trial_balance.start.end_period = last_period
+            print_trial_balance.start.parties = []
+            print_trial_balance.start.accounts = []
+            print_trial_balance.start.show_digits = None
+            print_trial_balance.start.with_move_only = False
+            print_trial_balance.start.split_parties = True
+            print_trial_balance.start.add_initial_balance = False
+            print_trial_balance.start.comparison_fiscalyear = None
+            print_trial_balance.start.comparison_start_period = None
+            print_trial_balance.start.comparison_end_period = None
+            print_trial_balance.start.output_format = 'pdf'
+            _, data = print_trial_balance.do_print_(None)
+            #Full splited with parties
+            records, parameters = self.trial_balance_report.prepare(data)
+            self.assertEqual(len(records), 11)
+            self.assertEqual(parameters['split_parties'], True)
+            credit = sum([Decimal(str(m['period_credit'])) for m in records])
+            debit = sum([Decimal(str(m['period_debit'])) for m in records])
+            balance = sum([Decimal(str(m['period_balance'])) for m in records])
+            self.assertEqual(credit, Decimal('730.0'))
+            self.assertEqual(debit, Decimal('730.0'))
 
     def test0060taxes_by_invoice(self):
         '''
