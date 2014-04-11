@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d6f9a712-83ca-4bb9-a7ca-fa195ab39a4f">
 	<property name="TRYTON_RELATIONS" value="[&apos;invoice&apos;,&apos;invoice/move&apos;,&apos;invoice/move/period&apos;,&apos;tax&apos;,&apos;account&apos;]"/>
 	<property name="ireport.zoom" value="1.7715610000000035"/>
-	<property name="ireport.x" value="48"/>
+	<property name="ireport.x" value="144"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="STANDARD_DIR" class="java.lang.String"/>
@@ -59,32 +59,42 @@
 	<field name="invoice_total_amount" class="java.lang.Number">
 		<fieldDescription><![CDATA[invoice-invoice/total_amount-total_amount]]></fieldDescription>
 	</field>
+	<field name="tax_sign" class="java.lang.Integer">
+		<fieldDescription><![CDATA[tax_sign]]></fieldDescription>
+	</field>
+	<field name="base_sign" class="java.lang.Integer">
+		<fieldDescription><![CDATA[base_sign]]></fieldDescription>
+	</field>
+	<field name="invoice_id" class="java.lang.String">
+		<fieldDescription><![CDATA[invoice-invoice/id]]></fieldDescription>
+	</field>
 	<sortField name="period"/>
 	<sortField name="number"/>
+	<sortField name="invoice_id"/>
 	<variable name="L" class="java.util.Locale">
 		<variableExpression><![CDATA[$P{REPORT_LOCALE}]]></variableExpression>
 		<initialValueExpression><![CDATA[$P{REPORT_LOCALE}]]></initialValueExpression>
 	</variable>
 	<variable name="base_tax_line" class="java.lang.Number">
-		<variableExpression><![CDATA[$F{tax_amount}==null?$F{base_amount}:$F{base_amount}+$F{tax_amount}]]></variableExpression>
+		<variableExpression><![CDATA[$F{tax_amount}==null?$F{base_amount}*$F{base_sign}:$F{base_amount}*$F{base_sign}+$F{tax_amount}*$F{tax_sign}]]></variableExpression>
 	</variable>
 	<variable name="base_tax_total" class="java.lang.Number" resetType="Group" resetGroup="quarter" calculation="Sum">
-		<variableExpression><![CDATA[$F{tax_amount}==null?$F{base_amount}:$F{base_amount}+$F{tax_amount}]]></variableExpression>
+		<variableExpression><![CDATA[$F{tax_amount}==null?$F{base_amount}*$F{base_sign}:$F{base_amount}*$F{base_sign}+$F{tax_amount}*$F{tax_sign}]]></variableExpression>
 	</variable>
-	<variable name="tax_amount_1" class="java.lang.Number" resetType="Group" resetGroup="number" calculation="Sum">
-		<variableExpression><![CDATA[$F{tax_amount}]]></variableExpression>
+	<variable name="tax_amount_1" class="java.lang.Number" resetType="Group" resetGroup="quarter" calculation="Sum">
+		<variableExpression><![CDATA[$F{tax_amount}*$F{tax_sign}]]></variableExpression>
 	</variable>
-	<variable name="base_amount_1" class="java.lang.Number" resetType="Group" resetGroup="number" calculation="Sum">
-		<variableExpression><![CDATA[$F{base_amount}]]></variableExpression>
+	<variable name="base_amount_1" class="java.lang.Number" resetType="Group" resetGroup="quarter" calculation="Sum">
+		<variableExpression><![CDATA[$F{base_amount}*$F{base_sign}]]></variableExpression>
 	</variable>
-	<variable name="cc_amount_total_1" class="java.lang.Number" resetType="Group" resetGroup="number" calculation="Sum">
+	<variable name="cc_amount_total_1" class="java.lang.Number" resetType="Group" resetGroup="invoice_id" calculation="Sum">
 		<variableExpression><![CDATA[$F{type}.equalsIgnoreCase("out_credit_note") || $F{type}.equalsIgnoreCase("in_credit_note")
 ?
     -($F{base_amount}+$F{tax_amount})
 :
     $F{base_amount}+$F{tax_amount}]]></variableExpression>
 	</variable>
-	<variable name="total" class="java.math.BigDecimal" incrementType="Group" incrementGroup="number" calculation="Sum">
+	<variable name="total" class="java.math.BigDecimal" incrementType="Group" incrementGroup="invoice_id" calculation="Sum">
 		<variableExpression><![CDATA[$F{type} == "out_credit_note" || $F{type} == "in_credit_note"
 ?
     -$F{invoice_total_amount}
@@ -145,6 +155,15 @@
 	</group>
 	<group name="number">
 		<groupExpression><![CDATA[$F{number}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<group name="invoice_id" minHeightToStartNewPage="10">
+		<groupExpression><![CDATA[$F{invoice_id}]]></groupExpression>
 		<groupHeader>
 			<band/>
 		</groupHeader>
@@ -265,38 +284,11 @@
 		<band/>
 	</columnHeader>
 	<detail>
-		<band height="13">
+		<band height="12">
 			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false]]></printWhenExpression>
-			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement uuid="f42d3245-aa77-4c9c-83e6-ae7ca64ceee4" x="462" y="0" width="56" height="12">
-					<printWhenExpression><![CDATA[$V{number_COUNT} == 1]]></printWhenExpression>
-				</reportElement>
-				<textElement verticalAlignment="Middle">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{date_invoice}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement uuid="a85255ce-5a7b-435c-a7b6-b9ee62a5ac5a" x="94" y="0" width="57" height="12">
-					<printWhenExpression><![CDATA[$V{number_COUNT} == 1]]></printWhenExpression>
-				</reportElement>
-				<textElement verticalAlignment="Middle">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{account_code}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement uuid="c81b6493-7b68-4e34-a7cb-1eea95dd4886" x="394" y="0" width="68" height="12">
-					<printWhenExpression><![CDATA[$V{number_COUNT} == 1]]></printWhenExpression>
-				</reportElement>
-				<textElement verticalAlignment="Middle">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{number}]]></textFieldExpression>
-			</textField>
 			<textField pattern="#,##0.00" isBlankWhenNull="false">
 				<reportElement uuid="a60563f3-207d-48db-813e-d65c570ba121" x="729" y="0" width="74" height="12">
-					<printWhenExpression><![CDATA[$V{number_COUNT} == 1]]></printWhenExpression>
+					<printWhenExpression><![CDATA[$V{invoice_id_COUNT}==1]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true" pdfFontName="Helvetica"/>
@@ -314,30 +306,12 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{tax_name}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement uuid="92eb121b-e066-462f-9522-b0b857322560" x="151" y="0" width="178" height="12">
-					<printWhenExpression><![CDATA[$V{number_COUNT} == 1]]></printWhenExpression>
-				</reportElement>
-				<textElement verticalAlignment="Middle">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{partner_name}]]></textFieldExpression>
-			</textField>
-			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement uuid="6bb8638c-37e3-4e35-ab80-dfc14040a29c" x="1" y="0" width="93" height="12">
-					<printWhenExpression><![CDATA[$V{number_COUNT} == 1]]></printWhenExpression>
-				</reportElement>
-				<textElement verticalAlignment="Middle">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{account_move_date}]]></textFieldExpression>
-			</textField>
 			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
 				<reportElement uuid="c05743ac-9a74-4cd4-ac8f-ecd5a33e4542" x="615" y="0" width="55" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{tax_amount} != null ? $F{tax_amount} : 0.0]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{tax_amount} != null ? $F{tax_amount}*$F{tax_sign} : 0.0]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00" isBlankWhenNull="false">
 				<reportElement uuid="efcf3be5-1af7-4cc8-ae70-6c4902cb26f8" x="670" y="0" width="59" height="12"/>
@@ -351,11 +325,56 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{base_amount} != null ? $F{base_amount} : 0.0]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{base_amount}*$F{base_sign}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement uuid="f42d3245-aa77-4c9c-83e6-ae7ca64ceee4" x="461" y="0" width="56" height="12">
+					<printWhenExpression><![CDATA[$V{invoice_id_COUNT}==1]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{date_invoice}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="5551245c-dd89-4fd6-9a32-f6638482b163" x="329" y="0" width="65" height="12">
-					<printWhenExpression><![CDATA[$V{number_COUNT} == 1]]></printWhenExpression>
+				<reportElement uuid="a85255ce-5a7b-435c-a7b6-b9ee62a5ac5a" x="93" y="0" width="57" height="12">
+					<printWhenExpression><![CDATA[$V{invoice_id_COUNT}==1]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{account_code}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="c81b6493-7b68-4e34-a7cb-1eea95dd4886" x="393" y="0" width="68" height="12">
+					<printWhenExpression><![CDATA[$V{invoice_id_COUNT}==1]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{number}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="92eb121b-e066-462f-9522-b0b857322560" x="150" y="0" width="178" height="12">
+					<printWhenExpression><![CDATA[$V{invoice_id_COUNT}==1]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{partner_name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement uuid="6bb8638c-37e3-4e35-ab80-dfc14040a29c" x="0" y="0" width="93" height="12">
+					<printWhenExpression><![CDATA[$V{invoice_id_COUNT}==1]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{account_move_date}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="5551245c-dd89-4fd6-9a32-f6638482b163" x="328" y="0" width="65" height="12">
+					<printWhenExpression><![CDATA[$V{invoice_id_COUNT}==1]]></printWhenExpression>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
