@@ -779,9 +779,9 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             print_trial_balance.start.with_move_only = True
             print_trial_balance.start.split_parties = False
             print_trial_balance.start.add_initial_balance = True
-            print_trial_balance.start.comparison_fiscalyear = None
-            print_trial_balance.start.comparison_start_period = None
-            print_trial_balance.start.comparison_end_period = None
+            print_trial_balance.start.comparison_fiscalyear = fiscalyear
+            print_trial_balance.start.comparison_start_period = last_period
+            print_trial_balance.start.comparison_end_period = last_period
             print_trial_balance.start.output_format = 'pdf'
             _, data = print_trial_balance.do_print_(None)
             #With moves and add initial balance
@@ -796,12 +796,56 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             self.assertEqual(credit, Decimal('350.0'))
             self.assertEqual(debit, Decimal('350.0'))
             self.assertEqual(balance, Decimal('0.0'))
+            results = {
+                '41': (Decimal('-80'), Decimal('-130')),
+                '43': (Decimal('300'), Decimal('600')),
+                '6': (Decimal('80'), Decimal('130')),
+                '7': (Decimal('-300'), Decimal('-600')),
+                }
+            for r in records:
+                initial, balance = results[r['code']]
+                self.assertEqual(r['period_initial_balance'], initial)
+                self.assertEqual(r['period_balance'], balance)
+                self.assertEqual(r['initial_balance'], initial)
+                self.assertEqual(r['balance'], balance)
             for initial, balance in [(m['period_initial_balance'],
                         m['period_balance']) for m in records]:
                 self.assertNotEqual(Decimal(str(initial)), Decimal('0.0'))
                 self.assertNotEqual(Decimal(str(balance)), Decimal('0.0'))
                 self.assertNotEqual(Decimal(str(balance)),
                     Decimal(str(initial)))
+            session_id, _, _ = self.print_trial_balance.create()
+            print_trial_balance = self.print_trial_balance(session_id)
+            print_trial_balance.start.company = company
+            print_trial_balance.start.fiscalyear = fiscalyear
+            print_trial_balance.start.start_period = last_period
+            print_trial_balance.start.end_period = last_period
+            print_trial_balance.start.parties = []
+            print_trial_balance.start.accounts = []
+            print_trial_balance.start.show_digits = None
+            print_trial_balance.start.with_move_only = True
+            print_trial_balance.start.split_parties = True
+            print_trial_balance.start.add_initial_balance = True
+            print_trial_balance.start.comparison_fiscalyear = fiscalyear
+            print_trial_balance.start.comparison_start_period = last_period
+            print_trial_balance.start.comparison_end_period = last_period
+            print_trial_balance.start.output_format = 'pdf'
+            _, data = print_trial_balance.do_print_(None)
+            #With moves, split parties and add initial balance
+            records, parameters = self.trial_balance_report.prepare(data)
+            self.assertEqual(len(records), 4)
+            results = {
+                '41': (Decimal('-0'), Decimal('-50')),
+                '43': (Decimal('0'), Decimal('300')),
+                '6': (Decimal('80'), Decimal('130')),
+                '7': (Decimal('-300'), Decimal('-600')),
+                }
+            for r in records:
+                initial, balance = results[r['code']]
+                self.assertEqual(r['period_initial_balance'], initial)
+                self.assertEqual(r['period_balance'], balance)
+                self.assertEqual(r['initial_balance'], initial)
+                self.assertEqual(r['balance'], balance)
             session_id, _, _ = self.print_trial_balance.create()
             print_trial_balance = self.print_trial_balance(session_id)
             print_trial_balance.start.company = company

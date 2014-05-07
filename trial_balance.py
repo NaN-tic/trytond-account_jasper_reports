@@ -2,6 +2,8 @@
 #at the top level of this repository contains the full copyright notices and
 #license terms.
 
+from datetime import timedelta
+
 from sql.aggregate import Sum
 from sql.conditionals import Coalesce
 from sql.operators import In
@@ -235,6 +237,9 @@ class TrialBalanceReport(JasperReport):
             if periods:
                 periods.append(0)
                 where = (where & In(Coalesce(move.period, 0), periods))
+            date = transaction.context.get('date')
+            if date:
+                where = (where & (move.date <= date))
             cursor.execute(*table_a.join(table_c,
                     condition=(table_c.left >= table_a.left)
                     & (table_c.right <= table_a.right)
@@ -395,23 +400,17 @@ class TrialBalanceReport(JasperReport):
             values = cls.read_account_vals(accounts, with_moves=with_moves)
 
         # Calc Initial Balance for first period
-        initial_periods = [p.id for p in Period.search([
-                    ('fiscalyear', '=', fiscalyear.id),
-                    ('start_date', '<=', start_period.start_date),
-                    ('end_date', '<', start_period.end_date),
-            ])]
-
         init_values = {}
-        if initial_periods:
+        if add_initial_balance:
             logger.info('Calc Initial Balance')
-            with transaction.set_context(periods=initial_periods):
+            initial_balance_date = start_period.start_date - timedelta(days=1)
+            with transaction.set_context(date=initial_balance_date):
                 init_values = cls.read_account_vals(accounts,
                     with_moves=with_moves)
 
         # Calc comparison period values.
         comparison_initial_values = {}.fromkeys(accounts, Decimal('0.00'))
         comparison_values = {}.fromkeys(accounts, Decimal('0.00'))
-        initial_comparison_periods = []
 
         if comparison_fiscalyear:
         #    second_dict = {}.fromkeys(accounts, Decimal('0.00'))
@@ -420,24 +419,20 @@ class TrialBalanceReport(JasperReport):
                 comparison_values = cls.read_account_vals(accounts,
                     with_moves=with_moves)
 
-            # Calc Initial Balance for comparison period
-            initial_comparison_periods = Period.search([
-                    ('fiscalyear', '=', comparison_fiscalyear.id),
-                    ('start_date', '<=', comparison_start_period.start_date),
-                    ('end_date', '<', comparison_end_period.end_date),
-                ])
-
             logger.info('Calc vals for comparison period')
-            with transaction.set_context(periods=initial_comparison_periods):
+            initial_comparision_date = (comparison_start_period.start_date -
+                timedelta(days=1))
+            with transaction.set_context(date=initial_comparision_date):
                 comparison_initial_values.update(
                     cls.read_account_vals(accounts, with_moves=with_moves))
         if split_parties:
 
-            logger.info('Calc initial values for parties')
-            with transaction.set_context(fiscalyear=fiscalyear.id,
-                    periods=initial_periods):
-                init_party_values = Party.get_account_values_by_party(
-                    parties, accounts)
+            init_party_values = {}
+            if add_initial_balance:
+                logger.info('Calc initial values for parties')
+                with transaction.set_context(date=initial_balance_date):
+                    init_party_values = Party.get_account_values_by_party(
+                        parties, accounts)
 
             logger.info('Calc  values for parties')
             with transaction.set_context(fiscalyear=fiscalyear.id,
@@ -449,8 +444,7 @@ class TrialBalanceReport(JasperReport):
             comparison_party_values = {}
             if comparison_fiscalyear:
                 logger.info('Calc initial values for comparsion for parties')
-                with transaction.set_context(fiscalyear=fiscalyear.id,
-                        periods=initial_comparison_periods):
+                with transaction.set_context(date=initial_comparision_date):
                     init_comparison_party_values = \
                         Party.get_account_values_by_party(parties, accounts)
 
