@@ -18,9 +18,7 @@ from trytond.transaction import Transaction
 
 
 class AccountJasperReportsTestCase(unittest.TestCase):
-    '''
-    Test Account Jasper Reports module.
-    '''
+    'Test Account Jasper Reports module'
 
     def setUp(self):
         trytond.tests.test_tryton.install_module('account_jasper_reports')
@@ -61,172 +59,164 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             'account_jasper_reports.taxes_by_invoice', type='report')
 
     def test0005views(self):
-        '''
-        Test views.
-        '''
+        'Test views'
         test_view('account_jasper_reports')
 
     def test0006depends(self):
-        '''
-        Test depends.
-        '''
+        'Test depends'
         test_depends()
 
-    def test0010create_moves(self):
-        'Test create moves.'
-        with Transaction().start(DB_NAME, USER,
-                context=CONTEXT) as transaction:
-            fiscalyear, = self.fiscalyear.search([])
-            period = fiscalyear.periods[0]
-            last_period = fiscalyear.periods[-1]
-            journal_revenue, = self.journal.search([
-                    ('code', '=', 'REV'),
-                    ])
-            journal_expense, = self.journal.search([
-                    ('code', '=', 'EXP'),
-                    ])
-            revenue, = self.account.search([
-                    ('kind', '=', 'revenue'),
-                    ])
-            self.account.write([revenue], {'code': '7'})
-            receivable, = self.account.search([
-                    ('kind', '=', 'receivable'),
-                    ])
-            self.account.write([receivable], {'code': '43'})
-            expense, = self.account.search([
-                    ('kind', '=', 'expense'),
-                    ])
-            self.account.write([expense], {'code': '6'})
-            payable, = self.account.search([
-                    ('kind', '=', 'payable'),
-                    ])
-            self.account.write([payable], {'code': '41'})
-            chart, = self.account.search([
-                    ('parent', '=', None),
-                    ])
-            self.account.create([{
-                        'name': 'View',
-                        'code': '1',
-                        'kind': 'view',
-                        'parent': chart.id,
-                        }])
-            #Create some parties
-            customer1, customer2, supplier1, supplier2 = self.party.create([{
-                            'name': 'customer1',
-                        }, {
-                            'name': 'customer2',
-                        }, {
-                            'name': 'supplier1',
-                        }, {
-                            'name': 'supplier2',
-                        }])
-            self.party_address.create([{
-                            'active': True,
-                            'party': customer1.id,
-                        }, {
-                            'active': True,
-                            'party': supplier1.id,
-                        }])
-            # Create some moves
-            vlist = [
-                {
-                    'period': period.id,
-                    'journal': journal_revenue.id,
-                    'date': period.start_date,
-                    'lines': [
-                        ('create', [{
-                                    'account': revenue.id,
-                                    'credit': Decimal(100),
-                                    }, {
-                                    'party': customer1.id,
-                                    'account': receivable.id,
-                                    'debit': Decimal(100),
-                                    }]),
-                        ],
-                    },
-                {
-                    'period': period.id,
-                    'journal': journal_revenue.id,
-                    'date': period.start_date,
-                    'lines': [
-                        ('create', [{
-                                    'account': revenue.id,
-                                    'credit': Decimal(200),
-                                    }, {
-                                    'party': customer2.id,
-                                    'account': receivable.id,
-                                    'debit': Decimal(200),
-                                    }]),
-                        ],
-                    },
-                {
-                    'period': period.id,
-                    'journal': journal_expense.id,
-                    'date': period.start_date,
-                    'lines': [
-                        ('create', [{
-                                    'account': expense.id,
-                                    'debit': Decimal(30),
-                                    }, {
-                                    'party': supplier1.id,
-                                    'account': payable.id,
-                                    'credit': Decimal(30),
-                                    }]),
-                        ],
-                    },
-                {
-                    'period': period.id,
-                    'journal': journal_expense.id,
-                    'date': period.start_date,
-                    'lines': [
-                        ('create', [{
-                                    'account': expense.id,
-                                    'debit': Decimal(50),
-                                    }, {
-                                    'party': supplier2.id,
-                                    'account': payable.id,
-                                    'credit': Decimal(50),
-                                    }]),
-                        ],
-                    },
-                {
-                    'period': last_period.id,
-                    'journal': journal_expense.id,
-                    'date': last_period.end_date,
-                    'lines': [
-                        ('create', [{
-                                    'account': expense.id,
-                                    'debit': Decimal(50),
-                                    }, {
-                                    'account': payable.id,
-                                    'credit': Decimal(50),
-                                    }]),
-                        ],
-                    },
-                {
-                    'period': last_period.id,
-                    'journal': journal_revenue.id,
-                    'date': last_period.end_date,
-                    'lines': [
-                        ('create', [{
-                                    'account': revenue.id,
-                                    'credit': Decimal(300),
-                                    }, {
-                                    'account': receivable.id,
-                                    'debit': Decimal(300),
-                                    }]),
-                        ],
-                    },
-                ]
-            moves = self.move.create(vlist)
-            self.move.post(moves)
-            transaction.cursor.commit()
+    def create_moves(self):
+        'Create moves for running tests'
+        fiscalyear, = self.fiscalyear.search([])
+        period = fiscalyear.periods[0]
+        last_period = fiscalyear.periods[-1]
+        journal_revenue, = self.journal.search([
+                ('code', '=', 'REV'),
+                ])
+        journal_expense, = self.journal.search([
+                ('code', '=', 'EXP'),
+                ])
+        revenue, = self.account.search([
+                ('kind', '=', 'revenue'),
+                ])
+        self.account.write([revenue], {'code': '7'})
+        receivable, = self.account.search([
+                ('kind', '=', 'receivable'),
+                ])
+        self.account.write([receivable], {'code': '43'})
+        expense, = self.account.search([
+                ('kind', '=', 'expense'),
+                ])
+        self.account.write([expense], {'code': '6'})
+        payable, = self.account.search([
+                ('kind', '=', 'payable'),
+                ])
+        self.account.write([payable], {'code': '41'})
+        chart, = self.account.search([
+                ('parent', '=', None),
+                ])
+        self.account.create([{
+                    'name': 'View',
+                    'code': '1',
+                    'kind': 'view',
+                    'parent': chart.id,
+                    }])
+        #Create some parties
+        customer1, customer2, supplier1, supplier2 = self.party.create([{
+                        'name': 'customer1',
+                    }, {
+                        'name': 'customer2',
+                    }, {
+                        'name': 'supplier1',
+                    }, {
+                        'name': 'supplier2',
+                    }])
+        self.party_address.create([{
+                        'active': True,
+                        'party': customer1.id,
+                    }, {
+                        'active': True,
+                        'party': supplier1.id,
+                    }])
+        # Create some moves
+        vlist = [
+            {
+                'period': period.id,
+                'journal': journal_revenue.id,
+                'date': period.start_date,
+                'lines': [
+                    ('create', [{
+                                'account': revenue.id,
+                                'credit': Decimal(100),
+                                }, {
+                                'party': customer1.id,
+                                'account': receivable.id,
+                                'debit': Decimal(100),
+                                }]),
+                    ],
+                },
+            {
+                'period': period.id,
+                'journal': journal_revenue.id,
+                'date': period.start_date,
+                'lines': [
+                    ('create', [{
+                                'account': revenue.id,
+                                'credit': Decimal(200),
+                                }, {
+                                'party': customer2.id,
+                                'account': receivable.id,
+                                'debit': Decimal(200),
+                                }]),
+                    ],
+                },
+            {
+                'period': period.id,
+                'journal': journal_expense.id,
+                'date': period.start_date,
+                'lines': [
+                    ('create', [{
+                                'account': expense.id,
+                                'debit': Decimal(30),
+                                }, {
+                                'party': supplier1.id,
+                                'account': payable.id,
+                                'credit': Decimal(30),
+                                }]),
+                    ],
+                },
+            {
+                'period': period.id,
+                'journal': journal_expense.id,
+                'date': period.start_date,
+                'lines': [
+                    ('create', [{
+                                'account': expense.id,
+                                'debit': Decimal(50),
+                                }, {
+                                'party': supplier2.id,
+                                'account': payable.id,
+                                'credit': Decimal(50),
+                                }]),
+                    ],
+                },
+            {
+                'period': last_period.id,
+                'journal': journal_expense.id,
+                'date': last_period.end_date,
+                'lines': [
+                    ('create', [{
+                                'account': expense.id,
+                                'debit': Decimal(50),
+                                }, {
+                                'account': payable.id,
+                                'credit': Decimal(50),
+                                }]),
+                    ],
+                },
+            {
+                'period': last_period.id,
+                'journal': journal_revenue.id,
+                'date': last_period.end_date,
+                'lines': [
+                    ('create', [{
+                                'account': revenue.id,
+                                'credit': Decimal(300),
+                                }, {
+                                'account': receivable.id,
+                                'debit': Decimal(300),
+                                }]),
+                    ],
+                },
+            ]
+        moves = self.move.create(vlist)
+        self.move.post(moves)
 
-    def test0020journal(self):
-        '''
-        Test journal
-        '''
+    def test0010journal(self):
+        'Test journal'
         with Transaction().start(DB_NAME, USER, context=CONTEXT):
+            self.create_moves()
             company, = self.company.search([('rec_name', '=', 'B2CK')])
             fiscalyear, = self.fiscalyear.search([])
             period = fiscalyear.periods[0]
@@ -302,11 +292,10 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             self.assertEqual(credit, debit)
             self.assertEqual(credit, Decimal('380.0'))
 
-    def test0030abreviated_journal(self):
-        '''
-        Test journal
-        '''
+    def test0020abreviated_journal(self):
+        'Test journal'
         with Transaction().start(DB_NAME, USER, context=CONTEXT):
+            self.create_moves()
             company, = self.company.search([('rec_name', '=', 'B2CK')])
             fiscalyear, = self.fiscalyear.search([])
             period = fiscalyear.periods[0]
@@ -373,11 +362,10 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             records, parameters = self.abreviated_journal_report.prepare(data)
             self.assertEqual(len(records), 4 * 2)
 
-    def test0040general_ledger(self):
-        '''
-        Test General Ledger
-        '''
+    def test0030general_ledger(self):
+        'Test General Ledger'
         with Transaction().start(DB_NAME, USER, context=CONTEXT):
+            self.create_moves()
             company, = self.company.search([('rec_name', '=', 'B2CK')])
             fiscalyear, = self.fiscalyear.search([])
             period = fiscalyear.periods[0]
@@ -510,12 +498,10 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             self.assertEqual(True, all(m['party_name'] != ''
                     for m in records))
 
-    def test0050trial_balance(self):
-        '''
-        Test Trial Balance
-        '''
-        with Transaction().start(DB_NAME, USER,
-                context=CONTEXT) as transaction:
+    def test0040trial_balance(self):
+        'Test Trial Balance'
+        with Transaction().start(DB_NAME, USER, context=CONTEXT):
+            self.create_moves()
             company, = self.company.search([('rec_name', '=', 'B2CK')])
             fiscalyear, = self.fiscalyear.search([])
             period = fiscalyear.periods[0]
@@ -946,12 +932,10 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             self.assertEqual(credit, Decimal('730.0'))
             self.assertEqual(debit, Decimal('730.0'))
 
-    def test0060taxes_by_invoice(self):
-        '''
-        Test taxes by invoice
-        '''
-        with Transaction().start(DB_NAME, USER,
-                context=CONTEXT) as transaction:
+    def test0050taxes_by_invoice(self):
+        'Test taxes by invoice'
+        with Transaction().start(DB_NAME, USER, context=CONTEXT):
+            self.create_moves()
             company, = self.company.search([('rec_name', '=', 'B2CK')])
             fiscalyear, = self.fiscalyear.search([])
             period = fiscalyear.periods[0]
