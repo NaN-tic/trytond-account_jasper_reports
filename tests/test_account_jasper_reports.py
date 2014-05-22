@@ -217,7 +217,8 @@ class AccountJasperReportsTestCase(unittest.TestCase):
         'Test journal'
         with Transaction().start(DB_NAME, USER, context=CONTEXT):
             self.create_moves()
-            company, = self.company.search([('rec_name', '=', 'B2CK')])
+            company, = self.company.search([
+                    ('rec_name', '=', 'Dunder Mifflin')])
             fiscalyear, = self.fiscalyear.search([])
             period = fiscalyear.periods[0]
             last_period = fiscalyear.periods[-1]
@@ -296,7 +297,8 @@ class AccountJasperReportsTestCase(unittest.TestCase):
         'Test journal'
         with Transaction().start(DB_NAME, USER, context=CONTEXT):
             self.create_moves()
-            company, = self.company.search([('rec_name', '=', 'B2CK')])
+            company, = self.company.search([
+                    ('rec_name', '=', 'Dunder Mifflin')])
             fiscalyear, = self.fiscalyear.search([])
             period = fiscalyear.periods[0]
             session_id, _, _ = self.print_abreviated_journal.create()
@@ -366,7 +368,8 @@ class AccountJasperReportsTestCase(unittest.TestCase):
         'Test General Ledger'
         with Transaction().start(DB_NAME, USER, context=CONTEXT):
             self.create_moves()
-            company, = self.company.search([('rec_name', '=', 'B2CK')])
+            company, = self.company.search([
+                    ('rec_name', '=', 'Dunder Mifflin')])
             fiscalyear, = self.fiscalyear.search([])
             period = fiscalyear.periods[0]
             last_period = fiscalyear.periods[-1]
@@ -502,7 +505,8 @@ class AccountJasperReportsTestCase(unittest.TestCase):
         'Test Trial Balance'
         with Transaction().start(DB_NAME, USER, context=CONTEXT):
             self.create_moves()
-            company, = self.company.search([('rec_name', '=', 'B2CK')])
+            company, = self.company.search([
+                    ('rec_name', '=', 'Dunder Mifflin')])
             fiscalyear, = self.fiscalyear.search([])
             period = fiscalyear.periods[0]
             last_period = fiscalyear.periods[-1]
@@ -936,7 +940,8 @@ class AccountJasperReportsTestCase(unittest.TestCase):
         'Test taxes by invoice'
         with Transaction().start(DB_NAME, USER, context=CONTEXT):
             self.create_moves()
-            company, = self.company.search([('rec_name', '=', 'B2CK')])
+            company, = self.company.search([
+                    ('rec_name', '=', 'Dunder Mifflin')])
             fiscalyear, = self.fiscalyear.search([])
             period = fiscalyear.periods[0]
             last_period = fiscalyear.periods[-1]
