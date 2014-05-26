@@ -18,7 +18,7 @@ class PrintTaxesByInvoiceAndPeriodStart(ModelView):
     __name__ = 'account_jasper_reports.print_taxes_by_invoice.start'
 
     fiscalyear = fields.Many2One('account.fiscalyear', 'Fiscal Year',
-            required=True, on_change=['fiscalyear'])
+            required=True)
     periods = fields.Many2Many('account.period', None, None, 'Periods',
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
@@ -61,6 +61,7 @@ class PrintTaxesByInvoiceAndPeriodStart(ModelView):
     def default_output_format():
         return 'pdf'
 
+    @fields.depends('fiscalyear')
     def on_change_fiscalyear(self):
         return {'periods': None, }
 

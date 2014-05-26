@@ -18,7 +18,7 @@ class PrintGeneralLedgerStart(ModelView):
     'Print General Ledger'
     __name__ = 'account_jasper_reports.print_general_ledger.start'
     fiscalyear = fields.Many2One('account.fiscalyear', 'Fiscal Year',
-            required=True, on_change=['fiscalyear'])
+            required=True)
     start_period = fields.Many2One('account.period', 'Start Period',
         required=True,
         domain=[
@@ -54,6 +54,7 @@ class PrintGeneralLedgerStart(ModelView):
     def default_output_format():
         return 'pdf'
 
+    @fields.depends('fiscalyear')
     def on_change_fiscalyear(self):
         return {
             'start_period': None,

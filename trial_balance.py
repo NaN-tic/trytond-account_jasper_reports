@@ -28,9 +28,9 @@ class PrintTrialBalanceStart(ModelView):
     __name__ = 'account_jasper_reports.print_trial_balance.start'
 
     fiscalyear = fields.Many2One('account.fiscalyear', 'Fiscal Year',
-            required=True, on_change=['fiscalyear'])
+            required=True)
     comparison_fiscalyear = fields.Many2One('account.fiscalyear',
-            'Fiscal Year', on_change=['comparison_fiscalyear'])
+            'Fiscal Year')
     show_digits = fields.Integer('Digits')
     with_move_only = fields.Boolean('Only Accounts With Move')
     accounts = fields.Many2Many('account.account', None, None, 'Accounts')
@@ -131,12 +131,14 @@ class PrintTrialBalanceStart(ModelView):
     def default_output_format():
         return 'pdf'
 
+    @fields.depends('fiscalyear')
     def on_change_fiscalyear(self):
         return {
             'start_period': None,
             'end_period': None,
             }
 
+    @fields.depends('comparison_fiscalyear')
     def on_change_comparison_fiscalyear(self):
         return {
             'comparison_start_period': None,
