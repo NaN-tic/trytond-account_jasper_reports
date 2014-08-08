@@ -77,25 +77,33 @@ class AccountJasperReportsTestCase(unittest.TestCase):
         journal_expense, = self.journal.search([
                 ('code', '=', 'EXP'),
                 ])
-        revenue, = self.account.search([
-                ('kind', '=', 'revenue'),
-                ])
-        self.account.write([revenue], {'code': '7'})
-        receivable, = self.account.search([
-                ('kind', '=', 'receivable'),
-                ])
-        self.account.write([receivable], {'code': '43'})
-        expense, = self.account.search([
-                ('kind', '=', 'expense'),
-                ])
-        self.account.write([expense], {'code': '6'})
-        payable, = self.account.search([
-                ('kind', '=', 'payable'),
-                ])
-        self.account.write([payable], {'code': '41'})
         chart, = self.account.search([
                 ('parent', '=', None),
                 ])
+        revenue, = self.account.search([
+                ('kind', '=', 'revenue'),
+                ])
+        revenue.parent = chart
+        revenue.code = '7'
+        revenue.save()
+        receivable, = self.account.search([
+                ('kind', '=', 'receivable'),
+                ])
+        receivable.parent = chart
+        receivable.code = '43'
+        receivable.save()
+        expense, = self.account.search([
+                ('kind', '=', 'expense'),
+                ])
+        expense.parent = chart
+        expense.code = '6'
+        expense.save()
+        payable, = self.account.search([
+                ('kind', '=', 'payable'),
+                ])
+        payable.parent = chart
+        payable.code = '41'
+        payable.save()
         self.account.create([{
                     'name': 'View',
                     'code': '1',
