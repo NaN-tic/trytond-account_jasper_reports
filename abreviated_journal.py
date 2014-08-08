@@ -162,8 +162,8 @@ class AbreviatedJournalReport(JasperReport):
                             'period_date': period.start_date,
                             'code': account.code,
                             'name': account.name,
-                            'debit': 0.0,
-                            'credit': 0.0,
+                            'debit': Decimal('0.0'),
+                            'credit': Decimal('0.0'),
                         })
         return res, parameters
 
