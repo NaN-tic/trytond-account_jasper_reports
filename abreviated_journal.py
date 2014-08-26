@@ -145,7 +145,15 @@ class AbreviatedJournalReport(JasperReport):
                             group_by=group_by))
 
                 for row in cursor.fetchall():
-                    all_accounts[row[0]] = {'debit': row[1], 'credit': row[2]}
+                    account_id, debit, credit = row
+                    if not isinstance(debit, Decimal):
+                        debit = Decimal(str(debit))
+                    if not isinstance(credit, Decimal):
+                        credit = Decimal(str(credit))
+                    all_accounts[account_id] = {
+                        'debit': debit,
+                        'credit': credit,
+                        }
             for account in accounts:
                 if account.id in all_accounts:
                     res.append({
