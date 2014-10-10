@@ -90,15 +90,16 @@
 	<variable name="cc_amount_total_1" class="java.lang.Number" resetType="Group" resetGroup="invoice_id" calculation="Sum">
 		<variableExpression><![CDATA[$F{type}.equalsIgnoreCase("out_credit_note") || $F{type}.equalsIgnoreCase("in_credit_note")
 ?
-    -($F{base_amount}+$F{tax_amount})
-:
-    $F{base_amount}+$F{tax_amount}]]></variableExpression>
+    $F{tax_amount}==null?-$F{base_amount}:-($F{base_amount}+$F{tax_amount})
+    :
+    $F{tax_amount}==null?$F{base_amount}:$F{base_amount}+$F{tax_amount}
+]]></variableExpression>
 	</variable>
 	<variable name="total" class="java.math.BigDecimal" incrementType="Group" incrementGroup="invoice_id" calculation="Sum">
 		<variableExpression><![CDATA[$F{type} == "out_credit_note" || $F{type} == "in_credit_note"
 ?
     -$F{invoice_total_amount}
-:
+    :
     $F{invoice_total_amount}]]></variableExpression>
 	</variable>
 	<variable name="total_base_tax" class="java.math.BigDecimal" calculation="Sum">
@@ -127,7 +128,7 @@
 					<textElement verticalAlignment="Middle">
 						<font size="8" isBold="true" pdfFontName="Helvetica"/>
 					</textElement>
-					<textFieldExpression><![CDATA[tr($V{L},"Toal Period")+" "+ $F{period}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[tr($V{L},"Total Period")+" "+ $F{period}]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
 					<reportElement uuid="1ef2d9a7-d9da-49a9-bc37-eaf0a7343d00" x="573" y="0" width="98" height="16"/>
@@ -295,9 +296,10 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{type}.equalsIgnoreCase("out_credit_note") || $F{type}.equalsIgnoreCase("in_credit_note")
 ?
-    -$F{invoice_total_amount}
+   $F{invoice_total_amount} != null ? -$F{invoice_total_amount} : 0.0
 :
-    $F{invoice_total_amount}]]></textFieldExpression>
+   $F{invoice_total_amount} != null ? $F{invoice_total_amount} : 0.0
+]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement uuid="3c9e00e1-a5d7-4efe-8fbc-837af50c088f" x="573" y="0" width="42" height="12"/>
@@ -325,7 +327,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{base_amount}*$F{base_sign}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{base_amount} != null ? $F{base_amount}*$F{base_sign} : 0.0]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
 				<reportElement uuid="f42d3245-aa77-4c9c-83e6-ae7ca64ceee4" x="461" y="0" width="56" height="12">

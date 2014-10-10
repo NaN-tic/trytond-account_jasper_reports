@@ -459,7 +459,7 @@ msgid "Taxes By Invoice and Period"
 msgstr "Impuestos por factura y período"
 
 msgctxt "jasper:account_jasper_reports.taxes_by_invoice_and_period:"
-msgid "Toal Period"
+msgid "Total Period"
 msgstr "Total Período"
 
 msgctxt "jasper:account_jasper_reports.taxes_by_invoice_and_period:"

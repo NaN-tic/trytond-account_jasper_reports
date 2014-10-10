@@ -72,9 +72,6 @@
     $F{tax_amount}==null?-$F{base_amount}:-($F{base_amount}+$F{tax_amount})
     :
     $F{tax_amount}==null?$F{base_amount}:$F{base_amount}+$F{tax_amount}
-
-
-
 ]]></variableExpression>
 	</variable>
 	<variable name="base_tax_total" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
@@ -91,9 +88,6 @@
     -$F{tax_amount}
     :
     $F{tax_amount}
-
-
-
 ]]></variableExpression>
 	</variable>
 	<variable name="base_amount_1" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
@@ -107,9 +101,10 @@
 	<variable name="cc_amount_total_1" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
 		<variableExpression><![CDATA[$F{type}.equalsIgnoreCase("out_credit_note") || $F{type}.equalsIgnoreCase("in_credit_note")
 ?
-    -($F{base_amount}+$F{tax_amount})
-:
-    $F{base_amount}+$F{tax_amount}]]></variableExpression>
+    $F{tax_amount}==null?-$F{base_amount}:-($F{base_amount}+$F{tax_amount})
+    :
+    $F{tax_amount}==null?$F{base_amount}:$F{base_amount}+$F{tax_amount}
+]]></variableExpression>
 	</variable>
 	<group name="tax" isReprintHeaderOnEachPage="true">
 		<groupExpression><![CDATA[$F{base_code_name}]]></groupExpression>
@@ -134,7 +129,7 @@
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font size="8" isBold="true" pdfFontName="Helvetica"/>
 					</textElement>
-					<textFieldExpression><![CDATA[tr($V{L},"Total") + ($F{base_code_name} == null || $F{base_code_name}.equalsIgnoreCase("") ?
+					<textFieldExpression><![CDATA[tr($V{L},"Total")+" "+ ($F{base_code_name} == null || $F{base_code_name}.equalsIgnoreCase("") ?
     tr($V{L}, "Without taxes") : $F{base_code_name} )]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
@@ -313,9 +308,10 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{type}.equalsIgnoreCase("out_credit_note") || $F{type}.equalsIgnoreCase("in_credit_note")
 ?
-    -$F{invoice_total_amount}
+   $F{invoice_total_amount} != null ? -$F{invoice_total_amount} : 0.0
 :
-    $F{invoice_total_amount}]]></textFieldExpression>
+   $F{invoice_total_amount} != null ? $F{invoice_total_amount} : 0.0
+]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement uuid="3c9e00e1-a5d7-4efe-8fbc-837af50c088f" x="572" y="0" width="42" height="12"/>
