@@ -1,14 +1,6 @@
 #!/usr/bin/env python
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
-
-import sys
-import os
-DIR = os.path.abspath(os.path.normpath(os.path.join(__file__,
-    '..', '..', '..', '..', '..', 'trytond')))
-if os.path.isdir(DIR):
-    sys.path.insert(0, os.path.dirname(DIR))
-
 from decimal import Decimal
 import unittest
 import trytond.tests.test_tryton
@@ -198,6 +190,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
                                 'account': expense.id,
                                 'debit': Decimal(50),
                                 }, {
+                                'party': supplier2.id,
                                 'account': payable.id,
                                 'credit': Decimal(50),
                                 }]),
@@ -212,6 +205,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
                                 'account': revenue.id,
                                 'credit': Decimal(300),
                                 }, {
+                                'party': customer2.id,
                                 'account': receivable.id,
                                 'debit': Decimal(300),
                                 }]),
@@ -258,7 +252,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             self.assertEqual(credit, debit)
             self.assertEqual(credit, Decimal('730.0'))
             with_party = [m for m in records if m.party]
-            self.assertEqual(len(with_party), 4)
+            self.assertEqual(len(with_party), 6)
             #Filtering periods
             session_id, _, _ = self.print_journal.create()
             print_journal = self.print_journal(session_id)
@@ -411,7 +405,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             self.assertEqual(credit, debit)
             self.assertEqual(credit, Decimal('730.0'))
             with_party = [m for m in records if m['party_name'] != '']
-            self.assertEqual(len(with_party), 4)
+            self.assertEqual(len(with_party), 6)
             dates = sorted(set([r['date'] for r in records]))
             for date, expected_value in zip(dates, [period.start_date,
                         last_period.end_date]):
@@ -669,7 +663,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             _, data = print_trial_balance.do_print_(None)
             #With 2 digits and splited with parties
             records, parameters = self.trial_balance_report.prepare(data)
-            self.assertEqual(len(records), 6)
+            self.assertEqual(len(records), 4)
             self.assertEqual(parameters['split_parties'], True)
             credit = sum([Decimal(str(m['period_credit'])) for m in records])
             debit = sum([Decimal(str(m['period_debit'])) for m in records])
@@ -695,7 +689,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             _, data = print_trial_balance.do_print_(None)
             #Full splited with parties
             records, parameters = self.trial_balance_report.prepare(data)
-            self.assertEqual(len(records), 11)
+            self.assertEqual(len(records), 9)
             self.assertEqual(parameters['split_parties'], True)
             credit = sum([Decimal(str(m['period_credit'])) for m in records])
             debit = sum([Decimal(str(m['period_debit'])) for m in records])
@@ -833,8 +827,8 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             records, parameters = self.trial_balance_report.prepare(data)
             self.assertEqual(len(records), 4)
             results = {
-                '41': (Decimal('-0'), Decimal('-50')),
-                '43': (Decimal('0'), Decimal('300')),
+                '41': (Decimal('-50'), Decimal('-100')),
+                '43': (Decimal('200'), Decimal('500')),
                 '6': (Decimal('80'), Decimal('130')),
                 '7': (Decimal('-300'), Decimal('-600')),
                 }
@@ -936,7 +930,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             _, data = print_trial_balance.do_print_(None)
             #Full splited with parties
             records, parameters = self.trial_balance_report.prepare(data)
-            self.assertEqual(len(records), 11)
+            self.assertEqual(len(records), 9)
             self.assertEqual(parameters['split_parties'], True)
             credit = sum([Decimal(str(m['period_credit'])) for m in records])
             debit = sum([Decimal(str(m['period_debit'])) for m in records])
