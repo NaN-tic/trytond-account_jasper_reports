@@ -2,6 +2,7 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
 from decimal import Decimal
+import datetime
 import unittest
 import trytond.tests.test_tryton
 from trytond.tests.test_tryton import test_view, test_depends
@@ -24,6 +25,8 @@ class AccountJasperReportsTestCase(unittest.TestCase):
         self.line = POOL.get('account.move.line')
         self.journal = POOL.get('account.journal')
         self.period = POOL.get('account.period')
+        self.sequence = POOL.get('ir.sequence')
+        self.sequence_strict = POOL.get('ir.sequence.strict')
         self.taxcode = POOL.get('account.tax.code')
         self.tax = POOL.get('account.tax')
         self.invoice = POOL.get('account.invoice')
@@ -58,9 +61,10 @@ class AccountJasperReportsTestCase(unittest.TestCase):
         'Test depends'
         test_depends()
 
-    def create_moves(self):
+    def create_moves(self, fiscalyear=None):
         'Create moves for running tests'
-        fiscalyear, = self.fiscalyear.search([])
+        if not fiscalyear:
+            fiscalyear, = self.fiscalyear.search([])
         period = fiscalyear.periods[0]
         last_period = fiscalyear.periods[-1]
         journal_revenue, = self.journal.search([
@@ -102,23 +106,29 @@ class AccountJasperReportsTestCase(unittest.TestCase):
                     'kind': 'view',
                     'parent': chart.id,
                     }])
-        #Create some parties
-        customer1, customer2, supplier1, supplier2 = self.party.create([{
-                        'name': 'customer1',
-                    }, {
-                        'name': 'customer2',
-                    }, {
-                        'name': 'supplier1',
-                    }, {
-                        'name': 'supplier2',
-                    }])
-        self.party_address.create([{
-                        'active': True,
-                        'party': customer1.id,
-                    }, {
-                        'active': True,
-                        'party': supplier1.id,
-                    }])
+        #Create some parties if not exist
+        if self.party.search([('name', '=', 'customer1')]):
+            customer1, = self.party.search([('name', '=', 'customer1')])
+            customer2, = self.party.search([('name', '=', 'customer2')])
+            supplier1, = self.party.search([('name', '=', 'supplier1')])
+            supplier2, = self.party.search([('name', '=', 'supplier2')])
+        else:
+            customer1, customer2, supplier1, supplier2 = self.party.create([{
+                            'name': 'customer1',
+                        }, {
+                            'name': 'customer2',
+                        }, {
+                            'name': 'supplier1',
+                        }, {
+                            'name': 'supplier2',
+                        }])
+            self.party_address.create([{
+                            'active': True,
+                            'party': customer1.id,
+                        }, {
+                            'active': True,
+                            'party': supplier1.id,
+                        }])
         # Create some moves
         vlist = [
             {
@@ -385,7 +395,8 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             print_general_ledger.start.accounts = []
             print_general_ledger.start.output_format = 'pdf'
             _, data = print_general_ledger.do_print_(None)
-            #Full general_ledger
+
+            # Full general_ledger
             self.assertEqual(data['company'], company.id)
             self.assertEqual(data['fiscalyear'], fiscalyear.id)
             self.assertEqual(data['start_period'], period.id)
@@ -410,7 +421,8 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             for date, expected_value in zip(dates, [period.start_date,
                         last_period.end_date]):
                 self.assertEqual(date, expected_value.strftime('%d/%m/%Y'))
-            #Filtered by periods
+
+            # Filtered by periods
             session_id, _, _ = self.print_general_ledger.create()
             print_general_ledger = self.print_general_ledger(session_id)
             print_general_ledger.start.company = company
@@ -478,7 +490,8 @@ class AccountJasperReportsTestCase(unittest.TestCase):
                     if m['party_name'] != ''])
             self.assertEqual(credit, Decimal('0.0'))
             self.assertEqual(debit, Decimal('100.0'))
-            #Filter by parties and accounts
+
+            # Filter by parties and accounts
             receivable, = self.account.search([
                     ('kind', '=', 'receivable'),
                     ])
@@ -502,6 +515,35 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             self.assertEqual(debit, Decimal('100.0'))
             self.assertEqual(True, all(m['party_name'] != ''
                     for m in records))
+
+            # Check balance of full general_ledger
+            print_general_ledger = self.print_general_ledger(session_id)
+            print_general_ledger.start.company = company
+            print_general_ledger.start.fiscalyear = fiscalyear
+            print_general_ledger.start.start_period = period
+            print_general_ledger.start.end_period = last_period
+            print_general_ledger.start.parties = []
+            print_general_ledger.start.accounts = []
+            print_general_ledger.start.output_format = 'pdf'
+            _, data = print_general_ledger.do_print_(None)
+            records, parameters = self.general_ledger_report.prepare(data)
+            self.assertEqual(len(records), 12)
+            balances = [
+                Decimal('30'),             # Expense
+                Decimal('80'),             # Expense
+                Decimal('130'),            # Expense
+                Decimal('-30'),            # Payable Party 1
+                Decimal('-50'),            # Payable Party 2
+                Decimal('-50'),            # Payable
+                Decimal('100'),            # Receivable Party 1
+                Decimal('200'),            # Receivable Party 2
+                Decimal('300'),            # Receivable
+                Decimal('-100'),           # Revenue
+                Decimal('-300'),           # Revenue
+                Decimal('-600'),           # Revenue
+                ]
+            for record, balance in zip(records, balances):
+                self.assertEqual(record['balance'], balance)
 
     def test0040trial_balance(self):
         'Test Trial Balance'
@@ -784,10 +826,8 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             credit = sum([Decimal(str(m['period_credit'])) for m in records])
             debit = sum([Decimal(str(m['period_debit'])) for m in records])
             balance = sum([Decimal(str(m['period_balance'])) for m in records])
-            self.assertEqual(initial, Decimal('0.0'))
             self.assertEqual(credit, Decimal('350.0'))
             self.assertEqual(debit, Decimal('350.0'))
-            self.assertEqual(balance, Decimal('0.0'))
             results = {
                 '41': (Decimal('-80'), Decimal('-130')),
                 '43': (Decimal('300'), Decimal('600')),
@@ -1173,12 +1213,141 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             records = self.invoice_tax.browse(ids)
             self.assertEqual(len(records), 0)
 
+    def test0060_fiscalyear_not_closed(self):
+        'Test fiscalyear not closed'
+        with Transaction().start(DB_NAME, USER, context=CONTEXT):
+            today = datetime.date.today()
+            fiscalyear, = self.fiscalyear.search([])
+            company = fiscalyear.company
+            invoice_sequence, = self.sequence_strict.create([{
+                        'name': '%s' % today.year,
+                        'code': 'account.invoice',
+                        'company': company.id,
+                        }])
+            fiscalyear.out_invoice_sequence = invoice_sequence
+            fiscalyear.in_invoice_sequence = invoice_sequence
+            fiscalyear.out_credit_note_sequence = invoice_sequence
+            fiscalyear.in_credit_note_sequence = invoice_sequence
+            fiscalyear.save()
+            next_invoice_sequence, = self.sequence_strict.create([{
+                        'name': 'Next year invoice',
+                        'code': 'account.invoice',
+                        'company': company.id,
+                        }])
+            next_sequence, = self.sequence.create([{
+                        'name': 'Next Year',
+                        'code': 'account.move',
+                        'company': fiscalyear.company.id,
+                        }])
+            next_fiscalyear, = self.fiscalyear.copy([fiscalyear],
+                default={
+                    'name': 'Next fiscalyear',
+                    'start_date': fiscalyear.end_date + datetime.timedelta(1),
+                    'end_date': fiscalyear.end_date + datetime.timedelta(360),
+                    'post_move_sequence': next_sequence.id,
+                    'out_invoice_sequence':  next_invoice_sequence,
+                    'in_invoice_sequence':  next_invoice_sequence,
+                    'out_credit_note_sequence':  next_invoice_sequence,
+                    'in_credit_note_sequence':  next_invoice_sequence,
+                    'periods': None,
+                    })
+            self.fiscalyear.create_period([next_fiscalyear])
+            self.create_moves(fiscalyear)
+            self.create_moves(next_fiscalyear)
+
+            # General ledger for the next year
+            period = next_fiscalyear.periods[0]
+            last_period = next_fiscalyear.periods[-1]
+            session_id, _, _ = self.print_general_ledger.create()
+            print_general_ledger = self.print_general_ledger(session_id)
+            print_general_ledger.start.company = company
+            print_general_ledger.start.fiscalyear = next_fiscalyear
+            print_general_ledger.start.start_period = period
+            print_general_ledger.start.end_period = last_period
+            print_general_ledger.start.parties = []
+            print_general_ledger.start.accounts = []
+            print_general_ledger.start.output_format = 'pdf'
+            _, data = print_general_ledger.do_print_(None)
+            records, parameters = self.general_ledger_report.prepare(data)
+            self.assertEqual(len(records), 12)
+            self.assertEqual(parameters['start_period'], period.name)
+            self.assertEqual(parameters['end_period'], last_period.name)
+            self.assertEqual(parameters['fiscal_year'], next_fiscalyear.name)
+            self.assertEqual(parameters['accounts'], '')
+            self.assertEqual(parameters['parties'], '')
+            credit = sum([m['credit'] for m in records])
+            debit = sum([m['debit'] for m in records])
+            self.assertEqual(credit, debit)
+            self.assertEqual(credit, Decimal('730.0'))
+            with_party = [m for m in records if m['party_name'] != '']
+            self.assertEqual(len(with_party), 4)
+            dates = sorted(set([r['date'] for r in records]))
+            for date, expected_value in zip(dates, [period.start_date,
+                        last_period.end_date]):
+                self.assertEqual(date, expected_value.strftime('%d/%m/%Y'))
+            balances = [
+                Decimal('160'),            # Expense
+                Decimal('210'),            # Expense
+                Decimal('260'),            # Expense
+                Decimal('-60'),            # Payable Party 1
+                Decimal('-100'),           # Payable Party 2
+                Decimal('-100'),           # Payable
+                Decimal('200'),            # Receivable Party 1
+                Decimal('400'),            # Receivable Party 2
+                Decimal('600'),            # Receivable
+                Decimal('-700'),           # Revenue
+                Decimal('-900'),           # Revenue
+                Decimal('-1200'),          # Revenue
+                ]
+            for record, balance in zip(records, balances):
+                self.assertEqual(record['balance'], balance)
+
+            # Trial for the next year
+            session_id, _, _ = self.print_trial_balance.create()
+            print_trial_balance = self.print_trial_balance(session_id)
+            print_trial_balance.start.company = company
+            print_trial_balance.start.fiscalyear = next_fiscalyear
+            print_trial_balance.start.start_period = period
+            print_trial_balance.start.end_period = last_period
+            print_trial_balance.start.parties = []
+            print_trial_balance.start.accounts = []
+            print_trial_balance.start.show_digits = None
+            print_trial_balance.start.with_move_only = False
+            print_trial_balance.start.split_parties = True
+            print_trial_balance.start.add_initial_balance = True
+            print_trial_balance.start.comparison_fiscalyear = next_fiscalyear
+            print_trial_balance.start.comparison_start_period = period
+            print_trial_balance.start.comparison_end_period = last_period
+            print_trial_balance.start.output_format = 'pdf'
+            _, data = print_trial_balance.do_print_(None)
+
+            # Full trial_balance
+            records, parameters = self.trial_balance_report.prepare(data)
+            balances = {
+                'Main Cash': Decimal('0'),
+                'Main Tax': Decimal('0'),
+                'View': Decimal('0'),
+                'Main Payable': Decimal('-50'),
+                'supplier1': Decimal('-30'),
+                'supplier2': Decimal('-50'),
+                'Main Receivable': Decimal('300'),
+                'customer1': Decimal('100'),
+                'customer2': Decimal('200'),
+                'Main Expense': Decimal('130'),
+                'Main Revenue': Decimal('-600'),
+                }
+            for record in records:
+                self.assertEqual(record['period_initial_balance'],
+                    balances[record['name']])
+                self.assertEqual(record['initial_balance'],
+                    balances[record['name']])
+
 
 def suite():
     suite = trytond.tests.test_tryton.suite()
     from trytond.modules.account.tests import test_account
     for test in test_account.suite():
-        #Skip doctest
+        # Skip doctest
         class_name = test.__class__.__name__
         if test not in suite and class_name != 'DocFileCase':
             suite.addTest(test)

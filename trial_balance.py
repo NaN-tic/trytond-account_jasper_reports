@@ -1,19 +1,15 @@
-#This file is part of account_jasper_reports for tryton.  The COPYRIGHT file
-#at the top level of this repository contains the full copyright notices and
-#license terms.
+# This file is part of account_jasper_reports for tryton.  The COPYRIGHT file
+# At the top level of this repository contains the full copyright notices and
+# License terms.
 
 from datetime import timedelta
 
-from sql.aggregate import Sum
-from sql.conditionals import Coalesce
-from sql.operators import In
 from decimal import Decimal
 from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.pyson import Eval, Bool
-from trytond.tools import reduce_ids
 from trytond.modules.jasper_reports.jasper import JasperReport
 import logging
 
@@ -211,55 +207,6 @@ class TrialBalanceReport(JasperReport):
     __name__ = 'account_jasper_reports.trial_balance'
 
     @classmethod
-    def read_account_vals(cls, accounts, with_moves=False):
-        pool = Pool()
-        Account = pool.get('account.account')
-        Move = pool.get('account.move')
-        MoveLine = pool.get('account.move.line')
-        line = MoveLine.__table__()
-        move = Move.__table__()
-        table_a = Account.__table__()
-        table_c = Account.__table__()
-        in_max = 3000
-        values = {}
-        transaction = Transaction()
-        cursor = transaction.cursor
-        move_join = 'INNER' if with_moves else 'LEFT'
-        account_ids = [a.id for a in accounts]
-        group_by = (table_a.id,)
-        columns = (group_by + (Sum(Coalesce(line.debit, 0)).as_('debit'),
-                Sum(Coalesce(line.credit, 0)).as_('credit'),
-                (Sum(Coalesce(line.debit, 0)) -
-                    Sum(Coalesce(line.credit, 0))).as_('balance')))
-        for i in range(0, len(account_ids), in_max):
-            sub_ids = account_ids[i:i + in_max]
-            red_sql = reduce_ids(table_a.id, sub_ids)
-            where = red_sql
-            periods = transaction.context.get('periods', False)
-            if periods:
-                periods.append(0)
-                where = (where & In(Coalesce(move.period, 0), periods))
-            date = transaction.context.get('date')
-            if date:
-                where = (where & (move.date <= date))
-            cursor.execute(*table_a.join(table_c,
-                    condition=(table_c.left >= table_a.left)
-                    & (table_c.right <= table_a.right)
-                    ).join(line, move_join,
-                        condition=line.account == table_c.id
-                    ).join(move, move_join,
-                        condition=move.id == line.move
-                    ).select(*columns, where=where, group_by=group_by))
-
-            for x in cursor.dictfetchall():
-                values[x['id']] = {
-                    'credit': x['credit'],
-                    'debit': x['debit'],
-                    'balance': x['balance'],
-                    }
-        return values
-
-    @classmethod
     def prepare(cls, data):
         def _amounts(account, init_vals, vals):
             initial = init_vals.get(account.id, {}).get('balance') or _ZERO
@@ -399,7 +346,7 @@ class TrialBalanceReport(JasperReport):
         # Calc first period values
         with transaction.set_context(fiscalyear=fiscalyear.id,
                 periods=periods):
-            values = cls.read_account_vals(accounts, with_moves=with_moves)
+            values = Account.read_account_vals(accounts, with_moves=with_moves)
 
         # Calc Initial Balance for first period
         init_values = {}
@@ -407,7 +354,7 @@ class TrialBalanceReport(JasperReport):
             logger.info('Calc Initial Balance')
             initial_balance_date = start_period.start_date - timedelta(days=1)
             with transaction.set_context(date=initial_balance_date):
-                init_values = cls.read_account_vals(accounts,
+                init_values = Account.read_account_vals(accounts,
                     with_moves=with_moves)
 
         # Calc comparison period values.
@@ -415,10 +362,10 @@ class TrialBalanceReport(JasperReport):
         comparison_values = {}.fromkeys(accounts, Decimal('0.00'))
 
         if comparison_fiscalyear:
-        #    second_dict = {}.fromkeys(accounts, Decimal('0.00'))
+            # second_dict = {}.fromkeys(accounts, Decimal('0.00'))
             logger.info('Calc initial vals for comparison period')
             with transaction.set_context(periods=comparison_periods):
-                comparison_values = cls.read_account_vals(accounts,
+                comparison_values = Account.read_account_vals(accounts,
                     with_moves=with_moves)
 
             logger.info('Calc vals for comparison period')
@@ -426,7 +373,7 @@ class TrialBalanceReport(JasperReport):
                 timedelta(days=1))
             with transaction.set_context(date=initial_comparision_date):
                 comparison_initial_values.update(
-                    cls.read_account_vals(accounts, with_moves=with_moves))
+                    Account.read_account_vals(accounts, with_moves=with_moves))
         if split_parties:
 
             init_party_values = {}

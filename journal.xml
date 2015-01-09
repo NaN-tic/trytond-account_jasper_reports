@@ -19,9 +19,8 @@ copyright notices and license terms. -->
             <field name="report">account_jasper_reports/journal.jrxml</field>
             <field name="extension">pdf</field>
         </record>
-        <menuitem parent="account.menu_reporting"
-            id="menu_reporting_es" name="Informes ES"/>
-        <menuitem parent="menu_reporting_es" action="wizard_print_journal"
-            id="menu_print_journal" icon="tryton-print"/>
+
+        <menuitem id="menu_print_journal" action="wizard_print_journal"
+            parent="account.menu_reporting" icon="tryton-print"/>
     </data>
 </tryton>

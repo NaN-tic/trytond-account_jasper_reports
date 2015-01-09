@@ -11,6 +11,7 @@ from .taxes_by_invoice import *
 
 def register():
     Pool.register(
+        Account,
         Party,
         PrintJournalStart,
         PrintAbreviatedJournalStart,

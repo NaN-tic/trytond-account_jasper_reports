@@ -19,7 +19,8 @@ copyright notices and license terms. -->
             <field name="report">account_jasper_reports/trial_balance.jrxml</field>
             <field name="extension">pdf</field>
         </record>
-        <menuitem parent="menu_reporting_es" action="wizard_print_trial_balance"
-            id="menu_print_trial_balance" icon="tryton-print"/>
+
+        <menuitem id="account.menu_print_trial_balance"
+            action="wizard_print_trial_balance" icon="tryton-print"/>
     </data>
 </tryton>

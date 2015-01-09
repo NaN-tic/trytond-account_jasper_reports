@@ -1,8 +1,9 @@
-#This file is part of account_jasper_reports for tryton.  The COPYRIGHT file
-#at the top level of this repository contains the full copyright notices and
-#license terms.
-
+# This file is part of account_jasper_reports for tryton.  The COPYRIGHT file
+# at the top level of this repository contains the full copyright notices and
+# license terms.
+from datetime import timedelta
 from decimal import Decimal
+
 from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.model import ModelView, fields
@@ -121,6 +122,7 @@ class GeneralLedgerReport(JasperReport):
         Account = pool.get('account.account')
         Party = pool.get('party.party')
         Line = pool.get('account.move.line')
+
         fiscalyear = FiscalYear(data['fiscalyear'])
         start_period = None
         if data['start_period']:
@@ -163,8 +165,9 @@ class GeneralLedgerReport(JasperReport):
 
         domain = []
         if accounts:
-            accounts = [('account', 'in', accounts)]
-            domain += accounts
+            domain += [('account', 'in', accounts)]
+        else:
+            accounts = Account.search([('parent', '!=', None)])
 
         filter_periods = fiscalyear.get_periods(start_period, end_period)
         domain += [('period', 'in', filter_periods)]
@@ -201,9 +204,19 @@ class GeneralLedgerReport(JasperReport):
                     -- type 'receivable' or 'payable'
                     CASE WHEN aa.kind in ('receivable', 'payable') THEN
                            aml.party ELSE 0 END,
-                    am.date, am.description
+                    am.date,
+                    am.description,
+                    aml.id
                 """ % ','.join([str(x.id) for x in lines]))
             line_ids = [x[0] for x in cursor.fetchall()]
+
+        initial_balance_date = start_period.start_date - timedelta(days=1)
+        with Transaction().set_context(date=initial_balance_date):
+            init_values = Account.read_account_vals(accounts, with_moves=True,
+                exclude_party_moves=True)
+        with Transaction().set_context(date=initial_balance_date):
+            init_party_values = Party.get_account_values_by_party(
+                parties, accounts)
 
         records = []
         lastKey = None
@@ -216,7 +229,18 @@ class GeneralLedgerReport(JasperReport):
                 currentKey = line.account
             if lastKey != currentKey:
                 lastKey = currentKey
-                balance = Decimal('0.00')
+                if isinstance(currentKey, tuple):
+                    account_id = currentKey[0].id
+                    party_id = currentKey[1].id if currentKey[1] else None
+                else:
+                    account_id = currentKey.id
+                    party_id = None
+                if party_id:
+                    balance = init_party_values.get(account_id,
+                        {}).get(party_id, {}).get('balance', Decimal(0))
+                else:
+                    balance = init_values.get(account_id, {}).get('balance',
+                        Decimal(0))
             balance += line.debit - line.credit
             sequence += 1
             records.append({
