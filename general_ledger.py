@@ -252,7 +252,9 @@ class GeneralLedgerReport(JasperReport):
                     'date': line.date.strftime('%d/%m/%Y'),
                     'move_line_name': line.description or '',
                     'ref': line.origin.rec_name if line.origin else '',
-                    'move_name': line.move.rec_name,
+                    'move_number': line.move.number,
+                    'move_post_number': (line.move.post_number
+                        if line.move.post_number else ''),
                     'party_name': line.party.name if line.party else '',
                     'credit': line.credit,
                     'debit': line.debit,
