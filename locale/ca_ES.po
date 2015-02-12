@@ -284,11 +284,19 @@ msgstr "Referència"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "To"
-msgstr "a"
+msgstr "A"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "Total"
 msgstr "Total"
+
+msgctxt "jasper:account_jasper_reports.general_ledger:"
+msgid ""
+"When the Move number is between '()' means it hasn't Post Number and the "
+"shown number is the provisional one."
+msgstr ""
+"Quan el número d'assentament apareix entre parèntesis vol dir que no té "
+"Número confirmat i el número que es mostra és el provisional."
 
 msgctxt "jasper:account_jasper_reports.journal:"
 msgid " From"
@@ -334,10 +342,17 @@ msgctxt "jasper:account_jasper_reports.journal:"
 msgid "Party"
 msgstr "Tercer"
 
-#, fuzzy
 msgctxt "jasper:account_jasper_reports.journal:"
 msgid "To"
-msgstr "Per a"
+msgstr "A"
+
+msgctxt "jasper:account_jasper_reports.journal:"
+msgid ""
+"When the Move number is between '()' means it hasn't Post Number and the "
+"shown number is the provisional one."
+msgstr ""
+"Quan el número d'assentament apareix entre parèntesis vol dir que no té "
+"Número confirmat i el número que es mostra és el provisional."
 
 msgctxt "jasper:account_jasper_reports.taxes_by_invoice:"
 msgid "Account"
@@ -460,12 +475,12 @@ msgid "Taxes By Invoice and Period"
 msgstr "Impostos per factura i període"
 
 msgctxt "jasper:account_jasper_reports.taxes_by_invoice_and_period:"
-msgid "Total Period"
-msgstr "Total període"
-
-msgctxt "jasper:account_jasper_reports.taxes_by_invoice_and_period:"
 msgid "Total"
 msgstr "Total"
+
+msgctxt "jasper:account_jasper_reports.taxes_by_invoice_and_period:"
+msgid "Total Period"
+msgstr "Total període"
 
 msgctxt "jasper:account_jasper_reports.taxes_by_invoice_and_period:"
 msgid "VAT"
@@ -525,7 +540,7 @@ msgstr "Segon balanç"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "To"
-msgstr "a"
+msgstr "A"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Trial Balance"
