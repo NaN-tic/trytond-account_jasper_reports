@@ -1,3 +1,6 @@
+* Replace Tryton's journal menu with the journal report
+* Layout improvements in journal report
+
 Version 3.4.1 - 2015-01-09
 * Fix treatment of deferred/cummulate accounts (use the Tryton's default
   behaviour).

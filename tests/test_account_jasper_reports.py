@@ -534,10 +534,10 @@ class AccountJasperReportsTestCase(unittest.TestCase):
                 Decimal('130'),            # Expense
                 Decimal('-30'),            # Payable Party 1
                 Decimal('-50'),            # Payable Party 2
-                Decimal('-50'),            # Payable
+                Decimal('-100'),           # Payable Party 2
                 Decimal('100'),            # Receivable Party 1
                 Decimal('200'),            # Receivable Party 2
-                Decimal('300'),            # Receivable
+                Decimal('500'),            # Receivable Party 2
                 Decimal('-100'),           # Revenue
                 Decimal('-300'),           # Revenue
                 Decimal('-600'),           # Revenue
@@ -1280,7 +1280,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             self.assertEqual(credit, debit)
             self.assertEqual(credit, Decimal('730.0'))
             with_party = [m for m in records if m['party_name'] != '']
-            self.assertEqual(len(with_party), 4)
+            self.assertEqual(len(with_party), 6)
             dates = sorted(set([r['date'] for r in records]))
             for date, expected_value in zip(dates, [period.start_date,
                         last_period.end_date]):
@@ -1290,11 +1290,11 @@ class AccountJasperReportsTestCase(unittest.TestCase):
                 Decimal('210'),            # Expense
                 Decimal('260'),            # Expense
                 Decimal('-60'),            # Payable Party 1
-                Decimal('-100'),           # Payable Party 2
-                Decimal('-100'),           # Payable
+                Decimal('-150'),           # Payable Party 2
+                Decimal('-200'),           # Payable Party 2
                 Decimal('200'),            # Receivable Party 1
-                Decimal('400'),            # Receivable Party 2
-                Decimal('600'),            # Receivable
+                Decimal('700'),            # Receivable Party 2
+                Decimal('1000'),           # Receivable Party 2
                 Decimal('-700'),           # Revenue
                 Decimal('-900'),           # Revenue
                 Decimal('-1200'),          # Revenue
@@ -1327,12 +1327,10 @@ class AccountJasperReportsTestCase(unittest.TestCase):
                 'Main Cash': Decimal('0'),
                 'Main Tax': Decimal('0'),
                 'View': Decimal('0'),
-                'Main Payable': Decimal('-50'),
                 'supplier1': Decimal('-30'),
-                'supplier2': Decimal('-50'),
-                'Main Receivable': Decimal('300'),
+                'supplier2': Decimal('-100'),
                 'customer1': Decimal('100'),
-                'customer2': Decimal('200'),
+                'customer2': Decimal('500'),
                 'Main Expense': Decimal('130'),
                 'Main Revenue': Decimal('-600'),
                 }

@@ -82,11 +82,18 @@ class Account:
                         condition=move.id == line.move
                     ).select(*columns, where=where, group_by=group_by))
 
-            for x in cursor.dictfetchall():
-                values[x['id']] = {
-                    'credit': x['credit'],
-                    'debit': x['debit'],
-                    'balance': x['balance'],
+            for account, debit, credit, balance in cursor.fetchall():
+                # SQLite uses float for SUM
+                if not isinstance(credit, Decimal):
+                    credit = Decimal(str(credit))
+                if not isinstance(debit, Decimal):
+                    debit = Decimal(str(debit))
+                if not isinstance(balance, Decimal):
+                    balance = Decimal(str(balance))
+                values[account] = {
+                    'credit': credit,
+                    'debit': debit,
+                    'balance': balance,
                     }
         return values
 

@@ -418,6 +418,10 @@ msgctxt "jasper:account_jasper_reports.taxes_by_invoice:"
 msgid "VAT"
 msgstr "NIF"
 
+msgctxt "jasper:account_jasper_reports.taxes_by_invoice:"
+msgid "Without taxes"
+msgstr "Sin impuestos"
+
 msgctxt "jasper:account_jasper_reports.taxes_by_invoice_and_period:"
 msgid "Account"
 msgstr "Cuenta"
@@ -658,25 +662,9 @@ msgctxt "model:ir.ui.menu,name:menu_print_abreviated_journal"
 msgid "Print Abreviated Journal"
 msgstr "Imprimir diario abreviado"
 
-msgctxt "model:ir.ui.menu,name:menu_print_general_ledger"
-msgid "Print General Ledger"
-msgstr "Imprimir libro mayor"
-
-msgctxt "model:ir.ui.menu,name:menu_print_journal"
-msgid "Print Journal"
-msgstr "Imprimir diario"
-
 msgctxt "model:ir.ui.menu,name:menu_print_taxes_by_invoice"
 msgid "Print Taxes by Invoice and Period"
 msgstr "Imprimir impuestos por factura y período"
-
-msgctxt "model:ir.ui.menu,name:menu_print_trial_balance"
-msgid "Print Trial Balance"
-msgstr "Imprimir balance de sumas y saldos"
-
-msgctxt "model:ir.ui.menu,name:menu_reporting_es"
-msgid "Informes ES"
-msgstr "Informes ES"
 
 msgctxt ""
 "selection:account_jasper_reports.print_abreviated_journal.start,display_account:"
