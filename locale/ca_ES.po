@@ -564,15 +564,15 @@ msgstr "Imprimeix diari"
 
 msgctxt "model:account_jasper_reports.print_taxes_by_invoice.start,name:"
 msgid "Print Taxes by Invoice and Period"
-msgstr "Imprmeix Impostos per factura i període"
+msgstr "Imprimeix impostos per factura i període"
 
 msgctxt "model:account_jasper_reports.print_trial_balance.start,name:"
 msgid "Print Trial Balance Start"
-msgstr "Inici Imprimeix balanç de sumes i saldos"
+msgstr "Inici imprimeix balanç de sumes i saldos"
 
 msgctxt "model:ir.action,name:report_abreviated_journal"
 msgid "Abreviated Journal"
-msgstr "Diari Abreviat"
+msgstr "Diari abreviat"
 
 msgctxt "model:ir.action,name:report_general_ledger"
 msgid "General Ledger"
@@ -608,7 +608,7 @@ msgstr "Imprimeix diari"
 
 msgctxt "model:ir.action,name:wizard_print_taxes_by_invoice"
 msgid "Print Taxes by Invoice and Period"
-msgstr "Imprmeix Impostos per factura i període"
+msgstr "Imprimeix impostos per factura i període"
 
 msgctxt "model:ir.action,name:wizard_print_trial_balance"
 msgid "Print Trial Balance"
@@ -616,7 +616,7 @@ msgstr "Imprimeix balanç de sumes i saldos"
 
 msgctxt "model:ir.action.report,name:report_abreviated_journal"
 msgid "Abreviated Journal"
-msgstr "Diari Abreviat"
+msgstr "Diari abreviat"
 
 msgctxt "model:ir.action.report,name:report_general_ledger"
 msgid "General Ledger"
@@ -652,7 +652,7 @@ msgstr "Imprimeix diari"
 
 msgctxt "model:ir.action.wizard,name:wizard_print_taxes_by_invoice"
 msgid "Print Taxes by Invoice and Period"
-msgstr "Imprimeix Impostos per factura i període"
+msgstr "Imprimeix impostos per factura i període"
 
 msgctxt "model:ir.action.wizard,name:wizard_print_trial_balance"
 msgid "Print Trial Balance"
