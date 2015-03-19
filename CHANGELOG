@@ -1,3 +1,4 @@
+* Exclude root account on abreviated journal
 * Replace Tryton's journal menu with the journal report
 * Layout improvements in journal report
 

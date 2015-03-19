@@ -115,7 +115,7 @@ class AbreviatedJournalReport(JasperReport):
         level = data['level']
         for account in Account.search([('company', '=', data['company'])],
                 order=[('code', 'ASC')]):
-            if not account.code:
+            if not account.code or not account.parent:
                 continue
             if len(account.code) == level or \
                 account.kind != 'view' and len(account.childs) == 0 and \
