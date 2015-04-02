@@ -664,7 +664,7 @@ msgstr "Imprimeix diari abreviat"
 
 msgctxt "model:ir.ui.menu,name:menu_print_taxes_by_invoice"
 msgid "Print Taxes by Invoice and Period"
-msgstr "Imprmeix Impostos per factura i període"
+msgstr "Imprimeix impostos per factura i període"
 
 msgctxt ""
 "selection:account_jasper_reports.print_abreviated_journal.start,display_account:"
