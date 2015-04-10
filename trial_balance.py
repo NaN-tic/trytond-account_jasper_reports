@@ -28,7 +28,18 @@ class PrintTrialBalanceStart(ModelView):
     comparison_fiscalyear = fields.Many2One('account.fiscalyear',
             'Fiscal Year')
     show_digits = fields.Integer('Digits')
-    with_move_only = fields.Boolean('Only Accounts With Move')
+    with_move_only = fields.Boolean('Only Accounts With Move',
+        states={
+            'invisible': Bool(Eval('add_initial_balance') &
+                Eval('with_move_or_initial'))
+        },
+        depends=['with_move_or_initial'])
+    with_move_or_initial = fields.Boolean(
+        'Only Accounts With Moves or Initial Balance',
+        states={
+            'invisible': ~Bool(Eval('add_initial_balance'))
+        },
+        depends=['add_initial_balance'])
     accounts = fields.Many2Many('account.account', None, None, 'Accounts')
     split_parties = fields.Boolean('Split Parties')
     add_initial_balance = fields.Boolean('Add Initial Balance')
@@ -173,6 +184,7 @@ class PrintTrialBalance(Wizard):
             'digits': self.start.show_digits or None,
             'add_initial_balance': self.start.add_initial_balance,
             'with_move_only': self.start.with_move_only,
+            'with_move_or_initial': self.start.with_move_or_initial,
             'split_parties': self.start.split_parties,
             'accounts': [x.id for x in self.start.accounts],
             'parties': [x.id for x in self.start.parties],
@@ -277,6 +289,11 @@ class TrialBalanceReport(JasperReport):
         digits = data['digits']
         add_initial_balance = data['add_initial_balance']
         with_moves = data['with_move_only']
+        with_moves_or_initial = data['with_move_or_initial']
+        if not add_initial_balance:
+            with_moves_or_initial = False
+        if with_moves_or_initial:
+            with_moves = True
 
         periods = [x.id for x in fiscalyear.get_periods(start_period,
                 end_period)]
@@ -421,11 +438,14 @@ class TrialBalanceReport(JasperReport):
                 vals = _amounts(account, init_values, values)
                 initial, credit, debit, balance = vals
 
-                if with_moves and credit == 0 and debit == 0:
+                if with_moves_or_initial:
+                    if credit == 0 and debit == 0 and initial == 0:
+                        continue
+                elif with_moves and credit == 0 and debit == 0:
                     continue
 
                 comp_vals = _amounts(account,
-                    comparison_initial_values,  comparison_values)
+                    comparison_initial_values, comparison_values)
                 comp_initial, comp_credit, comp_debit, comp_balance = \
                     comp_vals
 
@@ -452,8 +472,8 @@ class TrialBalanceReport(JasperReport):
                                 comparison_party_values)
                         init, credit, debit, balance = party_vals
 
-                        if with_moves and not debit and not credit and \
-                                not balance:
+                        if (with_moves or with_moves_or_initial) and \
+                                not debit and not credit and not balance:
                             continue
 
                         record = _record(account, party,

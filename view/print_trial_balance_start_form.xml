@@ -4,19 +4,16 @@ copyright notices and license terms. -->
 <form string="Trial Balance Report" >
     <label name="company"/>
     <field name="company"/>
-    <newline/>
     <label name="show_digits"/>
     <field name="show_digits"/>
-    <newline/>
-    <label name="with_move_only"/>
-    <field name="with_move_only"/>
-    <newline/>
-    <label name="split_parties"/>
-    <field name="split_parties"/>
-    <newline/>
     <label name="add_initial_balance"/>
     <field name="add_initial_balance"/>
-    <newline/>
+    <label name="with_move_or_initial"/>
+    <field name="with_move_or_initial"/>
+    <label name="split_parties"/>
+    <field name="split_parties"/>
+    <label name="with_move_only"/>
+    <field name="with_move_only"/>
     <label id="all_parties" string="All parties if Empty" colspan="4"/>
     <field name="parties" colspan="4"/>
     <label id="all_accounts" string="All accounts if Empty" colspan="4"/>
