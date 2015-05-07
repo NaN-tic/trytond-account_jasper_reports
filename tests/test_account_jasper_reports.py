@@ -564,6 +564,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             print_trial_balance.start.accounts = []
             print_trial_balance.start.show_digits = None
             print_trial_balance.start.with_move_only = False
+            print_trial_balance.start.with_move_or_initial = False
             print_trial_balance.start.split_parties = False
             print_trial_balance.start.add_initial_balance = False
             print_trial_balance.start.comparison_fiscalyear = None
@@ -616,6 +617,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             print_trial_balance.start.accounts = []
             print_trial_balance.start.show_digits = 1
             print_trial_balance.start.with_move_only = False
+            print_trial_balance.start.with_move_or_initial = False
             print_trial_balance.start.split_parties = False
             print_trial_balance.start.add_initial_balance = False
             print_trial_balance.start.comparison_fiscalyear = None
@@ -643,6 +645,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             print_trial_balance.start.accounts = []
             print_trial_balance.start.show_digits = 2
             print_trial_balance.start.with_move_only = False
+            print_trial_balance.start.with_move_or_initial = False
             print_trial_balance.start.split_parties = False
             print_trial_balance.start.add_initial_balance = False
             print_trial_balance.start.comparison_fiscalyear = None
@@ -669,6 +672,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             print_trial_balance.start.accounts = []
             print_trial_balance.start.show_digits = 1
             print_trial_balance.start.with_move_only = True
+            print_trial_balance.start.with_move_or_initial = False
             print_trial_balance.start.split_parties = False
             print_trial_balance.start.add_initial_balance = False
             print_trial_balance.start.comparison_fiscalyear = None
@@ -696,6 +700,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             print_trial_balance.start.accounts = []
             print_trial_balance.start.show_digits = 2
             print_trial_balance.start.with_move_only = False
+            print_trial_balance.start.with_move_or_initial = False
             print_trial_balance.start.split_parties = True
             print_trial_balance.start.add_initial_balance = False
             print_trial_balance.start.comparison_fiscalyear = None
@@ -722,6 +727,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             print_trial_balance.start.accounts = []
             print_trial_balance.start.show_digits = None
             print_trial_balance.start.with_move_only = False
+            print_trial_balance.start.with_move_or_initial = False
             print_trial_balance.start.split_parties = True
             print_trial_balance.start.add_initial_balance = False
             print_trial_balance.start.comparison_fiscalyear = None
@@ -751,6 +757,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             print_trial_balance.start.accounts = []
             print_trial_balance.start.show_digits = None
             print_trial_balance.start.with_move_only = False
+            print_trial_balance.start.with_move_or_initial = False
             print_trial_balance.start.split_parties = True
             print_trial_balance.start.add_initial_balance = False
             print_trial_balance.start.comparison_fiscalyear = None
@@ -784,6 +791,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             print_trial_balance.start.accounts = [revenue.id]
             print_trial_balance.start.show_digits = None
             print_trial_balance.start.with_move_only = False
+            print_trial_balance.start.with_move_or_initial = False
             print_trial_balance.start.split_parties = False
             print_trial_balance.start.add_initial_balance = False
             print_trial_balance.start.comparison_fiscalyear = None
@@ -811,6 +819,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             print_trial_balance.start.accounts = []
             print_trial_balance.start.show_digits = None
             print_trial_balance.start.with_move_only = True
+            print_trial_balance.start.with_move_or_initial = False
             print_trial_balance.start.split_parties = False
             print_trial_balance.start.add_initial_balance = True
             print_trial_balance.start.comparison_fiscalyear = fiscalyear
@@ -856,6 +865,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             print_trial_balance.start.accounts = []
             print_trial_balance.start.show_digits = None
             print_trial_balance.start.with_move_only = True
+            print_trial_balance.start.with_move_or_initial = False
             print_trial_balance.start.split_parties = True
             print_trial_balance.start.add_initial_balance = True
             print_trial_balance.start.comparison_fiscalyear = fiscalyear
@@ -888,6 +898,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             print_trial_balance.start.accounts = []
             print_trial_balance.start.show_digits = None
             print_trial_balance.start.with_move_only = True
+            print_trial_balance.start.with_move_or_initial = False
             print_trial_balance.start.split_parties = False
             print_trial_balance.start.add_initial_balance = False
             print_trial_balance.start.comparison_fiscalyear = fiscalyear
@@ -930,6 +941,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             print_trial_balance.start.accounts = [receivable.id]
             print_trial_balance.start.show_digits = None
             print_trial_balance.start.with_move_only = True
+            print_trial_balance.start.with_move_or_initial = False
             print_trial_balance.start.split_parties = True
             print_trial_balance.start.add_initial_balance = False
             print_trial_balance.start.comparison_fiscalyear = None
@@ -961,6 +973,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             print_trial_balance.start.accounts = []
             print_trial_balance.start.show_digits = None
             print_trial_balance.start.with_move_only = False
+            print_trial_balance.start.with_move_or_initial = False
             print_trial_balance.start.split_parties = True
             print_trial_balance.start.add_initial_balance = False
             print_trial_balance.start.comparison_fiscalyear = None
@@ -1313,6 +1326,7 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             print_trial_balance.start.accounts = []
             print_trial_balance.start.show_digits = None
             print_trial_balance.start.with_move_only = False
+            print_trial_balance.start.with_move_or_initial = False
             print_trial_balance.start.split_parties = True
             print_trial_balance.start.add_initial_balance = True
             print_trial_balance.start.comparison_fiscalyear = next_fiscalyear

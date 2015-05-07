@@ -1,11 +1,9 @@
 # coding=utf-8
-#This file is part of account_jasper_reports for tryton.  The COPYRIGHT file
-#at the top level of this repository contains the full copyright notices and
-#license terms.
+# The COPYRIGHT file at the top level of this repository contains the full
+# copyright notices and license terms.
 from decimal import Decimal
 from sql.aggregate import Sum
 from sql.conditionals import Coalesce
-from sql.operators import In
 
 from trytond.pool import Pool
 from trytond.transaction import Transaction

@@ -1,6 +1,5 @@
-# This file is part of account_jasper_reports for tryton.  The COPYRIGHT file
-# At the top level of this repository contains the full copyright notices and
-# License terms.
+# The COPYRIGHT filei at the top level of this repository contains the full
+# copyright notices and License terms.
 
 from datetime import timedelta
 
@@ -432,7 +431,8 @@ class TrialBalanceReport(JasperReport):
                 if digits and account.code:
                     if len(account.code.strip()) < digits:
                         continue
-                    elif len(account.code) == digits and account.kind == 'view':
+                    elif (len(account.code) == digits and
+                            account.kind == 'view'):
                         account.kind = 'other'
 
                 vals = _amounts(account, init_values, values)
