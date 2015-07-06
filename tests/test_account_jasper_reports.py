@@ -2,6 +2,7 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
 from decimal import Decimal
+from dateutil.relativedelta import relativedelta
 import datetime
 import unittest
 import trytond.tests.test_tryton
@@ -1255,8 +1256,9 @@ class AccountJasperReportsTestCase(unittest.TestCase):
             next_fiscalyear, = self.fiscalyear.copy([fiscalyear],
                 default={
                     'name': 'Next fiscalyear',
-                    'start_date': fiscalyear.end_date + datetime.timedelta(1),
-                    'end_date': fiscalyear.end_date + datetime.timedelta(360),
+                    'start_date': fiscalyear.start_date + relativedelta(
+                        years=1),
+                    'end_date': fiscalyear.end_date + relativedelta(years=1),
                     'post_move_sequence': next_sequence.id,
                     'out_invoice_sequence':  next_invoice_sequence,
                     'in_invoice_sequence':  next_invoice_sequence,
@@ -1347,6 +1349,73 @@ class AccountJasperReportsTestCase(unittest.TestCase):
                 'customer2': Decimal('500'),
                 'Main Expense': Decimal('130'),
                 'Main Revenue': Decimal('-600'),
+                }
+            for record in records:
+                self.assertEqual(record['period_initial_balance'],
+                    balances[record['name']])
+                self.assertEqual(record['initial_balance'],
+                    balances[record['name']])
+
+            # Create another fiscalyear and test it cumulates correctly
+            future_invoice_sequence, = self.sequence_strict.create([{
+                        'name': 'Future year invoice',
+                        'code': 'account.invoice',
+                        'company': company.id,
+                        }])
+            future_sequence, = self.sequence.create([{
+                        'name': 'Future Year',
+                        'code': 'account.move',
+                        'company': fiscalyear.company.id,
+                        }])
+            future_fiscalyear, = self.fiscalyear.copy([fiscalyear],
+                default={
+                    'name': 'Future fiscalyear',
+                    'start_date': fiscalyear.start_date + relativedelta(
+                        years=2),
+                    'end_date': fiscalyear.end_date + relativedelta(years=2),
+                    'post_move_sequence': future_sequence.id,
+                    'out_invoice_sequence':  future_invoice_sequence,
+                    'in_invoice_sequence':  future_invoice_sequence,
+                    'out_credit_note_sequence':  future_invoice_sequence,
+                    'in_credit_note_sequence':  future_invoice_sequence,
+                    'periods': None,
+                    })
+            self.fiscalyear.create_period([future_fiscalyear])
+            self.create_moves(future_fiscalyear)
+
+            period = future_fiscalyear.periods[0]
+            last_period = future_fiscalyear.periods[-1]
+            session_id, _, _ = self.print_trial_balance.create()
+            print_trial_balance = self.print_trial_balance(session_id)
+            print_trial_balance.start.company = company
+            print_trial_balance.start.fiscalyear = future_fiscalyear
+            print_trial_balance.start.start_period = period
+            print_trial_balance.start.end_period = last_period
+            print_trial_balance.start.parties = []
+            print_trial_balance.start.accounts = []
+            print_trial_balance.start.show_digits = None
+            print_trial_balance.start.with_move_only = False
+            print_trial_balance.start.with_move_or_initial = False
+            print_trial_balance.start.split_parties = True
+            print_trial_balance.start.add_initial_balance = True
+            print_trial_balance.start.comparison_fiscalyear = future_fiscalyear
+            print_trial_balance.start.comparison_start_period = period
+            print_trial_balance.start.comparison_end_period = last_period
+            print_trial_balance.start.output_format = 'pdf'
+            _, data = print_trial_balance.do_print_(None)
+
+            # Full trial_balance
+            records, parameters = self.trial_balance_report.prepare(data)
+            balances = {
+                'Main Cash': Decimal('0'),
+                'Main Tax': Decimal('0'),
+                'View': Decimal('0'),
+                'supplier1': Decimal('-60'),
+                'supplier2': Decimal('-200'),
+                'customer1': Decimal('200'),
+                'customer2': Decimal('1000'),
+                'Main Expense': Decimal('260'),
+                'Main Revenue': Decimal('-1200'),
                 }
             for record in records:
                 self.assertEqual(record['period_initial_balance'],

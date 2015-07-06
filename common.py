@@ -69,7 +69,7 @@ class Account:
                 where = (where & In(Coalesce(move.period, 0), periods))
             date = transaction.context.get('date')
             if date:
-                where = (where & (move.date <= date))
+                where &= (move.date <= date)
             if exclude_party_moves:
                 where = (where & (~In(table_a.kind, ['receivable', 'payable'])
                         | (line.party == None)))
@@ -109,15 +109,18 @@ class Party:
         '''
         res = {}
         pool = Pool()
+        Move = pool.get('account.move')
         MoveLine = pool.get('account.move.line')
         Account = pool.get('account.account')
         transaction = Transaction()
+        context = transaction.context
         cursor = transaction.cursor
 
+        move = Move.__table__()
         line = MoveLine.__table__()
         account = Account.__table__()
 
-        company = transaction.context.get('company')
+        company = context.get('company')
         if not company:
             return res
 
@@ -127,6 +130,10 @@ class Party:
                 (Sum(Coalesce(line.debit, 0)) -
                     Sum(Coalesce(line.credit, 0))).as_('balance')))
         line_query, _ = MoveLine.query_get(line)
+        if context.get('date'):
+            # Cumulate data from previous fiscalyears
+            line_query = line.move.in_(move.select(move.id,
+                        where=move.date <= context.get('date')))
         where = (line_query & account.active &
             (account.company == company))
         if accounts:
