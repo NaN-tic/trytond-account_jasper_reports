@@ -1,8 +1,6 @@
 # The COPYRIGHT filei at the top level of this repository contains the full
 # copyright notices and License terms.
-
 from datetime import timedelta
-
 from decimal import Decimal
 from trytond.pool import Pool
 from trytond.transaction import Transaction
@@ -16,6 +14,7 @@ __all__ = ['PrintTrialBalanceStart', 'PrintTrialBalance',
     'TrialBalanceReport']
 
 _ZERO = Decimal('0.00')
+logger = logging.getLogger(__name__)
 
 
 class PrintTrialBalanceStart(ModelView):
@@ -254,7 +253,7 @@ class TrialBalanceReport(JasperReport):
                 'debit': debit_comp,
                 'balance': balance_comp,
             }
-        logger = logging.getLogger('account_jasper_reports')
+
         logger.info('Start Trial Balance')
 
         pool = Pool()
