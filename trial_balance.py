@@ -138,17 +138,13 @@ class PrintTrialBalanceStart(ModelView):
 
     @fields.depends('fiscalyear')
     def on_change_fiscalyear(self):
-        return {
-            'start_period': None,
-            'end_period': None,
-            }
+        self.start_period = None
+        self.end_period = None
 
     @fields.depends('comparison_fiscalyear')
     def on_change_comparison_fiscalyear(self):
-        return {
-            'comparison_start_period': None,
-            'comparison_end_period': None,
-            }
+        self.comparison_start_period = None
+        self.comparison_end_period = None
 
 
 class PrintTrialBalance(Wizard):

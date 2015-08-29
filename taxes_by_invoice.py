@@ -62,7 +62,7 @@ class PrintTaxesByInvoiceAndPeriodStart(ModelView):
 
     @fields.depends('fiscalyear')
     def on_change_fiscalyear(self):
-        return {'periods': None, }
+        self.periods = None
 
 
 class PrintTaxesByInvoiceAndPeriod(Wizard):

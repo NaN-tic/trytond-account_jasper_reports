@@ -51,10 +51,9 @@ class PrintJournalStart(ModelView):
 
     @fields.depends('fiscalyear')
     def on_change_fiscalyear(self):
-        return {
-            'start_period': None,
-            'end_period': None,
-            }
+        self.start_period = None
+        self.end_period = None
+
 
 class PrintJournal(Wizard):
     'Print Journal'
