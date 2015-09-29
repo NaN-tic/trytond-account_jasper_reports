@@ -4,7 +4,7 @@
 from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.model import ModelView, fields
-from trytond.wizard import Wizard, StateView, StateAction, Button
+from trytond.wizard import Wizard, StateView, StateAction, StateReport, Button
 from trytond.pyson import Eval
 from trytond.modules.jasper_reports.jasper import JasperReport
 
@@ -73,7 +73,7 @@ class PrintTaxesByInvoiceAndPeriod(Wizard):
             Button('Cancel', 'end', 'tryton-cancel'),
             Button('Print', 'print_', 'tryton-print', default=True),
             ])
-    print_ = StateAction('account_jasper_reports.report_taxes_by_invoice')
+    print_ = StateReport('account_jasper_reports.taxes_by_invoice')
 
     def do_print_(self, action):
         data = {

@@ -8,7 +8,7 @@ from sql.conditionals import Coalesce
 from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.model import ModelView, fields
-from trytond.wizard import Wizard, StateView, StateAction, Button
+from trytond.wizard import Wizard, StateView, StateReport, Button
 from trytond.tools import reduce_ids
 from trytond.modules.jasper_reports.jasper import JasperReport
 
@@ -64,7 +64,7 @@ class PrintAbreviatedJournal(Wizard):
             Button('Cancel', 'end', 'tryton-cancel'),
             Button('Print', 'print_', 'tryton-print', default=True),
             ])
-    print_ = StateAction('account_jasper_reports.report_abreviated_journal')
+    print_ = StateReport('account_jasper_reports.abreviated_journal')
 
     def do_print_(self, action):
         data = {
