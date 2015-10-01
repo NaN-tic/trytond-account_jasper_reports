@@ -467,8 +467,10 @@ class TrialBalanceReport(JasperReport):
                                 comparison_party_values)
                         init, credit, debit, balance = party_vals
 
-                        if (with_moves or with_moves_or_initial) and \
-                                not debit and not credit and not balance:
+                        if with_moves_or_initial:
+                            if credit == 0 and debit == 0 and initial == 0:
+                                continue
+                        elif with_moves and credit == 0 and debit == 0:
                             continue
 
                         record = _record(account, party,
