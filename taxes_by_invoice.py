@@ -128,7 +128,8 @@ class TaxesByInvoiceReport(JasperReport):
             periods = Period.search([('fiscalyear', '=', fiscalyear.id)])
             periods_subtitle = ''
 
-        parties = Party.browse(data.get('parties', []))
+        with Transaction().set_context(active_test=False):
+            parties = Party.browse(data.get('parties', []))
         if parties:
             parties_subtitle = []
             for x in parties:
@@ -167,7 +168,8 @@ class TaxesByInvoiceReport(JasperReport):
 
     @classmethod
     def execute(cls, ids, data):
-        report_ids, parameters = cls.prepare(data)
+        with Transaction().set_context(active_test=False):
+            report_ids, parameters = cls.prepare(data)
         return super(TaxesByInvoiceReport, cls).execute(report_ids, {
                 'name': cls.__name__,
                 'parameters': parameters,

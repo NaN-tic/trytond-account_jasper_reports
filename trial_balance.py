@@ -322,29 +322,30 @@ class TrialBalanceReport(JasperReport):
         parameters['with_moves_only'] = with_moves or ''
         parameters['split_parties'] = split_parties or ''
 
-        if parties:
-            parties = Party.browse(parties)
-            parties_subtitle = []
-            for x in parties:
-                if len(parties_subtitle) > 4:
-                    parties_subtitle.append('...')
-                    break
-                parties_subtitle.append(x.name)
-            parties_subtitle = '; '.join(parties_subtitle)
-        else:
-            parties_subtitle = ''
+        with Transaction().set_context(active_test=False):
+            if parties:
+                parties = Party.browse(parties)
+                parties_subtitle = []
+                for x in parties:
+                    if len(parties_subtitle) > 4:
+                        parties_subtitle.append('...')
+                        break
+                    parties_subtitle.append(x.name)
+                parties_subtitle = '; '.join(parties_subtitle)
+            else:
+                parties_subtitle = ''
 
-        parameters['parties'] = parties_subtitle
-        logger.info('Search accounts')
-        accounts = []
-        for account in Account.search(domain, order=[('code', 'ASC')]):
-            if not account.code:
-                if not digits:
+            parameters['parties'] = parties_subtitle
+            logger.info('Search accounts')
+            accounts = []
+            for account in Account.search(domain, order=[('code', 'ASC')]):
+                if not account.code:
+                    if not digits:
+                        accounts.append(account)
+                elif not digits or len(account.code) == digits or \
+                    account.kind != 'view' and len(account.childs) == 0 and \
+                        len(account.code) < (digits or 9999):
                     accounts.append(account)
-            elif not digits or len(account.code) == digits or \
-                account.kind != 'view' and len(account.childs) == 0 and \
-                    len(account.code) < (digits or 9999):
-                accounts.append(account)
 
         if accounts_title:
             accounts_subtitle = []
