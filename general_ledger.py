@@ -128,31 +128,32 @@ class GeneralLedgerReport(JasperReport):
         end_period = None
         if data['end_period']:
             end_period = Period(data['end_period'])
-        accounts = Account.browse(data.get('accounts', []))
-        parties = Party.browse(data.get('parties', []))
-        if accounts:
-            js = Account.search([('id', 'in', [x.id for x in accounts])])
-            accounts_subtitle = []
-            for x in js:
-                if len(accounts_subtitle) > 4:
-                    accounts_subtitle.append('...')
-                    break
-                accounts_subtitle.append(x.code)
-            accounts_subtitle = ', '.join(accounts_subtitle)
-        else:
-            accounts_subtitle = ''
+        with Transaction().set_context(active_test=False):
+            accounts = Account.browse(data.get('accounts', []))
+            parties = Party.browse(data.get('parties', []))
+            if accounts:
+                js = Account.search([('id', 'in', [x.id for x in accounts])])
+                accounts_subtitle = []
+                for x in js:
+                    if len(accounts_subtitle) > 4:
+                        accounts_subtitle.append('...')
+                        break
+                    accounts_subtitle.append(x.code)
+                accounts_subtitle = ', '.join(accounts_subtitle)
+            else:
+                accounts_subtitle = ''
 
-        if parties:
-            js = Party.search([('id', 'in', [x.id for x in parties])])
-            parties_subtitle = []
-            for x in js:
-                if len(parties_subtitle) > 4:
-                    parties_subtitle.append('...')
-                    break
-                parties_subtitle.append(x.name)
-            parties_subtitle = '; '.join(parties_subtitle)
-        else:
-            parties_subtitle = ''
+            if parties:
+                js = Party.search([('id', 'in', [x.id for x in parties])])
+                parties_subtitle = []
+                for x in js:
+                    if len(parties_subtitle) > 4:
+                        parties_subtitle.append('...')
+                        break
+                    parties_subtitle.append(x.name)
+                parties_subtitle = '; '.join(parties_subtitle)
+            else:
+                parties_subtitle = ''
 
         parameters = {}
         parameters['start_period'] = start_period and start_period.name or ''
@@ -165,7 +166,8 @@ class GeneralLedgerReport(JasperReport):
         if accounts:
             domain += [('account', 'in', accounts)]
         else:
-            accounts = Account.search([('parent', '!=', None)])
+            with Transaction().set_context(active_test=False):
+                accounts = Account.search([('parent', '!=', None)])
 
         filter_periods = fiscalyear.get_periods(start_period, end_period)
         domain += [('period', 'in', filter_periods)]
@@ -263,7 +265,8 @@ class GeneralLedgerReport(JasperReport):
 
     @classmethod
     def execute(cls, ids, data):
-        records, parameters = cls.prepare(data)
+        with Transaction().set_context(active_test=False):
+            records, parameters = cls.prepare(data)
         return super(GeneralLedgerReport, cls).execute(ids, {
                 'name': 'account_jasper_reports.general_ledger',
                 'model': 'account.move.line',

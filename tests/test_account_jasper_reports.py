@@ -106,16 +106,18 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             customer1, = self.party.search([('name', '=', 'customer1')])
             customer2, = self.party.search([('name', '=', 'customer2')])
             supplier1, = self.party.search([('name', '=', 'supplier1')])
-            supplier2, = self.party.search([('name', '=', 'supplier2')])
+            with Transaction().set_context(active_test=False):
+                supplier2, = self.party.search([('name', '=', 'supplier2')])
         else:
             customer1, customer2, supplier1, supplier2 = self.party.create([{
-                            'name': 'customer1',
+                        'name': 'customer1',
                         }, {
-                            'name': 'customer2',
+                        'name': 'customer2',
                         }, {
-                            'name': 'supplier1',
+                        'name': 'supplier1',
                         }, {
-                            'name': 'supplier2',
+                        'name': 'supplier2',
+                        'active': False,
                         }])
             self.party_address.create([{
                             'active': True,
@@ -219,6 +221,9 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             ]
         moves = self.move.create(vlist)
         self.move.post(moves)
+        # Set account inactive
+        expense.active = False
+        expense.save()
 
     def test0010journal(self):
         'Test journal'
@@ -1077,9 +1082,10 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             supplier_address, = self.party_address.search([
                     ('party', '=', supplier.id),
                     ], limit=1)
-            supplier2, = self.party.search([
-                    ('name', '=', 'supplier2'),
-                    ])
+            with Transaction().set_context(active_test=False):
+                supplier2, = self.party.search([
+                        ('name', '=', 'supplier2'),
+                        ])
             journal_revenue, = self.journal.search([
                     ('code', '=', 'REV'),
                     ])
