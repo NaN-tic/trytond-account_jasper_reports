@@ -147,7 +147,7 @@ class TaxesByInvoiceReport(JasperReport):
         parameters['periods'] = periods_subtitle
         parameters['TOTALS_ONLY'] = data['totals_only'] and True or False
 
-        domain = []
+        domain = [('invoice.state', 'in', ['posted', 'paid'])]
 
         if data['partner_type'] == 'customers':
             domain += [('invoice.type', 'in',
