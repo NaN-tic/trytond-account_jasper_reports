@@ -250,8 +250,6 @@ class TrialBalanceReport(JasperReport):
                 'balance': balance_comp,
             }
 
-        logger.info('Start Trial Balance')
-
         pool = Pool()
         FiscalYear = pool.get('account.fiscalyear')
         Period = pool.get('account.period')
