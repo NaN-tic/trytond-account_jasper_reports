@@ -100,9 +100,10 @@ class AbreviatedJournalReport(JasperReport):
         transaction = Transaction()
         cursor = transaction.cursor
         in_max = cursor.IN_MAX
-
+        
         res = []
         parameters = {}
+        parameters['company'] = fiscalyear.company.rec_name
         parameters['fiscal_year'] = fiscalyear.rec_name
 
         move_join = 'LEFT'

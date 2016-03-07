@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d6f9a712-83ca-4bb9-a7ca-fa195ab39a4f">
 	<property name="TRYTON_RELATIONS" value="[&apos;invoice&apos;,&apos;invoice/move&apos;,&apos;invoice/move/period&apos;,&apos;tax&apos;,&apos;account&apos;]"/>
-	<property name="ireport.zoom" value="1.9487171000000043"/>
-	<property name="ireport.x" value="613"/>
+	<property name="ireport.zoom" value="1.3310000000000028"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="STANDARD_DIR" class="java.lang.String"/>
@@ -11,6 +11,7 @@
 	<parameter name="TOTALS_ONLY" class="java.lang.Boolean">
 		<defaultValueExpression><![CDATA[false]]></defaultValueExpression>
 	</parameter>
+	<parameter name="company" class="java.lang.String"/>
 	<parameter name="fiscal_year" class="java.lang.String"/>
 	<parameter name="periods" class="java.lang.String"/>
 	<parameter name="parties" class="java.lang.String"/>
@@ -177,21 +178,21 @@
 	<title>
 		<band height="76">
 			<textField isBlankWhenNull="true">
-				<reportElement x="183" y="4" width="422" height="24" uuid="a4070f89-0ab9-4da0-b210-1738a25c98a3"/>
+				<reportElement x="0" y="4" width="802" height="24" uuid="a4070f89-0ab9-4da0-b210-1738a25c98a3"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="16" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Taxes By Invoice and Period")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="-2" y="50" width="803" height="12" uuid="472b623f-9fa2-4f50-83aa-2ae8b6ba0de1"/>
+				<reportElement x="0" y="61" width="803" height="12" uuid="472b623f-9fa2-4f50-83aa-2ae8b6ba0de1"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Parties: ")+ ($P{parties}==""?tr($V{L},"All Parties"):$P{parties})]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="-2" y="31" width="802" height="16" uuid="a09bdf39-a32b-4d96-8d4f-0bfea9e38366"/>
+				<reportElement x="0" y="44" width="802" height="16" uuid="a09bdf39-a32b-4d96-8d4f-0bfea9e38366"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
@@ -210,6 +211,13 @@
 					<font size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Página: " + $V{PAGE_NUMBER}.toString()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="28" width="802" height="16" uuid="61afcac2-48a0-4440-a6b4-d92e21e8c8bd"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{company}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
