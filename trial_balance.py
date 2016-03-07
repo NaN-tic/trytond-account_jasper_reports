@@ -301,6 +301,7 @@ class TrialBalanceReport(JasperReport):
             domain += [('id', 'in', accounts)]
 
         parameters = {}
+        parameters['company'] = fiscalyear.company.rec_name
         parameters['SECOND_BALANCE'] = comparison_fiscalyear and True or False
         parameters['fiscalyear'] = fiscalyear.name
         parameters['comparison_fiscalyear'] = comparison_fiscalyear and \

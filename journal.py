@@ -96,6 +96,7 @@ class JournalReport(JasperReport):
         Journal = pool.get('account.journal')
         Period = pool.get('account.period')
         Line = pool.get('account.move.line')
+
         parameters = {}
         fiscalyear = FiscalYear(data['fiscalyear'])
         start_period = None
@@ -106,6 +107,7 @@ class JournalReport(JasperReport):
             end_period = Period(data['end_period'])
         journals = Journal.browse(data.get('journals', []))
 
+        parameters['company'] = fiscalyear.company.rec_name
         parameters['start_period'] = start_period and start_period.name or ''
         parameters['end_period'] = end_period and end_period.name or ''
         parameters['fiscal_year'] = fiscalyear.name

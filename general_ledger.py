@@ -156,6 +156,7 @@ class GeneralLedgerReport(JasperReport):
                 parties_subtitle = ''
 
         parameters = {}
+        parameters['company'] = fiscalyear.company.rec_name
         parameters['start_period'] = start_period and start_period.name or ''
         parameters['end_period'] = end_period and end_period.name or ''
         parameters['fiscal_year'] = fiscalyear.name
