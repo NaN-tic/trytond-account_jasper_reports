@@ -98,7 +98,7 @@ class AbreviatedJournalReport(JasperReport):
 
         fiscalyear = FiscalYear(data['fiscalyear'])
         transaction = Transaction()
-        cursor = transaction.cursor
+        cursor = transaction.connection.cursor
         in_max = cursor.IN_MAX
         
         res = []

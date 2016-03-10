@@ -129,7 +129,7 @@ class JournalReport(JasperReport):
         else:
             periods = ''
 
-        cursor = Transaction().cursor
+        cursor = Transaction().connection.cursor()
         cursor.execute("""
             SELECT
                 aml.id
