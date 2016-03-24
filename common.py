@@ -51,7 +51,7 @@ class Account:
         in_max = 3000
         values = {}
         transaction = Transaction()
-        cursor = transaction.connection.cursor
+        cursor = transaction.connection.cursor()
         move_join = 'INNER' if with_moves else 'LEFT'
         account_ids = [a.id for a in accounts]
         group_by = (table_a.id,)
@@ -114,7 +114,7 @@ class Party:
         Account = pool.get('account.account')
         transaction = Transaction()
         context = transaction.context
-        cursor = transaction.connection.cursor
+        cursor = transaction.connection.cursor()
 
         move = Move.__table__()
         line = MoveLine.__table__()
