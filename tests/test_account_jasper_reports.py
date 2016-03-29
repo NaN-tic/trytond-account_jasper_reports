@@ -1120,7 +1120,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                         'number': '2',
                         'invoice_date': period.start_date,
                         'company': company.id,
-                        'type': 'in_invoice',
+                        'type': 'in',
                         'currency': company.currency.id,
                         'party': supplier.id,
                         'invoice_address': supplier_address.id,
@@ -1129,7 +1129,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                         'payment_term': term.id,
                         'lines': [
                             ('create', [{
-                                        'invoice_type': 'in_invoice',
+                                        'invoice_type': 'in',
                                         'type': 'line',
                                         'sequence': 0,
                                         'description': 'invoice_line',

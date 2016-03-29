@@ -152,11 +152,9 @@ class TaxesByInvoiceReport(JasperReport):
         domain = [('invoice.state', 'in', ['posted', 'paid'])]
 
         if data['partner_type'] == 'customers':
-            domain += [('invoice.type', 'in',
-                    ('out_invoice', 'out_credit_note'))]
+            domain += [('invoice.type', '=', 'out')]
         else:
-            domain += [('invoice.type', 'in',
-                    ('in_invoice', 'in_credit_note'))]
+            domain += [('invoice.type', '=', 'in')]
 
         if periods:
             domain += [('invoice.move.period', 'in', periods)]
