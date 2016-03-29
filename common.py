@@ -11,11 +11,10 @@ from trytond.tools import reduce_ids
 from trytond.transaction import Transaction
 
 __all__ = ['FiscalYear', 'Account', 'Party']
-__metaclass__ = PoolMeta
 
 
 class FiscalYear:
-    'Fiscal Year'
+    __metaclass__ = PoolMeta
     __name__ = 'account.fiscalyear'
 
     def get_periods(self, start_period, end_period):
@@ -34,6 +33,7 @@ class FiscalYear:
 
 
 class Account:
+    __metaclass__ = PoolMeta
     __name__ = 'account.account'
 
     @classmethod
@@ -99,7 +99,7 @@ class Account:
 
 
 class Party:
-    'Party'
+    __metaclass__ = PoolMeta
     __name__ = 'party.party'
 
     @classmethod
