@@ -19,8 +19,8 @@ copyright notices and license terms. -->
             <field name="report">account_jasper_reports/general_ledger.jrxml</field>
             <field name="extension">pdf</field>
         </record>
-        
-        <menuitem id="account.menu_print_general_ledger"
+
+        <menuitem id="account.menu_general_ledger"
             action="wizard_print_general_ledger" icon="tryton-print"/>
     </data>
 </tryton>

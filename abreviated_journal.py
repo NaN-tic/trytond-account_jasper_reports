@@ -9,7 +9,7 @@ from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateReport, Button
-from trytond.tools import reduce_ids
+from trytond.tools import reduce_ids, grouped_slice
 from trytond.modules.jasper_reports.jasper import JasperReport
 
 __all__ = ['PrintAbreviatedJournalStart', 'PrintAbreviatedJournal',
@@ -99,8 +99,7 @@ class AbreviatedJournalReport(JasperReport):
         fiscalyear = FiscalYear(data['fiscalyear'])
         transaction = Transaction()
         cursor = transaction.connection.cursor()
-        in_max = cursor.IN_MAX
-        
+
         res = []
         parameters = {}
         parameters['company'] = fiscalyear.company.rec_name
@@ -128,8 +127,7 @@ class AbreviatedJournalReport(JasperReport):
         periods = Period.search([('fiscalyear', '=', fiscalyear)])
         for period in periods:
             all_accounts = {}
-            for i in range(0, len(account_ids), in_max):
-                sub_ids = account_ids[i:i + in_max]
+            for sub_ids in grouped_slice(account_ids):
                 red_sql = reduce_ids(table_a.id, sub_ids)
                 cursor.execute(*table_a.join(table_c,
                         condition=(table_c.left >= table_a.left)

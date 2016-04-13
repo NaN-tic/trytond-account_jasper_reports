@@ -392,13 +392,13 @@ class TrialBalanceReport(JasperReport):
                 logger.info('Calc initial values for parties')
                 with transaction.set_context(date=initial_balance_date):
                     init_party_values = Party.get_account_values_by_party(
-                        parties, accounts)
+                        parties, accounts, fiscalyear.company)
 
             logger.info('Calc  values for parties')
             with transaction.set_context(fiscalyear=fiscalyear.id,
                     periods=periods):
                 party_values = Party.get_account_values_by_party(
-                    parties, accounts)
+                    parties, accounts, fiscalyear.company)
 
             init_comparison_party_values = {}
             comparison_party_values = {}
@@ -406,13 +406,15 @@ class TrialBalanceReport(JasperReport):
                 logger.info('Calc initial values for comparsion for parties')
                 with transaction.set_context(date=initial_comparision_date):
                     init_comparison_party_values = \
-                        Party.get_account_values_by_party(parties, accounts)
+                        Party.get_account_values_by_party(parties, accounts,
+                            fiscalyear.company)
 
                 logger.info('Calc values for comparsion for parties')
                 with transaction.set_context(fiscalyear=fiscalyear.id,
                         periods=comparison_periods):
                     comparison_party_values = \
-                        Party.get_account_values_by_party(parties, accounts)
+                        Party.get_account_values_by_party(parties, accounts,
+                            fiscalyear.company)
 
         records = []
         virt_records = {}
