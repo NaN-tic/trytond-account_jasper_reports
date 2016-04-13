@@ -3,13 +3,15 @@
 # copyright notices and license terms.
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
-import datetime
 import doctest
 import unittest
+from trytond.pool import Pool
 import trytond.tests.test_tryton
-from trytond.tests.test_tryton import ModuleTestCase
-from trytond.tests.test_tryton import POOL, DB_NAME, USER, CONTEXT
+from trytond.tests.test_tryton import ModuleTestCase, with_transaction
 from trytond.transaction import Transaction
+from trytond.modules.company.tests import create_company, set_company
+from trytond.modules.account.tests import create_chart, get_fiscalyear
+from trytond.modules.account_invoice.tests import set_invoice_sequences
 
 
 class AccountJasperReportsTestCase(ModuleTestCase):
@@ -18,117 +20,151 @@ class AccountJasperReportsTestCase(ModuleTestCase):
 
     def setUp(self):
         super(AccountJasperReportsTestCase, self).setUp()
-        self.account = POOL.get('account.account')
-        self.company = POOL.get('company.company')
-        self.user = POOL.get('res.user')
-        self.party = POOL.get('party.party')
-        self.party_address = POOL.get('party.address')
-        self.fiscalyear = POOL.get('account.fiscalyear')
-        self.move = POOL.get('account.move')
-        self.line = POOL.get('account.move.line')
-        self.journal = POOL.get('account.journal')
-        self.period = POOL.get('account.period')
-        self.sequence = POOL.get('ir.sequence')
-        self.sequence_strict = POOL.get('ir.sequence.strict')
-        self.taxcode = POOL.get('account.tax.code')
-        self.tax = POOL.get('account.tax')
-        self.invoice = POOL.get('account.invoice')
-        self.invoice_tax = POOL.get('account.invoice.tax')
-        self.payment_term = POOL.get('account.invoice.payment_term')
-        self.print_journal = POOL.get('account_jasper_reports.print_journal',
-            type='wizard')
-        self.journal_report = POOL.get('account_jasper_reports.journal',
-            type='report')
-        self.print_abreviated_journal = POOL.get(
-            'account_jasper_reports.print_abreviated_journal', type='wizard')
-        self.abreviated_journal_report = POOL.get(
-            'account_jasper_reports.abreviated_journal', type='report')
-        self.print_general_ledger = POOL.get(
-            'account_jasper_reports.print_general_ledger', type='wizard')
-        self.general_ledger_report = POOL.get(
-            'account_jasper_reports.general_ledger', type='report')
-        self.print_trial_balance = POOL.get(
-            'account_jasper_reports.print_trial_balance', type='wizard')
-        self.trial_balance_report = POOL.get(
-            'account_jasper_reports.trial_balance', type='report')
-        self.print_taxes_by_invoice = POOL.get(
-            'account_jasper_reports.print_taxes_by_invoice', type='wizard')
-        self.taxes_by_invoice_report = POOL.get(
-            'account_jasper_reports.taxes_by_invoice', type='report')
 
-    def create_moves(self, fiscalyear=None):
-        'Create moves for running tests'
-        if not fiscalyear:
-            fiscalyear, = self.fiscalyear.search([])
+    def create_fiscalyear_and_chart(self, company=None, fiscalyear=None,
+            chart=True):
+        'Test fiscalyear'
+        pool = Pool()
+        FiscalYear = pool.get('account.fiscalyear')
+        if not company:
+            company = create_company()
+        with set_company(company):
+            if chart:
+                create_chart(company)
+            if not fiscalyear:
+                fiscalyear = set_invoice_sequences(get_fiscalyear(company))
+                fiscalyear.save()
+                FiscalYear.create_period([fiscalyear])
+                self.assertEqual(len(fiscalyear.periods), 12)
+            return fiscalyear
+
+    def get_journals(self):
+        pool = Pool()
+        Journal = pool.get('account.journal')
+        return dict((j.code, j) for j in Journal.search([]))
+
+    def get_accounts(self, company):
+        pool = Pool()
+        Account = pool.get('account.account')
+        accounts = Account.search([
+                ('kind', 'in',
+                    ['receivable', 'payable', 'revenue', 'expense']),
+                ('company', '=', company.id),
+                ])
+        accounts = {a.kind: a for a in accounts}
+        root, = Account.search([
+                ('parent', '=', None),
+                ('company', '=', company.id),
+                ])
+        accounts['root'] = root
+        if not accounts['revenue'].code:
+            accounts['revenue'].parent = root
+            accounts['revenue'].code = '7'
+            accounts['revenue'].save()
+        if not accounts['receivable'].code:
+            accounts['receivable'].parent = root
+            accounts['receivable'].code = '43'
+            accounts['receivable'].save()
+        if not accounts['expense'].code:
+            accounts['expense'].parent = root
+            accounts['expense'].code = '6'
+            accounts['expense'].save()
+        if not accounts['payable'].code:
+            accounts['payable'].parent = root
+            accounts['payable'].code = '41'
+            accounts['payable'].save()
+        cash, = Account.search([
+                ('kind', '=', 'other'),
+                ('name', '=', 'Main Cash'),
+                ('company', '=', company.id),
+                ])
+        accounts['cash'] = cash
+        tax, = Account.search([
+                ('kind', '=', 'other'),
+                ('name', '=', 'Main Tax'),
+                ('company', '=', company.id),
+                ])
+        accounts['tax'] = tax
+        views = Account.search([
+                ('name', '=', 'View'),
+                ('company', '=', company.id),
+                ])
+        if views:
+            view, = views
+        else:
+            with set_company(company):
+                view, = Account.create([{
+                            'name': 'View',
+                            'code': '1',
+                            'kind': 'view',
+                            'parent': root.id,
+                            }])
+        accounts['view'] = view
+        return accounts
+
+    def create_parties(self, company):
+        pool = Pool()
+        Party = pool.get('party.party')
+        with set_company(company):
+            return Party.create([{
+                        'name': 'customer1',
+                        'addresses': [('create', [{}])],
+                    }, {
+                        'name': 'customer2',
+                        'addresses': [('create', [{}])],
+                    }, {
+                        'name': 'supplier1',
+                        'addresses': [('create', [{}])],
+                    }, {
+                        'name': 'supplier2',
+                        'addresses': [('create', [{'active': False}])],
+                        'active': False,
+                    }])
+
+    def get_parties(self):
+        pool = Pool()
+        Party = pool.get('party.party')
+        customer1, = Party.search([
+                ('name', '=', 'customer1'),
+                ])
+        customer2, = Party.search([
+                ('name', '=', 'customer2'),
+                ])
+        supplier1, = Party.search([
+                ('name', '=', 'supplier1'),
+                ])
+        with Transaction().set_context(active_test=False):
+            supplier2, = Party.search([
+                    ('name', '=', 'supplier2'),
+                    ])
+        return customer1, customer2, supplier1, supplier2
+
+    def create_moves(self, company, fiscalyear=None, create_chart=True):
+        'Create moves some moves for the test'
+        pool = Pool()
+        Move = pool.get('account.move')
+        fiscalyear = self.create_fiscalyear_and_chart(company, fiscalyear,
+            create_chart)
         period = fiscalyear.periods[0]
         last_period = fiscalyear.periods[-1]
-        journal_revenue, = self.journal.search([
-                ('code', '=', 'REV'),
-                ])
-        journal_expense, = self.journal.search([
-                ('code', '=', 'EXP'),
-                ])
-        chart, = self.account.search([
-                ('parent', '=', None),
-                ])
-        revenue, = self.account.search([
-                ('kind', '=', 'revenue'),
-                ])
-        revenue.parent = chart
-        revenue.code = '7'
-        revenue.save()
-        receivable, = self.account.search([
-                ('kind', '=', 'receivable'),
-                ])
-        receivable.parent = chart
-        receivable.code = '43'
-        receivable.save()
-        expense, = self.account.search([
-                ('kind', '=', 'expense'),
-                ])
-        expense.parent = chart
-        expense.code = '6'
-        expense.save()
-        payable, = self.account.search([
-                ('kind', '=', 'payable'),
-                ])
-        payable.parent = chart
-        payable.code = '41'
-        payable.save()
-        self.account.create([{
-                    'name': 'View',
-                    'code': '1',
-                    'kind': 'view',
-                    'parent': chart.id,
-                    }])
-        #Create some parties if not exist
-        if self.party.search([('name', '=', 'customer1')]):
-            customer1, = self.party.search([('name', '=', 'customer1')])
-            customer2, = self.party.search([('name', '=', 'customer2')])
-            supplier1, = self.party.search([('name', '=', 'supplier1')])
-            with Transaction().set_context(active_test=False):
-                supplier2, = self.party.search([('name', '=', 'supplier2')])
+        journals = self.get_journals()
+        journal_revenue = journals['REV']
+        journal_expense = journals['EXP']
+        accounts = self.get_accounts(company)
+        revenue = accounts['revenue']
+        receivable = accounts['receivable']
+        expense = accounts['expense']
+        payable = accounts['payable']
+        #Create some parties
+        if create_chart:
+            customer1, customer2, supplier1, supplier2 = self.create_parties(
+                company)
         else:
-            customer1, customer2, supplier1, supplier2 = self.party.create([{
-                        'name': 'customer1',
-                        }, {
-                        'name': 'customer2',
-                        }, {
-                        'name': 'supplier1',
-                        }, {
-                        'name': 'supplier2',
-                        'active': False,
-                        }])
-            self.party_address.create([{
-                            'active': True,
-                            'party': customer1.id,
-                        }, {
-                            'active': True,
-                            'party': supplier1.id,
-                        }])
+            customer1, customer2, supplier1, supplier2 = self.get_parties()
         # Create some moves
         vlist = [
             {
+                'company': company.id,
                 'period': period.id,
                 'journal': journal_revenue.id,
                 'date': period.start_date,
@@ -144,6 +180,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                     ],
                 },
             {
+                'company': company.id,
                 'period': period.id,
                 'journal': journal_revenue.id,
                 'date': period.start_date,
@@ -159,6 +196,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                     ],
                 },
             {
+                'company': company.id,
                 'period': period.id,
                 'journal': journal_expense.id,
                 'date': period.start_date,
@@ -174,6 +212,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                     ],
                 },
             {
+                'company': company.id,
                 'period': period.id,
                 'journal': journal_expense.id,
                 'date': period.start_date,
@@ -189,6 +228,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                     ],
                 },
             {
+                'company': company.id,
                 'period': last_period.id,
                 'journal': journal_expense.id,
                 'date': last_period.end_date,
@@ -204,6 +244,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                     ],
                 },
             {
+                'company': company.id,
                 'period': last_period.id,
                 'journal': journal_revenue.id,
                 'date': last_period.end_date,
@@ -219,821 +260,828 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                     ],
                 },
             ]
-        moves = self.move.create(vlist)
-        self.move.post(moves)
+        moves = Move.create(vlist)
+        Move.post(moves)
         # Set account inactive
         expense.active = False
         expense.save()
+        return fiscalyear
 
-    def test0010journal(self):
+    @with_transaction()
+    def test_journal(self):
         'Test journal'
-        with Transaction().start(DB_NAME, USER, context=CONTEXT):
-            self.create_moves()
-            company, = self.company.search([
-                    ('rec_name', '=', 'Dunder Mifflin')])
-            fiscalyear, = self.fiscalyear.search([])
-            period = fiscalyear.periods[0]
-            last_period = fiscalyear.periods[-1]
-            session_id, _, _ = self.print_journal.create()
-            print_journal = self.print_journal(session_id)
-            print_journal.start.company = company
-            print_journal.start.fiscalyear = fiscalyear
-            print_journal.start.start_period = period
-            print_journal.start.end_period = last_period
-            print_journal.start.journals = []
-            print_journal.start.output_format = 'pdf'
-            _, data = print_journal.do_print_(None)
-            #Full Journall
-            self.assertEqual(data['company'], company.id)
-            self.assertEqual(data['fiscalyear'], fiscalyear.id)
-            self.assertEqual(data['start_period'], period.id)
-            self.assertEqual(data['end_period'], last_period.id)
-            self.assertEqual(len(data['journals']), 0)
-            self.assertEqual(data['output_format'], 'pdf')
-            ids, parameters = self.journal_report.prepare(data)
-            records = self.line.browse(ids)
-            self.assertEqual(len(records), 12)
-            self.assertEqual(parameters['start_period'], period.name)
-            self.assertEqual(parameters['end_period'], last_period.name)
-            self.assertEqual(parameters['fiscal_year'], fiscalyear.name)
-            self.assertEqual(parameters['journals'], '')
-            credit = sum([m.credit for m in records])
-            debit = sum([m.debit for m in records])
-            self.assertEqual(credit, debit)
-            self.assertEqual(credit, Decimal('730.0'))
-            with_party = [m for m in records if m.party]
-            self.assertEqual(len(with_party), 6)
-            #Filtering periods
-            session_id, _, _ = self.print_journal.create()
-            print_journal = self.print_journal(session_id)
-            print_journal.start.company = company
-            print_journal.start.fiscalyear = fiscalyear
-            print_journal.start.start_period = period
-            print_journal.start.end_period = period
-            print_journal.start.journals = []
-            print_journal.start.output_format = 'pdf'
-            _, data = print_journal.do_print_(None)
-            ids, parameters = self.journal_report.prepare(data)
-            records = self.line.browse(ids)
-            self.assertEqual(len(records), 8)
-            credit = sum([m.credit for m in records])
-            debit = sum([m.debit for m in records])
-            self.assertEqual(credit, debit)
-            self.assertEqual(credit, Decimal('380.0'))
-            #Filtering journals
-            journal_revenue, = self.journal.search([
-                    ('code', '=', 'REV'),
-                    ])
-            journal_expense, = self.journal.search([
-                    ('code', '=', 'EXP'),
-                    ])
-            session_id, _, _ = self.print_journal.create()
-            print_journal = self.print_journal(session_id)
-            print_journal.start.company = company
-            print_journal.start.fiscalyear = fiscalyear
-            print_journal.start.start_period = period
-            print_journal.start.end_period = period
-            print_journal.start.journals = [journal_revenue, journal_expense]
-            print_journal.start.output_format = 'pdf'
-            _, data = print_journal.do_print_(None)
-            ids, parameters = self.journal_report.prepare(data)
-            records = self.line.browse(ids)
-            self.assertNotEqual(parameters['journals'], '')
-            self.assertEqual(len(records), 8)
-            credit = sum([m.credit for m in records])
-            debit = sum([m.debit for m in records])
-            self.assertEqual(credit, debit)
-            self.assertEqual(credit, Decimal('380.0'))
+        pool = Pool()
+        PrintJournal = pool.get('account_jasper_reports.print_journal',
+            type='wizard')
+        JournalReport = pool.get('account_jasper_reports.journal',
+            type='report')
+        Line = pool.get('account.move.line')
+        company = create_company()
+        fiscalyear = self.create_moves(company)
+        period = fiscalyear.periods[0]
+        last_period = fiscalyear.periods[-1]
+        journals = self.get_journals()
+        journal_revenue = journals['REV']
+        journal_expense = journals['EXP']
+        session_id, _, _ = PrintJournal.create()
+        print_journal = PrintJournal(session_id)
+        print_journal.start.company = company
+        print_journal.start.fiscalyear = fiscalyear
+        print_journal.start.start_period = period
+        print_journal.start.end_period = last_period
+        print_journal.start.journals = []
+        print_journal.start.output_format = 'pdf'
+        _, data = print_journal.do_print_(None)
+        #Full Journall
+        self.assertEqual(data['company'], company.id)
+        self.assertEqual(data['fiscalyear'], fiscalyear.id)
+        self.assertEqual(data['start_period'], period.id)
+        self.assertEqual(data['end_period'], last_period.id)
+        self.assertEqual(len(data['journals']), 0)
+        self.assertEqual(data['output_format'], 'pdf')
+        ids, parameters = JournalReport.prepare(data)
+        records = Line.browse(ids)
+        self.assertEqual(len(records), 12)
+        self.assertEqual(parameters['start_period'], period.name)
+        self.assertEqual(parameters['end_period'], last_period.name)
+        self.assertEqual(parameters['fiscal_year'], fiscalyear.name)
+        self.assertEqual(parameters['journals'], '')
+        credit = sum([m.credit for m in records])
+        debit = sum([m.debit for m in records])
+        self.assertEqual(credit, debit)
+        self.assertEqual(credit, Decimal('730.0'))
+        with_party = [m for m in records if m.party]
+        self.assertEqual(len(with_party), 6)
+        #Filtering periods
+        session_id, _, _ = PrintJournal.create()
+        print_journal = PrintJournal(session_id)
+        print_journal.start.company = company
+        print_journal.start.fiscalyear = fiscalyear
+        print_journal.start.start_period = period
+        print_journal.start.end_period = period
+        print_journal.start.journals = []
+        print_journal.start.output_format = 'pdf'
+        _, data = print_journal.do_print_(None)
+        ids, parameters = JournalReport.prepare(data)
+        records = Line.browse(ids)
+        self.assertEqual(len(records), 8)
+        credit = sum([m.credit for m in records])
+        debit = sum([m.debit for m in records])
+        self.assertEqual(credit, debit)
+        self.assertEqual(credit, Decimal('380.0'))
+        #Filtering journals
+        journals = self.get_journals()
+        journal_revenue = journals['REV']
+        journal_expense = journals['EXP']
+        session_id, _, _ = PrintJournal.create()
+        print_journal = PrintJournal(session_id)
+        print_journal.start.company = company
+        print_journal.start.fiscalyear = fiscalyear
+        print_journal.start.start_period = period
+        print_journal.start.end_period = period
+        print_journal.start.journals = [journal_revenue, journal_expense]
+        print_journal.start.output_format = 'pdf'
+        _, data = print_journal.do_print_(None)
+        ids, parameters = JournalReport.prepare(data)
+        records = Line.browse(ids)
+        self.assertNotEqual(parameters['journals'], '')
+        self.assertEqual(len(records), 8)
+        credit = sum([m.credit for m in records])
+        debit = sum([m.debit for m in records])
+        self.assertEqual(credit, debit)
+        self.assertEqual(credit, Decimal('380.0'))
 
-    def test0020abreviated_journal(self):
+    @with_transaction()
+    def test_abreviated_journal(self):
         'Test journal'
-        with Transaction().start(DB_NAME, USER, context=CONTEXT):
-            self.create_moves()
-            company, = self.company.search([
-                    ('rec_name', '=', 'Dunder Mifflin')])
-            fiscalyear, = self.fiscalyear.search([])
-            period = fiscalyear.periods[0]
-            session_id, _, _ = self.print_abreviated_journal.create()
-            print_abreviated_journal = self.print_abreviated_journal(
-                session_id)
-            print_abreviated_journal.start.company = company
-            print_abreviated_journal.start.fiscalyear = fiscalyear
-            print_abreviated_journal.start.display_account = 'bal_all'
-            print_abreviated_journal.start.level = 1
-            print_abreviated_journal.start.output_format = 'pdf'
-            _, data = print_abreviated_journal.do_print_(None)
-            self.assertEqual(data['company'], company.id)
-            self.assertEqual(data['fiscalyear'], fiscalyear.id)
-            self.assertEqual(data['display_account'], 'bal_all')
-            self.assertEqual(data['level'], 1)
-            self.assertEqual(data['output_format'], 'pdf')
-            records, parameters = self.abreviated_journal_report.prepare(data)
-            self.assertEqual(len(records), 3 * 12)
-            self.assertEqual(parameters['fiscal_year'], fiscalyear.name)
-            credit = sum([m['credit'] for m in records])
-            debit = sum([m['debit'] for m in records])
-            self.assertEqual(debit, 130.0)
-            self.assertEqual(credit, 600.0)
-            credit = sum([m['credit'] for m in records
-                    if m['month'] == period.rec_name])
-            debit = sum([m['debit'] for m in records
-                    if m['month'] == period.rec_name])
-            self.assertEqual(debit, 80.0)
-            self.assertEqual(credit, 300.0)
-            #Only with moves
-            print_abreviated_journal = self.print_abreviated_journal(
-                session_id)
-            print_abreviated_journal.start.company = company
-            print_abreviated_journal.start.fiscalyear = fiscalyear
-            print_abreviated_journal.start.display_account = 'bal_movement'
-            print_abreviated_journal.start.level = 1
-            print_abreviated_journal.start.output_format = 'pdf'
-            _, data = print_abreviated_journal.do_print_(None)
-            records, parameters = self.abreviated_journal_report.prepare(data)
-            self.assertEqual(len(records), 4)
-            #With two digits
-            session_id, _, _ = self.print_abreviated_journal.create()
-            print_abreviated_journal = self.print_abreviated_journal(
-                session_id)
-            print_abreviated_journal.start.company = company
-            print_abreviated_journal.start.fiscalyear = fiscalyear
-            print_abreviated_journal.start.display_account = 'bal_all'
-            print_abreviated_journal.start.level = 2
-            print_abreviated_journal.start.output_format = 'pdf'
-            _, data = print_abreviated_journal.do_print_(None)
-            records, parameters = self.abreviated_journal_report.prepare(data)
-            self.assertEqual(len(records), 4 * 12)
-            #With two digits and movements
-            session_id, _, _ = self.print_abreviated_journal.create()
-            print_abreviated_journal = self.print_abreviated_journal(
-                session_id)
-            print_abreviated_journal.start.company = company
-            print_abreviated_journal.start.fiscalyear = fiscalyear
-            print_abreviated_journal.start.display_account = 'bal_movement'
-            print_abreviated_journal.start.level = 2
-            print_abreviated_journal.start.output_format = 'pdf'
-            _, data = print_abreviated_journal.do_print_(None)
-            records, parameters = self.abreviated_journal_report.prepare(data)
-            self.assertEqual(len(records), 4 * 2)
+        pool = Pool()
+        PrintAbreviatedJournal = pool.get(
+            'account_jasper_reports.print_abreviated_journal', type='wizard')
+        AbreviatedJournalReport = pool.get(
+            'account_jasper_reports.abreviated_journal', type='report')
+        company = create_company()
+        fiscalyear = self.create_moves(company)
+        period = fiscalyear.periods[0]
+        session_id, _, _ = PrintAbreviatedJournal.create()
+        print_abreviated_journal = PrintAbreviatedJournal(
+            session_id)
+        print_abreviated_journal.start.company = company
+        print_abreviated_journal.start.fiscalyear = fiscalyear
+        print_abreviated_journal.start.display_account = 'bal_all'
+        print_abreviated_journal.start.level = 1
+        print_abreviated_journal.start.output_format = 'pdf'
+        _, data = print_abreviated_journal.do_print_(None)
+        self.assertEqual(data['company'], company.id)
+        self.assertEqual(data['fiscalyear'], fiscalyear.id)
+        self.assertEqual(data['display_account'], 'bal_all')
+        self.assertEqual(data['level'], 1)
+        self.assertEqual(data['output_format'], 'pdf')
+        records, parameters = AbreviatedJournalReport.prepare(data)
+        self.assertEqual(len(records), 3 * 12)
+        self.assertEqual(parameters['fiscal_year'], fiscalyear.name)
+        credit = sum([m['credit'] for m in records])
+        debit = sum([m['debit'] for m in records])
+        self.assertEqual(debit, 130.0)
+        self.assertEqual(credit, 600.0)
+        credit = sum([m['credit'] for m in records
+                if m['month'] == period.rec_name])
+        debit = sum([m['debit'] for m in records
+                if m['month'] == period.rec_name])
+        self.assertEqual(debit, 80.0)
+        self.assertEqual(credit, 300.0)
+        #Only with moves
+        print_abreviated_journal = PrintAbreviatedJournal(
+            session_id)
+        print_abreviated_journal.start.company = company
+        print_abreviated_journal.start.fiscalyear = fiscalyear
+        print_abreviated_journal.start.display_account = 'bal_movement'
+        print_abreviated_journal.start.level = 1
+        print_abreviated_journal.start.output_format = 'pdf'
+        _, data = print_abreviated_journal.do_print_(None)
+        records, parameters = AbreviatedJournalReport.prepare(data)
+        self.assertEqual(len(records), 4)
+        #With two digits
+        session_id, _, _ = PrintAbreviatedJournal.create()
+        print_abreviated_journal = PrintAbreviatedJournal(
+            session_id)
+        print_abreviated_journal.start.company = company
+        print_abreviated_journal.start.fiscalyear = fiscalyear
+        print_abreviated_journal.start.display_account = 'bal_all'
+        print_abreviated_journal.start.level = 2
+        print_abreviated_journal.start.output_format = 'pdf'
+        _, data = print_abreviated_journal.do_print_(None)
+        records, parameters = AbreviatedJournalReport.prepare(data)
+        self.assertEqual(len(records), 4 * 12)
+        #With two digits and movements
+        session_id, _, _ = PrintAbreviatedJournal.create()
+        print_abreviated_journal = PrintAbreviatedJournal(
+            session_id)
+        print_abreviated_journal.start.company = company
+        print_abreviated_journal.start.fiscalyear = fiscalyear
+        print_abreviated_journal.start.display_account = 'bal_movement'
+        print_abreviated_journal.start.level = 2
+        print_abreviated_journal.start.output_format = 'pdf'
+        _, data = print_abreviated_journal.do_print_(None)
+        records, parameters = AbreviatedJournalReport.prepare(data)
+        self.assertEqual(len(records), 4 * 2)
 
-    def test0030general_ledger(self):
+    @with_transaction()
+    def test_general_ledger(self):
         'Test General Ledger'
-        with Transaction().start(DB_NAME, USER, context=CONTEXT):
-            self.create_moves()
-            company, = self.company.search([
-                    ('rec_name', '=', 'Dunder Mifflin')])
-            fiscalyear, = self.fiscalyear.search([])
-            period = fiscalyear.periods[0]
-            last_period = fiscalyear.periods[-1]
-            session_id, _, _ = self.print_general_ledger.create()
-            print_general_ledger = self.print_general_ledger(session_id)
-            print_general_ledger.start.company = company
-            print_general_ledger.start.fiscalyear = fiscalyear
-            print_general_ledger.start.start_period = period
-            print_general_ledger.start.end_period = last_period
-            print_general_ledger.start.parties = []
-            print_general_ledger.start.accounts = []
-            print_general_ledger.start.output_format = 'pdf'
-            _, data = print_general_ledger.do_print_(None)
+        pool = Pool()
+        Account = pool.get('account.account')
+        PrintGeneralLedger = pool.get(
+            'account_jasper_reports.print_general_ledger', type='wizard')
+        GeneralLedgerReport = pool.get(
+            'account_jasper_reports.general_ledger', type='report')
+        company = create_company()
+        fiscalyear = self.create_moves(company)
+        period = fiscalyear.periods[0]
+        last_period = fiscalyear.periods[-1]
+        session_id, _, _ = PrintGeneralLedger.create()
+        print_general_ledger = PrintGeneralLedger(session_id)
+        print_general_ledger.start.company = company
+        print_general_ledger.start.fiscalyear = fiscalyear
+        print_general_ledger.start.start_period = period
+        print_general_ledger.start.end_period = last_period
+        print_general_ledger.start.parties = []
+        print_general_ledger.start.accounts = []
+        print_general_ledger.start.output_format = 'pdf'
+        _, data = print_general_ledger.do_print_(None)
 
-            # Full general_ledger
-            self.assertEqual(data['company'], company.id)
-            self.assertEqual(data['fiscalyear'], fiscalyear.id)
-            self.assertEqual(data['start_period'], period.id)
-            self.assertEqual(data['end_period'], last_period.id)
-            self.assertEqual(len(data['accounts']), 0)
-            self.assertEqual(len(data['parties']), 0)
-            self.assertEqual(data['output_format'], 'pdf')
-            records, parameters = self.general_ledger_report.prepare(data)
-            self.assertEqual(len(records), 12)
-            self.assertEqual(parameters['start_period'], period.name)
-            self.assertEqual(parameters['end_period'], last_period.name)
-            self.assertEqual(parameters['fiscal_year'], fiscalyear.name)
-            self.assertEqual(parameters['accounts'], '')
-            self.assertEqual(parameters['parties'], '')
-            credit = sum([m['credit'] for m in records])
-            debit = sum([m['debit'] for m in records])
-            self.assertEqual(credit, debit)
-            self.assertEqual(credit, Decimal('730.0'))
-            with_party = [m for m in records if m['party_name'] != '']
-            self.assertEqual(len(with_party), 6)
-            dates = sorted(set([r['date'] for r in records]))
-            for date, expected_value in zip(dates, [period.start_date,
-                        last_period.end_date]):
-                self.assertEqual(date, expected_value.strftime('%d/%m/%Y'))
+        # Full general_ledger
+        self.assertEqual(data['company'], company.id)
+        self.assertEqual(data['fiscalyear'], fiscalyear.id)
+        self.assertEqual(data['start_period'], period.id)
+        self.assertEqual(data['end_period'], last_period.id)
+        self.assertEqual(len(data['accounts']), 0)
+        self.assertEqual(len(data['parties']), 0)
+        self.assertEqual(data['output_format'], 'pdf')
+        records, parameters = GeneralLedgerReport.prepare(data)
+        self.assertEqual(len(records), 12)
+        self.assertEqual(parameters['start_period'], period.name)
+        self.assertEqual(parameters['end_period'], last_period.name)
+        self.assertEqual(parameters['fiscal_year'], fiscalyear.name)
+        self.assertEqual(parameters['accounts'], '')
+        self.assertEqual(parameters['parties'], '')
+        credit = sum([m['credit'] for m in records])
+        debit = sum([m['debit'] for m in records])
+        self.assertEqual(credit, debit)
+        self.assertEqual(credit, Decimal('730.0'))
+        with_party = [m for m in records if m['party_name'] != '']
+        self.assertEqual(len(with_party), 6)
+        dates = sorted(set([r['date'] for r in records]))
+        for date, expected_value in zip(dates, [period.start_date,
+                    last_period.end_date]):
+            self.assertEqual(date, expected_value.strftime('%d/%m/%Y'))
 
-            # Filtered by periods
-            session_id, _, _ = self.print_general_ledger.create()
-            print_general_ledger = self.print_general_ledger(session_id)
-            print_general_ledger.start.company = company
-            print_general_ledger.start.fiscalyear = fiscalyear
-            print_general_ledger.start.start_period = period
-            print_general_ledger.start.end_period = period
-            print_general_ledger.start.parties = []
-            print_general_ledger.start.accounts = []
-            print_general_ledger.start.output_format = 'pdf'
-            _, data = print_general_ledger.do_print_(None)
-            records, parameters = self.general_ledger_report.prepare(data)
-            self.assertEqual(len(records), 8)
-            credit = sum([m['credit'] for m in records])
-            debit = sum([m['debit'] for m in records])
-            self.assertEqual(credit, debit)
-            self.assertEqual(credit, Decimal('380.0'))
-            dates = [r['date'] for r in records]
-            for date in dates:
-                self.assertEqual(date, period.start_date.strftime('%d/%m/%Y'))
-            #Filtered by accounts
-            expense, = self.account.search([
-                    ('kind', '=', 'expense'),
-                    ])
-            session_id, _, _ = self.print_general_ledger.create()
-            print_general_ledger = self.print_general_ledger(session_id)
-            print_general_ledger.start.company = company
-            print_general_ledger.start.fiscalyear = fiscalyear
-            print_general_ledger.start.start_period = period
-            print_general_ledger.start.end_period = last_period
-            print_general_ledger.start.parties = []
-            print_general_ledger.start.accounts = [expense.id]
-            print_general_ledger.start.output_format = 'pdf'
-            _, data = print_general_ledger.do_print_(None)
-            records, parameters = self.general_ledger_report.prepare(data)
-            self.assertEqual(parameters['accounts'], expense.code)
-            self.assertEqual(len(records), 3)
-            credit = sum([m['credit'] for m in records])
-            debit = sum([m['debit'] for m in records])
-            self.assertEqual(credit, Decimal('0.0'))
-            self.assertEqual(debit, Decimal('130.0'))
-            #Filter by parties
-            customer1, = self.party.search([
-                    ('name', '=', 'customer1'),
-                    ])
-            session_id, _, _ = self.print_general_ledger.create()
-            print_general_ledger = self.print_general_ledger(session_id)
-            print_general_ledger.start.company = company
-            print_general_ledger.start.fiscalyear = fiscalyear
-            print_general_ledger.start.start_period = period
-            print_general_ledger.start.end_period = last_period
-            print_general_ledger.start.parties = [customer1.id]
-            print_general_ledger.start.accounts = []
-            print_general_ledger.start.output_format = 'pdf'
-            _, data = print_general_ledger.do_print_(None)
-            records, parameters = self.general_ledger_report.prepare(data)
-            self.assertEqual(parameters['parties'], customer1.rec_name)
-            self.assertEqual(len(records), 7)
-            credit = sum([m['credit'] for m in records])
-            debit = sum([m['debit'] for m in records])
-            self.assertEqual(credit, Decimal('600.0'))
-            self.assertEqual(debit, Decimal('230.0'))
-            credit = sum([m['credit'] for m in records
-                    if m['party_name'] != ''])
-            debit = sum([m['debit'] for m in records
-                    if m['party_name'] != ''])
-            self.assertEqual(credit, Decimal('0.0'))
-            self.assertEqual(debit, Decimal('100.0'))
+        # Filtered by periods
+        session_id, _, _ = PrintGeneralLedger.create()
+        print_general_ledger = PrintGeneralLedger(session_id)
+        print_general_ledger.start.company = company
+        print_general_ledger.start.fiscalyear = fiscalyear
+        print_general_ledger.start.start_period = period
+        print_general_ledger.start.end_period = period
+        print_general_ledger.start.parties = []
+        print_general_ledger.start.accounts = []
+        print_general_ledger.start.output_format = 'pdf'
+        _, data = print_general_ledger.do_print_(None)
+        records, parameters = GeneralLedgerReport.prepare(data)
+        self.assertEqual(len(records), 8)
+        credit = sum([m['credit'] for m in records])
+        debit = sum([m['debit'] for m in records])
+        self.assertEqual(credit, debit)
+        self.assertEqual(credit, Decimal('380.0'))
+        dates = [r['date'] for r in records]
+        for date in dates:
+            self.assertEqual(date, period.start_date.strftime('%d/%m/%Y'))
+        #Filtered by accounts
+        expense, = Account.search([
+                ('kind', '=', 'expense'),
+                ])
+        session_id, _, _ = PrintGeneralLedger.create()
+        print_general_ledger = PrintGeneralLedger(session_id)
+        print_general_ledger.start.company = company
+        print_general_ledger.start.fiscalyear = fiscalyear
+        print_general_ledger.start.start_period = period
+        print_general_ledger.start.end_period = last_period
+        print_general_ledger.start.parties = []
+        print_general_ledger.start.accounts = [expense.id]
+        print_general_ledger.start.output_format = 'pdf'
+        _, data = print_general_ledger.do_print_(None)
+        records, parameters = GeneralLedgerReport.prepare(data)
+        self.assertEqual(parameters['accounts'], expense.code)
+        self.assertEqual(len(records), 3)
+        credit = sum([m['credit'] for m in records])
+        debit = sum([m['debit'] for m in records])
+        self.assertEqual(credit, Decimal('0.0'))
+        self.assertEqual(debit, Decimal('130.0'))
+        #Filter by parties
+        customer1 = self.get_parties()[0]
+        session_id, _, _ = PrintGeneralLedger.create()
+        print_general_ledger = PrintGeneralLedger(session_id)
+        print_general_ledger.start.company = company
+        print_general_ledger.start.fiscalyear = fiscalyear
+        print_general_ledger.start.start_period = period
+        print_general_ledger.start.end_period = last_period
+        print_general_ledger.start.parties = [customer1.id]
+        print_general_ledger.start.accounts = []
+        print_general_ledger.start.output_format = 'pdf'
+        _, data = print_general_ledger.do_print_(None)
+        records, parameters = GeneralLedgerReport.prepare(data)
+        self.assertEqual(parameters['parties'], customer1.rec_name)
+        self.assertEqual(len(records), 7)
+        credit = sum([m['credit'] for m in records])
+        debit = sum([m['debit'] for m in records])
+        self.assertEqual(credit, Decimal('600.0'))
+        self.assertEqual(debit, Decimal('230.0'))
+        credit = sum([m['credit'] for m in records
+                if m['party_name'] != ''])
+        debit = sum([m['debit'] for m in records
+                if m['party_name'] != ''])
+        self.assertEqual(credit, Decimal('0.0'))
+        self.assertEqual(debit, Decimal('100.0'))
 
-            # Filter by parties and accounts
-            receivable, = self.account.search([
-                    ('kind', '=', 'receivable'),
-                    ])
-            session_id, _, _ = self.print_general_ledger.create()
-            print_general_ledger = self.print_general_ledger(session_id)
-            print_general_ledger.start.company = company
-            print_general_ledger.start.fiscalyear = fiscalyear
-            print_general_ledger.start.start_period = period
-            print_general_ledger.start.end_period = last_period
-            print_general_ledger.start.parties = [customer1.id]
-            print_general_ledger.start.accounts = [receivable.id]
-            print_general_ledger.start.output_format = 'pdf'
-            _, data = print_general_ledger.do_print_(None)
-            records, parameters = self.general_ledger_report.prepare(data)
-            self.assertEqual(parameters['parties'], customer1.rec_name)
-            self.assertEqual(parameters['accounts'], receivable.code)
-            self.assertEqual(len(records), 1)
-            credit = sum([m['credit'] for m in records])
-            debit = sum([m['debit'] for m in records])
-            self.assertEqual(credit, Decimal('0.0'))
-            self.assertEqual(debit, Decimal('100.0'))
-            self.assertEqual(True, all(m['party_name'] != ''
-                    for m in records))
+        # Filter by parties and accounts
+        receivable, = Account.search([
+                ('kind', '=', 'receivable'),
+                ])
+        session_id, _, _ = PrintGeneralLedger.create()
+        print_general_ledger = PrintGeneralLedger(session_id)
+        print_general_ledger.start.company = company
+        print_general_ledger.start.fiscalyear = fiscalyear
+        print_general_ledger.start.start_period = period
+        print_general_ledger.start.end_period = last_period
+        print_general_ledger.start.parties = [customer1.id]
+        print_general_ledger.start.accounts = [receivable.id]
+        print_general_ledger.start.output_format = 'pdf'
+        _, data = print_general_ledger.do_print_(None)
+        records, parameters = GeneralLedgerReport.prepare(data)
+        self.assertEqual(parameters['parties'], customer1.rec_name)
+        self.assertEqual(parameters['accounts'], receivable.code)
+        self.assertEqual(len(records), 1)
+        credit = sum([m['credit'] for m in records])
+        debit = sum([m['debit'] for m in records])
+        self.assertEqual(credit, Decimal('0.0'))
+        self.assertEqual(debit, Decimal('100.0'))
+        self.assertEqual(True, all(m['party_name'] != ''
+                for m in records))
 
-            # Check balance of full general_ledger
-            print_general_ledger = self.print_general_ledger(session_id)
-            print_general_ledger.start.company = company
-            print_general_ledger.start.fiscalyear = fiscalyear
-            print_general_ledger.start.start_period = period
-            print_general_ledger.start.end_period = last_period
-            print_general_ledger.start.parties = []
-            print_general_ledger.start.accounts = []
-            print_general_ledger.start.output_format = 'pdf'
-            _, data = print_general_ledger.do_print_(None)
-            records, parameters = self.general_ledger_report.prepare(data)
-            self.assertEqual(len(records), 12)
-            balances = [
-                Decimal('30'),             # Expense
-                Decimal('80'),             # Expense
-                Decimal('130'),            # Expense
-                Decimal('-30'),            # Payable Party 1
-                Decimal('-50'),            # Payable Party 2
-                Decimal('-100'),           # Payable Party 2
-                Decimal('100'),            # Receivable Party 1
-                Decimal('200'),            # Receivable Party 2
-                Decimal('500'),            # Receivable Party 2
-                Decimal('-100'),           # Revenue
-                Decimal('-300'),           # Revenue
-                Decimal('-600'),           # Revenue
-                ]
-            for record, balance in zip(records, balances):
-                self.assertEqual(record['balance'], balance)
+        # Check balance of full general_ledger
+        print_general_ledger = PrintGeneralLedger(session_id)
+        print_general_ledger.start.company = company
+        print_general_ledger.start.fiscalyear = fiscalyear
+        print_general_ledger.start.start_period = period
+        print_general_ledger.start.end_period = last_period
+        print_general_ledger.start.parties = []
+        print_general_ledger.start.accounts = []
+        print_general_ledger.start.output_format = 'pdf'
+        _, data = print_general_ledger.do_print_(None)
+        records, parameters = GeneralLedgerReport.prepare(data)
+        self.assertEqual(len(records), 12)
+        balances = [
+            Decimal('30'),             # Expense
+            Decimal('80'),             # Expense
+            Decimal('130'),            # Expense
+            Decimal('-30'),            # Payable Party 1
+            Decimal('-50'),            # Payable Party 2
+            Decimal('-100'),           # Payable Party 2
+            Decimal('100'),            # Receivable Party 1
+            Decimal('200'),            # Receivable Party 2
+            Decimal('500'),            # Receivable Party 2
+            Decimal('-100'),           # Revenue
+            Decimal('-300'),           # Revenue
+            Decimal('-600'),           # Revenue
+            ]
+        for record, balance in zip(records, balances):
+            self.assertEqual(record['balance'], balance)
 
-    def test0040trial_balance(self):
+    @with_transaction()
+    def test_trial_balance(self):
         'Test Trial Balance'
-        with Transaction().start(DB_NAME, USER, context=CONTEXT):
-            self.create_moves()
-            company, = self.company.search([
-                    ('rec_name', '=', 'Dunder Mifflin')])
-            fiscalyear, = self.fiscalyear.search([])
-            period = fiscalyear.periods[0]
-            last_period = fiscalyear.periods[-1]
-            session_id, _, _ = self.print_trial_balance.create()
-            print_trial_balance = self.print_trial_balance(session_id)
-            print_trial_balance.start.company = company
-            print_trial_balance.start.fiscalyear = fiscalyear
-            print_trial_balance.start.start_period = period
-            print_trial_balance.start.end_period = last_period
-            print_trial_balance.start.parties = []
-            print_trial_balance.start.accounts = []
-            print_trial_balance.start.show_digits = None
-            print_trial_balance.start.with_move_only = False
-            print_trial_balance.start.with_move_or_initial = False
-            print_trial_balance.start.split_parties = False
-            print_trial_balance.start.add_initial_balance = False
-            print_trial_balance.start.comparison_fiscalyear = None
-            print_trial_balance.start.comparison_start_period = None
-            print_trial_balance.start.comparison_end_period = None
-            print_trial_balance.start.output_format = 'pdf'
-            _, data = print_trial_balance.do_print_(None)
-            #Full trial_balance
-            self.assertEqual(data['company'], company.id)
-            self.assertEqual(data['fiscalyear'], fiscalyear.id)
-            self.assertEqual(data['start_period'], period.id)
-            self.assertEqual(data['end_period'], last_period.id)
-            self.assertEqual(len(data['accounts']), 0)
-            self.assertEqual(len(data['parties']), 0)
-            self.assertEqual(data['output_format'], 'pdf')
-            records, parameters = self.trial_balance_report.prepare(data)
-            self.assertEqual(len(records), 7)
-            self.assertEqual(parameters['start_period'], period.name)
-            self.assertEqual(parameters['end_period'], last_period.name)
-            self.assertEqual(parameters['fiscalyear'], fiscalyear.name)
-            self.assertEqual(parameters['accounts'], '')
-            self.assertEqual(parameters['parties'], '')
-            self.assertEqual(parameters['digits'], '')
-            self.assertEqual(parameters['with_moves_only'], '')
-            self.assertEqual(parameters['split_parties'], '')
-            self.assertEqual(parameters['SECOND_BALANCE'], False)
-            self.assertEqual(parameters['comparison_fiscalyear'], '')
-            self.assertEqual(parameters['comparison_start_period'], '')
-            self.assertEqual(parameters['comparison_end_period'], '')
-            credit = sum([Decimal(str(m['period_credit'])) for m in records])
-            debit = sum([Decimal(str(m['period_debit'])) for m in records])
-            balance = sum([Decimal(str(m['period_balance'])) for m in records])
-            self.assertEqual(credit, debit)
-            self.assertEqual(credit, Decimal('730.0'))
-            self.assertEqual(balance, Decimal('0.0'))
-            #Comparision data
-            credit = sum([Decimal(str(m['credit'])) for m in records])
-            debit = sum([Decimal(str(m['debit'])) for m in records])
-            balance = sum([Decimal(str(m['balance'])) for m in records])
-            self.assertEqual(credit, debit)
-            self.assertEqual(credit, balance)
-            self.assertEqual(balance, Decimal('0.0'))
-            session_id, _, _ = self.print_trial_balance.create()
-            print_trial_balance = self.print_trial_balance(session_id)
-            print_trial_balance.start.company = company
-            print_trial_balance.start.fiscalyear = fiscalyear
-            print_trial_balance.start.start_period = period
-            print_trial_balance.start.end_period = last_period
-            print_trial_balance.start.parties = []
-            print_trial_balance.start.accounts = []
-            print_trial_balance.start.show_digits = 1
-            print_trial_balance.start.with_move_only = False
-            print_trial_balance.start.with_move_or_initial = False
-            print_trial_balance.start.split_parties = False
-            print_trial_balance.start.add_initial_balance = False
-            print_trial_balance.start.comparison_fiscalyear = None
-            print_trial_balance.start.comparison_start_period = None
-            print_trial_balance.start.comparison_end_period = None
-            print_trial_balance.start.output_format = 'pdf'
-            _, data = print_trial_balance.do_print_(None)
-            #With 1 digit
-            records, parameters = self.trial_balance_report.prepare(data)
-            self.assertEqual(len(records), 3)
-            self.assertEqual(parameters['digits'], 1)
-            credit = sum([Decimal(str(m['period_credit'])) for m in records])
-            debit = sum([Decimal(str(m['period_debit'])) for m in records])
-            balance = sum([Decimal(str(m['period_balance'])) for m in records])
-            self.assertEqual(credit, Decimal('600.0'))
-            self.assertEqual(debit, Decimal('130.0'))
-            self.assertEqual(balance, Decimal('-470.0'))
-            session_id, _, _ = self.print_trial_balance.create()
-            print_trial_balance = self.print_trial_balance(session_id)
-            print_trial_balance.start.company = company
-            print_trial_balance.start.fiscalyear = fiscalyear
-            print_trial_balance.start.start_period = period
-            print_trial_balance.start.end_period = last_period
-            print_trial_balance.start.parties = []
-            print_trial_balance.start.accounts = []
-            print_trial_balance.start.show_digits = 2
-            print_trial_balance.start.with_move_only = False
-            print_trial_balance.start.with_move_or_initial = False
-            print_trial_balance.start.split_parties = False
-            print_trial_balance.start.add_initial_balance = False
-            print_trial_balance.start.comparison_fiscalyear = None
-            print_trial_balance.start.comparison_start_period = None
-            print_trial_balance.start.comparison_end_period = None
-            print_trial_balance.start.output_format = 'pdf'
-            _, data = print_trial_balance.do_print_(None)
-            #With 2 digits
-            records, parameters = self.trial_balance_report.prepare(data)
-            self.assertEqual(len(records), 2)
-            credit = sum([Decimal(str(m['period_credit'])) for m in records])
-            debit = sum([Decimal(str(m['period_debit'])) for m in records])
-            balance = sum([Decimal(str(m['period_balance'])) for m in records])
-            self.assertEqual(credit, Decimal('130.0'))
-            self.assertEqual(debit, Decimal('600.0'))
-            self.assertEqual(balance, Decimal('470.0'))
-            session_id, _, _ = self.print_trial_balance.create()
-            print_trial_balance = self.print_trial_balance(session_id)
-            print_trial_balance.start.company = company
-            print_trial_balance.start.fiscalyear = fiscalyear
-            print_trial_balance.start.start_period = period
-            print_trial_balance.start.end_period = last_period
-            print_trial_balance.start.parties = []
-            print_trial_balance.start.accounts = []
-            print_trial_balance.start.show_digits = 1
-            print_trial_balance.start.with_move_only = True
-            print_trial_balance.start.with_move_or_initial = False
-            print_trial_balance.start.split_parties = False
-            print_trial_balance.start.add_initial_balance = False
-            print_trial_balance.start.comparison_fiscalyear = None
-            print_trial_balance.start.comparison_start_period = None
-            print_trial_balance.start.comparison_end_period = None
-            print_trial_balance.start.output_format = 'pdf'
-            _, data = print_trial_balance.do_print_(None)
-            #With 1 digits and only with moves
-            records, parameters = self.trial_balance_report.prepare(data)
-            self.assertEqual(len(records), 2)
-            self.assertEqual(parameters['with_moves_only'], True)
-            credit = sum([Decimal(str(m['period_credit'])) for m in records])
-            debit = sum([Decimal(str(m['period_debit'])) for m in records])
-            balance = sum([Decimal(str(m['period_balance'])) for m in records])
-            self.assertEqual(debit, Decimal('130.0'))
-            self.assertEqual(credit, Decimal('600.0'))
-            self.assertEqual(balance, Decimal('-470.0'))
-            session_id, _, _ = self.print_trial_balance.create()
-            print_trial_balance = self.print_trial_balance(session_id)
-            print_trial_balance.start.company = company
-            print_trial_balance.start.fiscalyear = fiscalyear
-            print_trial_balance.start.start_period = period
-            print_trial_balance.start.end_period = last_period
-            print_trial_balance.start.parties = []
-            print_trial_balance.start.accounts = []
-            print_trial_balance.start.show_digits = 2
-            print_trial_balance.start.with_move_only = False
-            print_trial_balance.start.with_move_or_initial = False
-            print_trial_balance.start.split_parties = True
-            print_trial_balance.start.add_initial_balance = False
-            print_trial_balance.start.comparison_fiscalyear = None
-            print_trial_balance.start.comparison_start_period = None
-            print_trial_balance.start.comparison_end_period = None
-            print_trial_balance.start.output_format = 'pdf'
-            _, data = print_trial_balance.do_print_(None)
-            #With 2 digits and splited with parties
-            records, parameters = self.trial_balance_report.prepare(data)
-            self.assertEqual(len(records), 4)
-            self.assertEqual(parameters['split_parties'], True)
-            credit = sum([Decimal(str(m['period_credit'])) for m in records])
-            debit = sum([Decimal(str(m['period_debit'])) for m in records])
-            balance = sum([Decimal(str(m['period_balance'])) for m in records])
-            self.assertEqual(credit, Decimal('130.0'))
-            self.assertEqual(debit, Decimal('600.0'))
-            session_id, _, _ = self.print_trial_balance.create()
-            print_trial_balance = self.print_trial_balance(session_id)
-            print_trial_balance.start.company = company
-            print_trial_balance.start.fiscalyear = fiscalyear
-            print_trial_balance.start.start_period = period
-            print_trial_balance.start.end_period = last_period
-            print_trial_balance.start.parties = []
-            print_trial_balance.start.accounts = []
-            print_trial_balance.start.show_digits = None
-            print_trial_balance.start.with_move_only = False
-            print_trial_balance.start.with_move_or_initial = False
-            print_trial_balance.start.split_parties = True
-            print_trial_balance.start.add_initial_balance = False
-            print_trial_balance.start.comparison_fiscalyear = None
-            print_trial_balance.start.comparison_start_period = None
-            print_trial_balance.start.comparison_end_period = None
-            print_trial_balance.start.output_format = 'pdf'
-            _, data = print_trial_balance.do_print_(None)
-            #Full splited with parties
-            records, parameters = self.trial_balance_report.prepare(data)
-            self.assertEqual(len(records), 9)
-            self.assertEqual(parameters['split_parties'], True)
-            credit = sum([Decimal(str(m['period_credit'])) for m in records])
-            debit = sum([Decimal(str(m['period_debit'])) for m in records])
-            balance = sum([Decimal(str(m['period_balance'])) for m in records])
-            self.assertEqual(credit, Decimal('730.0'))
-            self.assertEqual(debit, Decimal('730.0'))
-            customer1, = self.party.search([
-                    ('name', '=', 'customer1'),
-                    ])
-            session_id, _, _ = self.print_trial_balance.create()
-            print_trial_balance = self.print_trial_balance(session_id)
-            print_trial_balance.start.company = company
-            print_trial_balance.start.fiscalyear = fiscalyear
-            print_trial_balance.start.start_period = period
-            print_trial_balance.start.end_period = last_period
-            print_trial_balance.start.parties = [customer1.id]
-            print_trial_balance.start.accounts = []
-            print_trial_balance.start.show_digits = None
-            print_trial_balance.start.with_move_only = False
-            print_trial_balance.start.with_move_or_initial = False
-            print_trial_balance.start.split_parties = True
-            print_trial_balance.start.add_initial_balance = False
-            print_trial_balance.start.comparison_fiscalyear = None
-            print_trial_balance.start.comparison_start_period = None
-            print_trial_balance.start.comparison_end_period = None
-            print_trial_balance.start.output_format = 'pdf'
-            _, data = print_trial_balance.do_print_(None)
-            #Customer 1 and splited with parties
-            records, parameters = self.trial_balance_report.prepare(data)
-            self.assertEqual(len(records), 7)
-            self.assertEqual(parameters['parties'], customer1.rec_name)
-            credit = sum([Decimal(str(m['period_credit'])) for m in records
-                    if m['name'] == customer1.rec_name])
-            debit = sum([Decimal(str(m['period_debit'])) for m in records
-                    if m['name'] == customer1.rec_name])
-            balance = sum([Decimal(str(m['period_balance'])) for m in records
-                    if m['name'] == customer1.rec_name])
-            self.assertEqual(credit, Decimal('0.0'))
-            self.assertEqual(debit, Decimal('100.0'))
-            self.assertEqual(balance, Decimal('100.0'))
-            revenue, = self.account.search([
-                    ('kind', '=', 'revenue'),
-                    ])
-            session_id, _, _ = self.print_trial_balance.create()
-            print_trial_balance = self.print_trial_balance(session_id)
-            print_trial_balance.start.company = company
-            print_trial_balance.start.fiscalyear = fiscalyear
-            print_trial_balance.start.start_period = period
-            print_trial_balance.start.end_period = last_period
-            print_trial_balance.start.parties = []
-            print_trial_balance.start.accounts = [revenue.id]
-            print_trial_balance.start.show_digits = None
-            print_trial_balance.start.with_move_only = False
-            print_trial_balance.start.with_move_or_initial = False
-            print_trial_balance.start.split_parties = False
-            print_trial_balance.start.add_initial_balance = False
-            print_trial_balance.start.comparison_fiscalyear = None
-            print_trial_balance.start.comparison_start_period = None
-            print_trial_balance.start.comparison_end_period = None
-            print_trial_balance.start.output_format = 'pdf'
-            _, data = print_trial_balance.do_print_(None)
-            #Only revenue account
-            records, parameters = self.trial_balance_report.prepare(data)
-            self.assertEqual(len(records), 1)
-            self.assertEqual(parameters['accounts'], revenue.code)
-            credit = sum([Decimal(str(m['period_credit'])) for m in records])
-            debit = sum([Decimal(str(m['period_debit'])) for m in records])
-            balance = sum([Decimal(str(m['period_balance'])) for m in records])
-            self.assertEqual(credit, Decimal('600.0'))
-            self.assertEqual(debit, Decimal('0.0'))
-            self.assertEqual(balance, Decimal('-600.0'))
-            session_id, _, _ = self.print_trial_balance.create()
-            print_trial_balance = self.print_trial_balance(session_id)
-            print_trial_balance.start.company = company
-            print_trial_balance.start.fiscalyear = fiscalyear
-            print_trial_balance.start.start_period = last_period
-            print_trial_balance.start.end_period = last_period
-            print_trial_balance.start.parties = []
-            print_trial_balance.start.accounts = []
-            print_trial_balance.start.show_digits = None
-            print_trial_balance.start.with_move_only = True
-            print_trial_balance.start.with_move_or_initial = False
-            print_trial_balance.start.split_parties = False
-            print_trial_balance.start.add_initial_balance = True
-            print_trial_balance.start.comparison_fiscalyear = fiscalyear
-            print_trial_balance.start.comparison_start_period = last_period
-            print_trial_balance.start.comparison_end_period = last_period
-            print_trial_balance.start.output_format = 'pdf'
-            _, data = print_trial_balance.do_print_(None)
-            #With moves and add initial balance
-            records, parameters = self.trial_balance_report.prepare(data)
-            self.assertEqual(len(records), 4)
-            initial = sum([Decimal(str(m['period_initial_balance']))
-                    for m in records])
-            credit = sum([Decimal(str(m['period_credit'])) for m in records])
-            debit = sum([Decimal(str(m['period_debit'])) for m in records])
-            balance = sum([Decimal(str(m['period_balance'])) for m in records])
-            self.assertEqual(credit, Decimal('350.0'))
-            self.assertEqual(debit, Decimal('350.0'))
-            results = {
-                '41': (Decimal('-80'), Decimal('-130')),
-                '43': (Decimal('300'), Decimal('600')),
-                '6': (Decimal('80'), Decimal('130')),
-                '7': (Decimal('-300'), Decimal('-600')),
-                }
-            for r in records:
-                initial, balance = results[r['code']]
-                self.assertEqual(r['period_initial_balance'], initial)
-                self.assertEqual(r['period_balance'], balance)
-                self.assertEqual(r['initial_balance'], initial)
-                self.assertEqual(r['balance'], balance)
-            for initial, balance in [(m['period_initial_balance'],
-                        m['period_balance']) for m in records]:
-                self.assertNotEqual(Decimal(str(initial)), Decimal('0.0'))
-                self.assertNotEqual(Decimal(str(balance)), Decimal('0.0'))
-                self.assertNotEqual(Decimal(str(balance)),
-                    Decimal(str(initial)))
-            session_id, _, _ = self.print_trial_balance.create()
-            print_trial_balance = self.print_trial_balance(session_id)
-            print_trial_balance.start.company = company
-            print_trial_balance.start.fiscalyear = fiscalyear
-            print_trial_balance.start.start_period = last_period
-            print_trial_balance.start.end_period = last_period
-            print_trial_balance.start.parties = []
-            print_trial_balance.start.accounts = []
-            print_trial_balance.start.show_digits = None
-            print_trial_balance.start.with_move_only = True
-            print_trial_balance.start.with_move_or_initial = False
-            print_trial_balance.start.split_parties = True
-            print_trial_balance.start.add_initial_balance = True
-            print_trial_balance.start.comparison_fiscalyear = fiscalyear
-            print_trial_balance.start.comparison_start_period = last_period
-            print_trial_balance.start.comparison_end_period = last_period
-            print_trial_balance.start.output_format = 'pdf'
-            _, data = print_trial_balance.do_print_(None)
-            #With moves, split parties and add initial balance
-            records, parameters = self.trial_balance_report.prepare(data)
-            self.assertEqual(len(records), 4)
-            results = {
-                '41': (Decimal('-50'), Decimal('-100')),
-                '43': (Decimal('200'), Decimal('500')),
-                '6': (Decimal('80'), Decimal('130')),
-                '7': (Decimal('-300'), Decimal('-600')),
-                }
-            for r in records:
-                initial, balance = results[r['code']]
-                self.assertEqual(r['period_initial_balance'], initial)
-                self.assertEqual(r['period_balance'], balance)
-                self.assertEqual(r['initial_balance'], initial)
-                self.assertEqual(r['balance'], balance)
-            session_id, _, _ = self.print_trial_balance.create()
-            print_trial_balance = self.print_trial_balance(session_id)
-            print_trial_balance.start.company = company
-            print_trial_balance.start.fiscalyear = fiscalyear
-            print_trial_balance.start.start_period = last_period
-            print_trial_balance.start.end_period = last_period
-            print_trial_balance.start.parties = []
-            print_trial_balance.start.accounts = []
-            print_trial_balance.start.show_digits = None
-            print_trial_balance.start.with_move_only = True
-            print_trial_balance.start.with_move_or_initial = False
-            print_trial_balance.start.split_parties = False
-            print_trial_balance.start.add_initial_balance = False
-            print_trial_balance.start.comparison_fiscalyear = fiscalyear
-            print_trial_balance.start.comparison_start_period = period
-            print_trial_balance.start.comparison_end_period = period
-            print_trial_balance.start.output_format = 'pdf'
-            _, data = print_trial_balance.do_print_(None)
-            #With moves and comparing period
-            records, parameters = self.trial_balance_report.prepare(data)
-            self.assertEqual(parameters['comparison_fiscalyear'],
-                fiscalyear.rec_name)
-            self.assertEqual(parameters['comparison_start_period'],
-                period.rec_name)
-            self.assertEqual(parameters['comparison_end_period'],
-                period.rec_name)
-            self.assertEqual(len(records), 4)
-            credit = sum([Decimal(str(m['period_credit'])) for m in records])
-            debit = sum([Decimal(str(m['period_debit'])) for m in records])
-            balance = sum([Decimal(str(m['period_balance'])) for m in records])
-            self.assertEqual(credit, debit)
-            self.assertEqual(debit, Decimal('350.0'))
-            self.assertEqual(balance, Decimal('0.0'))
-            #Comparision data
-            credit = sum([Decimal(str(m['credit'])) for m in records])
-            debit = sum([Decimal(str(m['debit'])) for m in records])
-            balance = sum([Decimal(str(m['balance'])) for m in records])
-            self.assertEqual(credit, debit)
-            self.assertEqual(debit, Decimal('380.0'))
-            self.assertEqual(balance, Decimal('0.0'))
-            receivable, = self.account.search([
-                    ('kind', '=', 'receivable'),
-                    ])
-            session_id, _, _ = self.print_trial_balance.create()
-            print_trial_balance = self.print_trial_balance(session_id)
-            print_trial_balance.start.company = company
-            print_trial_balance.start.fiscalyear = fiscalyear
-            print_trial_balance.start.start_period = last_period
-            print_trial_balance.start.end_period = last_period
-            print_trial_balance.start.parties = []
-            print_trial_balance.start.accounts = [receivable.id]
-            print_trial_balance.start.show_digits = None
-            print_trial_balance.start.with_move_only = True
-            print_trial_balance.start.with_move_or_initial = False
-            print_trial_balance.start.split_parties = True
-            print_trial_balance.start.add_initial_balance = False
-            print_trial_balance.start.comparison_fiscalyear = None
-            print_trial_balance.start.comparison_start_period = None
-            print_trial_balance.start.comparison_end_period = None
-            print_trial_balance.start.output_format = 'pdf'
-            _, data = print_trial_balance.do_print_(None)
-            #Splited by parties but move doesn't have any party defined
-            records, parameters = self.trial_balance_report.prepare(data)
-            self.assertEqual(len(records), 1)
-            self.assertEqual(parameters['accounts'], receivable.code)
-            credit = sum([Decimal(str(m['period_credit'])) for m in records])
-            debit = sum([Decimal(str(m['period_debit'])) for m in records])
-            balance = sum([Decimal(str(m['period_balance'])) for m in records])
-            self.assertEqual(debit, Decimal('300.0'))
-            self.assertEqual(credit, Decimal('0.0'))
-            self.assertEqual(balance, Decimal('300.0'))
-            #Inactive customers should always apear on trial balance
-            self.party.write([customer1], {
-                    'active': False,
-                    })
-            session_id, _, _ = self.print_trial_balance.create()
-            print_trial_balance = self.print_trial_balance(session_id)
-            print_trial_balance.start.company = company
-            print_trial_balance.start.fiscalyear = fiscalyear
-            print_trial_balance.start.start_period = period
-            print_trial_balance.start.end_period = last_period
-            print_trial_balance.start.parties = []
-            print_trial_balance.start.accounts = []
-            print_trial_balance.start.show_digits = None
-            print_trial_balance.start.with_move_only = False
-            print_trial_balance.start.with_move_or_initial = False
-            print_trial_balance.start.split_parties = True
-            print_trial_balance.start.add_initial_balance = False
-            print_trial_balance.start.comparison_fiscalyear = None
-            print_trial_balance.start.comparison_start_period = None
-            print_trial_balance.start.comparison_end_period = None
-            print_trial_balance.start.output_format = 'pdf'
-            _, data = print_trial_balance.do_print_(None)
-            #Full splited with parties
-            records, parameters = self.trial_balance_report.prepare(data)
-            self.assertEqual(len(records), 9)
-            self.assertEqual(parameters['split_parties'], True)
-            credit = sum([Decimal(str(m['period_credit'])) for m in records])
-            debit = sum([Decimal(str(m['period_debit'])) for m in records])
-            balance = sum([Decimal(str(m['period_balance'])) for m in records])
-            self.assertEqual(credit, Decimal('730.0'))
-            self.assertEqual(debit, Decimal('730.0'))
+        pool = Pool()
+        PrintTrialBalance = pool.get(
+            'account_jasper_reports.print_trial_balance', type='wizard')
+        TrialBalanceReport = pool.get(
+            'account_jasper_reports.trial_balance', type='report')
+        company = create_company()
+        fiscalyear = self.create_moves(company)
+        period = fiscalyear.periods[0]
+        last_period = fiscalyear.periods[-1]
+        session_id, _, _ = PrintTrialBalance.create()
+        print_trial_balance = PrintTrialBalance(session_id)
+        print_trial_balance.start.company = company
+        print_trial_balance.start.fiscalyear = fiscalyear
+        print_trial_balance.start.start_period = period
+        print_trial_balance.start.end_period = last_period
+        print_trial_balance.start.parties = []
+        print_trial_balance.start.accounts = []
+        print_trial_balance.start.show_digits = None
+        print_trial_balance.start.with_move_only = False
+        print_trial_balance.start.with_move_or_initial = False
+        print_trial_balance.start.split_parties = False
+        print_trial_balance.start.add_initial_balance = False
+        print_trial_balance.start.comparison_fiscalyear = None
+        print_trial_balance.start.comparison_start_period = None
+        print_trial_balance.start.comparison_end_period = None
+        print_trial_balance.start.output_format = 'pdf'
+        _, data = print_trial_balance.do_print_(None)
+        #Full trial_balance
+        self.assertEqual(data['company'], company.id)
+        self.assertEqual(data['fiscalyear'], fiscalyear.id)
+        self.assertEqual(data['start_period'], period.id)
+        self.assertEqual(data['end_period'], last_period.id)
+        self.assertEqual(len(data['accounts']), 0)
+        self.assertEqual(len(data['parties']), 0)
+        self.assertEqual(data['output_format'], 'pdf')
+        records, parameters = TrialBalanceReport.prepare(data)
+        self.assertEqual(len(records), 7)
+        self.assertEqual(parameters['start_period'], period.name)
+        self.assertEqual(parameters['end_period'], last_period.name)
+        self.assertEqual(parameters['fiscalyear'], fiscalyear.name)
+        self.assertEqual(parameters['accounts'], '')
+        self.assertEqual(parameters['parties'], '')
+        self.assertEqual(parameters['digits'], '')
+        self.assertEqual(parameters['with_moves_only'], '')
+        self.assertEqual(parameters['split_parties'], '')
+        self.assertEqual(parameters['SECOND_BALANCE'], False)
+        self.assertEqual(parameters['comparison_fiscalyear'], '')
+        self.assertEqual(parameters['comparison_start_period'], '')
+        self.assertEqual(parameters['comparison_end_period'], '')
+        credit = sum([Decimal(str(m['period_credit'])) for m in records])
+        debit = sum([Decimal(str(m['period_debit'])) for m in records])
+        balance = sum([Decimal(str(m['period_balance'])) for m in records])
+        self.assertEqual(credit, debit)
+        self.assertEqual(credit, Decimal('730.0'))
+        self.assertEqual(balance, Decimal('0.0'))
+        #Comparision data
+        credit = sum([Decimal(str(m['credit'])) for m in records])
+        debit = sum([Decimal(str(m['debit'])) for m in records])
+        balance = sum([Decimal(str(m['balance'])) for m in records])
+        self.assertEqual(credit, debit)
+        self.assertEqual(credit, balance)
+        self.assertEqual(balance, Decimal('0.0'))
+        session_id, _, _ = PrintTrialBalance.create()
+        print_trial_balance = PrintTrialBalance(session_id)
+        print_trial_balance.start.company = company
+        print_trial_balance.start.fiscalyear = fiscalyear
+        print_trial_balance.start.start_period = period
+        print_trial_balance.start.end_period = last_period
+        print_trial_balance.start.parties = []
+        print_trial_balance.start.accounts = []
+        print_trial_balance.start.show_digits = 1
+        print_trial_balance.start.with_move_only = False
+        print_trial_balance.start.with_move_or_initial = False
+        print_trial_balance.start.split_parties = False
+        print_trial_balance.start.add_initial_balance = False
+        print_trial_balance.start.comparison_fiscalyear = None
+        print_trial_balance.start.comparison_start_period = None
+        print_trial_balance.start.comparison_end_period = None
+        print_trial_balance.start.output_format = 'pdf'
+        _, data = print_trial_balance.do_print_(None)
+        #With 1 digit
+        records, parameters = TrialBalanceReport.prepare(data)
+        self.assertEqual(len(records), 3)
+        self.assertEqual(parameters['digits'], 1)
+        credit = sum([Decimal(str(m['period_credit'])) for m in records])
+        debit = sum([Decimal(str(m['period_debit'])) for m in records])
+        balance = sum([Decimal(str(m['period_balance'])) for m in records])
+        self.assertEqual(credit, Decimal('600.0'))
+        self.assertEqual(debit, Decimal('130.0'))
+        self.assertEqual(balance, Decimal('-470.0'))
+        session_id, _, _ = PrintTrialBalance.create()
+        print_trial_balance = PrintTrialBalance(session_id)
+        print_trial_balance.start.company = company
+        print_trial_balance.start.fiscalyear = fiscalyear
+        print_trial_balance.start.start_period = period
+        print_trial_balance.start.end_period = last_period
+        print_trial_balance.start.parties = []
+        print_trial_balance.start.accounts = []
+        print_trial_balance.start.show_digits = 2
+        print_trial_balance.start.with_move_only = False
+        print_trial_balance.start.with_move_or_initial = False
+        print_trial_balance.start.split_parties = False
+        print_trial_balance.start.add_initial_balance = False
+        print_trial_balance.start.comparison_fiscalyear = None
+        print_trial_balance.start.comparison_start_period = None
+        print_trial_balance.start.comparison_end_period = None
+        print_trial_balance.start.output_format = 'pdf'
+        _, data = print_trial_balance.do_print_(None)
+        #With 2 digits
+        records, parameters = TrialBalanceReport.prepare(data)
+        self.assertEqual(len(records), 2)
+        credit = sum([Decimal(str(m['period_credit'])) for m in records])
+        debit = sum([Decimal(str(m['period_debit'])) for m in records])
+        balance = sum([Decimal(str(m['period_balance'])) for m in records])
+        self.assertEqual(credit, Decimal('130.0'))
+        self.assertEqual(debit, Decimal('600.0'))
+        self.assertEqual(balance, Decimal('470.0'))
+        session_id, _, _ = PrintTrialBalance.create()
+        print_trial_balance = PrintTrialBalance(session_id)
+        print_trial_balance.start.company = company
+        print_trial_balance.start.fiscalyear = fiscalyear
+        print_trial_balance.start.start_period = period
+        print_trial_balance.start.end_period = last_period
+        print_trial_balance.start.parties = []
+        print_trial_balance.start.accounts = []
+        print_trial_balance.start.show_digits = 1
+        print_trial_balance.start.with_move_only = True
+        print_trial_balance.start.with_move_or_initial = False
+        print_trial_balance.start.split_parties = False
+        print_trial_balance.start.add_initial_balance = False
+        print_trial_balance.start.comparison_fiscalyear = None
+        print_trial_balance.start.comparison_start_period = None
+        print_trial_balance.start.comparison_end_period = None
+        print_trial_balance.start.output_format = 'pdf'
+        _, data = print_trial_balance.do_print_(None)
+        #With 1 digits and only with moves
+        records, parameters = TrialBalanceReport.prepare(data)
+        self.assertEqual(len(records), 2)
+        self.assertEqual(parameters['with_moves_only'], True)
+        credit = sum([Decimal(str(m['period_credit'])) for m in records])
+        debit = sum([Decimal(str(m['period_debit'])) for m in records])
+        balance = sum([Decimal(str(m['period_balance'])) for m in records])
+        self.assertEqual(debit, Decimal('130.0'))
+        self.assertEqual(credit, Decimal('600.0'))
+        self.assertEqual(balance, Decimal('-470.0'))
+        session_id, _, _ = PrintTrialBalance.create()
+        print_trial_balance = PrintTrialBalance(session_id)
+        print_trial_balance.start.company = company
+        print_trial_balance.start.fiscalyear = fiscalyear
+        print_trial_balance.start.start_period = period
+        print_trial_balance.start.end_period = last_period
+        print_trial_balance.start.parties = []
+        print_trial_balance.start.accounts = []
+        print_trial_balance.start.show_digits = 2
+        print_trial_balance.start.with_move_only = False
+        print_trial_balance.start.with_move_or_initial = False
+        print_trial_balance.start.split_parties = True
+        print_trial_balance.start.add_initial_balance = False
+        print_trial_balance.start.comparison_fiscalyear = None
+        print_trial_balance.start.comparison_start_period = None
+        print_trial_balance.start.comparison_end_period = None
+        print_trial_balance.start.output_format = 'pdf'
+        _, data = print_trial_balance.do_print_(None)
+        #With 2 digits and splited with parties
+        records, parameters = TrialBalanceReport.prepare(data)
+        self.assertEqual(len(records), 4)
+        self.assertEqual(parameters['split_parties'], True)
+        credit = sum([Decimal(str(m['period_credit'])) for m in records])
+        debit = sum([Decimal(str(m['period_debit'])) for m in records])
+        balance = sum([Decimal(str(m['period_balance'])) for m in records])
+        self.assertEqual(credit, Decimal('130.0'))
+        self.assertEqual(debit, Decimal('600.0'))
+        session_id, _, _ = PrintTrialBalance.create()
+        print_trial_balance = PrintTrialBalance(session_id)
+        print_trial_balance.start.company = company
+        print_trial_balance.start.fiscalyear = fiscalyear
+        print_trial_balance.start.start_period = period
+        print_trial_balance.start.end_period = last_period
+        print_trial_balance.start.parties = []
+        print_trial_balance.start.accounts = []
+        print_trial_balance.start.show_digits = None
+        print_trial_balance.start.with_move_only = False
+        print_trial_balance.start.with_move_or_initial = False
+        print_trial_balance.start.split_parties = True
+        print_trial_balance.start.add_initial_balance = False
+        print_trial_balance.start.comparison_fiscalyear = None
+        print_trial_balance.start.comparison_start_period = None
+        print_trial_balance.start.comparison_end_period = None
+        print_trial_balance.start.output_format = 'pdf'
+        _, data = print_trial_balance.do_print_(None)
+        #Full splited with parties
+        records, parameters = TrialBalanceReport.prepare(data)
+        self.assertEqual(len(records), 9)
+        self.assertEqual(parameters['split_parties'], True)
+        credit = sum([Decimal(str(m['period_credit'])) for m in records])
+        debit = sum([Decimal(str(m['period_debit'])) for m in records])
+        balance = sum([Decimal(str(m['period_balance'])) for m in records])
+        self.assertEqual(credit, Decimal('730.0'))
+        self.assertEqual(debit, Decimal('730.0'))
+        customer1 = self.get_parties()[0]
+        session_id, _, _ = PrintTrialBalance.create()
+        print_trial_balance = PrintTrialBalance(session_id)
+        print_trial_balance.start.company = company
+        print_trial_balance.start.fiscalyear = fiscalyear
+        print_trial_balance.start.start_period = period
+        print_trial_balance.start.end_period = last_period
+        print_trial_balance.start.parties = [customer1.id]
+        print_trial_balance.start.accounts = []
+        print_trial_balance.start.show_digits = None
+        print_trial_balance.start.with_move_only = False
+        print_trial_balance.start.with_move_or_initial = False
+        print_trial_balance.start.split_parties = True
+        print_trial_balance.start.add_initial_balance = False
+        print_trial_balance.start.comparison_fiscalyear = None
+        print_trial_balance.start.comparison_start_period = None
+        print_trial_balance.start.comparison_end_period = None
+        print_trial_balance.start.output_format = 'pdf'
+        _, data = print_trial_balance.do_print_(None)
+        #Customer 1 and splited with parties
+        records, parameters = TrialBalanceReport.prepare(data)
+        self.assertEqual(len(records), 7)
+        self.assertEqual(parameters['parties'], customer1.rec_name)
+        credit = sum([Decimal(str(m['period_credit'])) for m in records
+                if m['name'] == customer1.rec_name])
+        debit = sum([Decimal(str(m['period_debit'])) for m in records
+                if m['name'] == customer1.rec_name])
+        balance = sum([Decimal(str(m['period_balance'])) for m in records
+                if m['name'] == customer1.rec_name])
+        self.assertEqual(credit, Decimal('0.0'))
+        self.assertEqual(debit, Decimal('100.0'))
+        self.assertEqual(balance, Decimal('100.0'))
+        revenue = self.get_accounts(company)['revenue']
+        session_id, _, _ = PrintTrialBalance.create()
+        print_trial_balance = PrintTrialBalance(session_id)
+        print_trial_balance.start.company = company
+        print_trial_balance.start.fiscalyear = fiscalyear
+        print_trial_balance.start.start_period = period
+        print_trial_balance.start.end_period = last_period
+        print_trial_balance.start.parties = []
+        print_trial_balance.start.accounts = [revenue.id]
+        print_trial_balance.start.show_digits = None
+        print_trial_balance.start.with_move_only = False
+        print_trial_balance.start.with_move_or_initial = False
+        print_trial_balance.start.split_parties = False
+        print_trial_balance.start.add_initial_balance = False
+        print_trial_balance.start.comparison_fiscalyear = None
+        print_trial_balance.start.comparison_start_period = None
+        print_trial_balance.start.comparison_end_period = None
+        print_trial_balance.start.output_format = 'pdf'
+        _, data = print_trial_balance.do_print_(None)
+        #Only revenue account
+        records, parameters = TrialBalanceReport.prepare(data)
+        self.assertEqual(len(records), 1)
+        self.assertEqual(parameters['accounts'], revenue.code)
+        credit = sum([Decimal(str(m['period_credit'])) for m in records])
+        debit = sum([Decimal(str(m['period_debit'])) for m in records])
+        balance = sum([Decimal(str(m['period_balance'])) for m in records])
+        self.assertEqual(credit, Decimal('600.0'))
+        self.assertEqual(debit, Decimal('0.0'))
+        self.assertEqual(balance, Decimal('-600.0'))
+        session_id, _, _ = PrintTrialBalance.create()
+        print_trial_balance = PrintTrialBalance(session_id)
+        print_trial_balance.start.company = company
+        print_trial_balance.start.fiscalyear = fiscalyear
+        print_trial_balance.start.start_period = last_period
+        print_trial_balance.start.end_period = last_period
+        print_trial_balance.start.parties = []
+        print_trial_balance.start.accounts = []
+        print_trial_balance.start.show_digits = None
+        print_trial_balance.start.with_move_only = True
+        print_trial_balance.start.with_move_or_initial = False
+        print_trial_balance.start.split_parties = False
+        print_trial_balance.start.add_initial_balance = True
+        print_trial_balance.start.comparison_fiscalyear = fiscalyear
+        print_trial_balance.start.comparison_start_period = last_period
+        print_trial_balance.start.comparison_end_period = last_period
+        print_trial_balance.start.output_format = 'pdf'
+        _, data = print_trial_balance.do_print_(None)
+        #With moves and add initial balance
+        records, parameters = TrialBalanceReport.prepare(data)
+        self.assertEqual(len(records), 4)
+        initial = sum([Decimal(str(m['period_initial_balance']))
+                for m in records])
+        credit = sum([Decimal(str(m['period_credit'])) for m in records])
+        debit = sum([Decimal(str(m['period_debit'])) for m in records])
+        balance = sum([Decimal(str(m['period_balance'])) for m in records])
+        self.assertEqual(credit, Decimal('350.0'))
+        self.assertEqual(debit, Decimal('350.0'))
+        results = {
+            '41': (Decimal('-80'), Decimal('-130')),
+            '43': (Decimal('300'), Decimal('600')),
+            '6': (Decimal('80'), Decimal('130')),
+            '7': (Decimal('-300'), Decimal('-600')),
+            }
+        for r in records:
+            initial, balance = results[r['code']]
+            self.assertEqual(r['period_initial_balance'], initial)
+            self.assertEqual(r['period_balance'], balance)
+            self.assertEqual(r['initial_balance'], initial)
+            self.assertEqual(r['balance'], balance)
+        for initial, balance in [(m['period_initial_balance'],
+                    m['period_balance']) for m in records]:
+            self.assertNotEqual(Decimal(str(initial)), Decimal('0.0'))
+            self.assertNotEqual(Decimal(str(balance)), Decimal('0.0'))
+            self.assertNotEqual(Decimal(str(balance)),
+                Decimal(str(initial)))
+        session_id, _, _ = PrintTrialBalance.create()
+        print_trial_balance = PrintTrialBalance(session_id)
+        print_trial_balance.start.company = company
+        print_trial_balance.start.fiscalyear = fiscalyear
+        print_trial_balance.start.start_period = last_period
+        print_trial_balance.start.end_period = last_period
+        print_trial_balance.start.parties = []
+        print_trial_balance.start.accounts = []
+        print_trial_balance.start.show_digits = None
+        print_trial_balance.start.with_move_only = True
+        print_trial_balance.start.with_move_or_initial = False
+        print_trial_balance.start.split_parties = True
+        print_trial_balance.start.add_initial_balance = True
+        print_trial_balance.start.comparison_fiscalyear = fiscalyear
+        print_trial_balance.start.comparison_start_period = last_period
+        print_trial_balance.start.comparison_end_period = last_period
+        print_trial_balance.start.output_format = 'pdf'
+        _, data = print_trial_balance.do_print_(None)
+        #With moves, split parties and add initial balance
+        records, parameters = TrialBalanceReport.prepare(data)
+        self.assertEqual(len(records), 4)
+        results = {
+            '41': (Decimal('-50'), Decimal('-100')),
+            '43': (Decimal('200'), Decimal('500')),
+            '6': (Decimal('80'), Decimal('130')),
+            '7': (Decimal('-300'), Decimal('-600')),
+            }
+        for r in records:
+            initial, balance = results[r['code']]
+            self.assertEqual(r['period_initial_balance'], initial)
+            self.assertEqual(r['period_balance'], balance)
+            self.assertEqual(r['initial_balance'], initial)
+            self.assertEqual(r['balance'], balance)
+        session_id, _, _ = PrintTrialBalance.create()
+        print_trial_balance = PrintTrialBalance(session_id)
+        print_trial_balance.start.company = company
+        print_trial_balance.start.fiscalyear = fiscalyear
+        print_trial_balance.start.start_period = last_period
+        print_trial_balance.start.end_period = last_period
+        print_trial_balance.start.parties = []
+        print_trial_balance.start.accounts = []
+        print_trial_balance.start.show_digits = None
+        print_trial_balance.start.with_move_only = True
+        print_trial_balance.start.with_move_or_initial = False
+        print_trial_balance.start.split_parties = False
+        print_trial_balance.start.add_initial_balance = False
+        print_trial_balance.start.comparison_fiscalyear = fiscalyear
+        print_trial_balance.start.comparison_start_period = period
+        print_trial_balance.start.comparison_end_period = period
+        print_trial_balance.start.output_format = 'pdf'
+        _, data = print_trial_balance.do_print_(None)
+        #With moves and comparing period
+        records, parameters = TrialBalanceReport.prepare(data)
+        self.assertEqual(parameters['comparison_fiscalyear'],
+            fiscalyear.rec_name)
+        self.assertEqual(parameters['comparison_start_period'],
+            period.rec_name)
+        self.assertEqual(parameters['comparison_end_period'],
+            period.rec_name)
+        self.assertEqual(len(records), 4)
+        credit = sum([Decimal(str(m['period_credit'])) for m in records])
+        debit = sum([Decimal(str(m['period_debit'])) for m in records])
+        balance = sum([Decimal(str(m['period_balance'])) for m in records])
+        self.assertEqual(credit, debit)
+        self.assertEqual(debit, Decimal('350.0'))
+        self.assertEqual(balance, Decimal('0.0'))
+        #Comparision data
+        credit = sum([Decimal(str(m['credit'])) for m in records])
+        debit = sum([Decimal(str(m['debit'])) for m in records])
+        balance = sum([Decimal(str(m['balance'])) for m in records])
+        self.assertEqual(credit, debit)
+        self.assertEqual(debit, Decimal('380.0'))
+        self.assertEqual(balance, Decimal('0.0'))
+        receivable = self.get_accounts(company)['receivable']
+        session_id, _, _ = PrintTrialBalance.create()
+        print_trial_balance = PrintTrialBalance(session_id)
+        print_trial_balance.start.company = company
+        print_trial_balance.start.fiscalyear = fiscalyear
+        print_trial_balance.start.start_period = last_period
+        print_trial_balance.start.end_period = last_period
+        print_trial_balance.start.parties = []
+        print_trial_balance.start.accounts = [receivable.id]
+        print_trial_balance.start.show_digits = None
+        print_trial_balance.start.with_move_only = True
+        print_trial_balance.start.with_move_or_initial = False
+        print_trial_balance.start.split_parties = True
+        print_trial_balance.start.add_initial_balance = False
+        print_trial_balance.start.comparison_fiscalyear = None
+        print_trial_balance.start.comparison_start_period = None
+        print_trial_balance.start.comparison_end_period = None
+        print_trial_balance.start.output_format = 'pdf'
+        _, data = print_trial_balance.do_print_(None)
+        #Splited by parties but move doesn't have any party defined
+        records, parameters = TrialBalanceReport.prepare(data)
+        self.assertEqual(len(records), 1)
+        self.assertEqual(parameters['accounts'], receivable.code)
+        credit = sum([Decimal(str(m['period_credit'])) for m in records])
+        debit = sum([Decimal(str(m['period_debit'])) for m in records])
+        balance = sum([Decimal(str(m['period_balance'])) for m in records])
+        self.assertEqual(debit, Decimal('300.0'))
+        self.assertEqual(credit, Decimal('0.0'))
+        self.assertEqual(balance, Decimal('300.0'))
+        #Inactive customers should always apear on trial balance
+        customer1.active = False
+        customer1.save()
+        session_id, _, _ = PrintTrialBalance.create()
+        print_trial_balance = PrintTrialBalance(session_id)
+        print_trial_balance.start.company = company
+        print_trial_balance.start.fiscalyear = fiscalyear
+        print_trial_balance.start.start_period = period
+        print_trial_balance.start.end_period = last_period
+        print_trial_balance.start.parties = []
+        print_trial_balance.start.accounts = []
+        print_trial_balance.start.show_digits = None
+        print_trial_balance.start.with_move_only = False
+        print_trial_balance.start.with_move_or_initial = False
+        print_trial_balance.start.split_parties = True
+        print_trial_balance.start.add_initial_balance = False
+        print_trial_balance.start.comparison_fiscalyear = None
+        print_trial_balance.start.comparison_start_period = None
+        print_trial_balance.start.comparison_end_period = None
+        print_trial_balance.start.output_format = 'pdf'
+        _, data = print_trial_balance.do_print_(None)
+        #Full splited with parties
+        records, parameters = TrialBalanceReport.prepare(data)
+        self.assertEqual(len(records), 9)
+        self.assertEqual(parameters['split_parties'], True)
+        credit = sum([Decimal(str(m['period_credit'])) for m in records])
+        debit = sum([Decimal(str(m['period_debit'])) for m in records])
+        balance = sum([Decimal(str(m['period_balance'])) for m in records])
+        self.assertEqual(credit, Decimal('730.0'))
+        self.assertEqual(debit, Decimal('730.0'))
 
-    def test0050taxes_by_invoice(self):
+    @with_transaction()
+    def test_taxes_by_invoice(self):
         'Test taxes by invoice'
-        with Transaction().start(DB_NAME, USER, context=CONTEXT):
-            self.create_moves()
-            company, = self.company.search([
-                    ('rec_name', '=', 'Dunder Mifflin')])
-            fiscalyear, = self.fiscalyear.search([])
-            period = fiscalyear.periods[0]
-            last_period = fiscalyear.periods[-1]
-            account_tax, = self.account.search([
-                    ('kind', '=', 'other'),
-                    ('company', '=', company.id),
-                    ('name', '=', 'Main Tax'),
-                    ])
-            revenue, = self.account.search([
-                    ('kind', '=', 'revenue'),
-                    ])
-            receivable, = self.account.search([
-                    ('kind', '=', 'receivable'),
-                    ])
-            expense, = self.account.search([
-                    ('kind', '=', 'expense'),
-                    ])
-            payable, = self.account.search([
-                    ('kind', '=', 'payable'),
-                    ])
+        pool = Pool()
+        PaymentTerm = pool.get('account.invoice.payment_term')
+        TaxCode = pool.get('account.tax.code')
+        Tax = pool.get('account.tax')
+        Invoice = pool.get('account.invoice')
+        InvoiceTax = pool.get('account.invoice.tax')
+        PrintTaxesByInvoice = pool.get(
+            'account_jasper_reports.print_taxes_by_invoice', type='wizard')
+        TaxesByInvoiceReport = pool.get(
+            'account_jasper_reports.taxes_by_invoice', type='report')
+        company = create_company()
+        fiscalyear = self.create_moves(company)
+        period = fiscalyear.periods[0]
+        last_period = fiscalyear.periods[-1]
+        accounts = self.get_accounts(company)
+        revenue = accounts['revenue']
+        receivable = accounts['receivable']
+        expense = accounts['expense']
+        payable = accounts['payable']
+        account_tax = accounts['tax']
+        journals = self.get_journals()
+        journal_revenue = journals['REV']
+        journal_expense = journals['EXP']
 
-            term, = self.payment_term.create([{
-                        'name': 'Payment term',
-                        'lines': [
-                            ('create', [{
-                                        'type': 'remainder',
-                                        'relativedeltas': [
-                                            ('create', [{
-                                                        'sequence': 0,
-                                                        'days': 0,
-                                                        'months': 0,
-                                                        'weeks': 0,
-                                                        }])],
-                                        }])],
-                        }])
+        term, = PaymentTerm.create([{
+                    'name': 'Payment term',
+                    'lines': [
+                        ('create', [{
+                                    'type': 'remainder',
+                                    'relativedeltas': [
+                                        ('create', [{
+                                                    'sequence': 0,
+                                                    'days': 0,
+                                                    'months': 0,
+                                                    'weeks': 0,
+                                                    }])],
+                                    }])],
+                    }])
 
-            tx = self.taxcode.create([{
+        with set_company(company):
+            tx = TaxCode.create([{
                             'name': 'invoice base',
                             },
                         {
@@ -1046,7 +1094,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                             'name': 'credit note tax',
                         }])
             invoice_base, invoice_tax, credit_note_base, credit_note_tax = tx
-            tax1, tax2 = self.tax.create([{
+            tax1, tax2 = Tax.create([{
                         'name': 'Tax 1',
                         'description': 'Tax 1',
                         'type': 'percentage',
@@ -1070,29 +1118,10 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                         'credit_note_base_code': credit_note_base.id,
                         'credit_note_tax_code': credit_note_tax.id,
                         }])
-            customer, = self.party.search([
-                    ('name', '=', 'customer1'),
-                    ])
-            customer_address, = self.party_address.search([
-                    ('party', '=', customer.id),
-                    ], limit=1)
-            supplier, = self.party.search([
-                    ('name', '=', 'supplier1'),
-                    ])
-            supplier_address, = self.party_address.search([
-                    ('party', '=', supplier.id),
-                    ], limit=1)
-            with Transaction().set_context(active_test=False):
-                supplier2, = self.party.search([
-                        ('name', '=', 'supplier2'),
-                        ])
-            journal_revenue, = self.journal.search([
-                    ('code', '=', 'REV'),
-                    ])
-            journal_expense, = self.journal.search([
-                    ('code', '=', 'EXP'),
-                    ])
-            invoices = self.invoice.create([{
+            customer, _, supplier, supplier2 = self.get_parties()
+            customer_address, = customer.addresses
+            supplier_address, = supplier.addresses
+            invoices = Invoice.create([{
                         'number': '1',
                         'invoice_date': period.start_date,
                         'company': company.id,
@@ -1141,298 +1170,252 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                                         }])],
                         },
                 ])
-            self.invoice.post(invoices)
-            invoice1, invoice2 = invoices
-            session_id, _, _ = self.print_taxes_by_invoice.create()
-            print_taxes_by_invoice = self.print_taxes_by_invoice(session_id)
-            print_taxes_by_invoice.start.company = company
-            print_taxes_by_invoice.start.fiscalyear = fiscalyear
-            print_taxes_by_invoice.start.periods = []
-            print_taxes_by_invoice.start.parties = []
-            print_taxes_by_invoice.start.partner_type = 'customers'
-            print_taxes_by_invoice.start.grouping = 'invoice'
-            print_taxes_by_invoice.start.totals_only = False
-            print_taxes_by_invoice.start.output_format = 'pdf'
-            _, data = print_taxes_by_invoice.do_print_(None)
-            #Customer data
-            self.assertEqual(data['company'], company.id)
-            self.assertEqual(data['fiscalyear'], fiscalyear.id)
-            self.assertEqual(data['partner_type'], 'customers')
-            self.assertEqual(data['grouping'], 'invoice')
-            self.assertEqual(data['totals_only'], False)
-            self.assertEqual(len(data['periods']), 0)
-            self.assertEqual(len(data['parties']), 0)
-            self.assertEqual(data['output_format'], 'pdf')
-            ids, parameters = self.taxes_by_invoice_report.prepare(data)
-            records = self.invoice_tax.browse(ids)
-            self.assertEqual(len(records), 2)
-            self.assertEqual(parameters['fiscal_year'], fiscalyear.name)
-            self.assertEqual(parameters['parties'], '')
-            self.assertEqual(parameters['periods'], '')
-            self.assertEqual(parameters['TOTALS_ONLY'], False)
-            base = sum([m.base for m in records])
-            tax = sum([m.amount for m in records])
-            self.assertEqual(base, Decimal('100.0'))
-            self.assertEqual(tax, Decimal('7.0'))
-            for tax in records:
-                self.assertEqual(tax.invoice, invoice1)
-            session_id, _, _ = self.print_taxes_by_invoice.create()
-            print_taxes_by_invoice = self.print_taxes_by_invoice(session_id)
-            print_taxes_by_invoice.start.company = company
-            print_taxes_by_invoice.start.fiscalyear = fiscalyear
-            print_taxes_by_invoice.start.periods = []
-            print_taxes_by_invoice.start.parties = []
-            print_taxes_by_invoice.start.partner_type = 'suppliers'
-            print_taxes_by_invoice.start.grouping = 'invoice'
-            print_taxes_by_invoice.start.totals_only = False
-            print_taxes_by_invoice.start.output_format = 'pdf'
-            _, data = print_taxes_by_invoice.do_print_(None)
-            #Supplier data
-            ids, parameters = self.taxes_by_invoice_report.prepare(data)
-            records = self.invoice_tax.browse(ids)
-            self.assertEqual(len(records), 2)
-            base = sum([m.base for m in records])
-            tax = sum([m.amount for m in records])
-            self.assertEqual(base, Decimal('40.0'))
-            self.assertEqual(tax, Decimal('2.8'))
-            for tax in records:
-                self.assertEqual(tax.invoice, invoice2)
-            session_id, _, _ = self.print_taxes_by_invoice.create()
-            print_taxes_by_invoice = self.print_taxes_by_invoice(session_id)
-            print_taxes_by_invoice.start.company = company
-            print_taxes_by_invoice.start.fiscalyear = fiscalyear
-            print_taxes_by_invoice.start.periods = []
-            print_taxes_by_invoice.start.parties = [supplier2.id]
-            print_taxes_by_invoice.start.partner_type = 'suppliers'
-            print_taxes_by_invoice.start.grouping = 'invoice'
-            print_taxes_by_invoice.start.totals_only = False
-            print_taxes_by_invoice.start.output_format = 'pdf'
-            _, data = print_taxes_by_invoice.do_print_(None)
-            #Filter by supplier
-            ids, parameters = self.taxes_by_invoice_report.prepare(data)
-            self.assertEqual(parameters['parties'], supplier2.rec_name)
-            records = self.invoice_tax.browse(ids)
-            self.assertEqual(len(records), 0)
-            session_id, _, _ = self.print_taxes_by_invoice.create()
-            print_taxes_by_invoice = self.print_taxes_by_invoice(session_id)
-            print_taxes_by_invoice.start.company = company
-            print_taxes_by_invoice.start.fiscalyear = fiscalyear
-            print_taxes_by_invoice.start.periods = [last_period.id]
-            print_taxes_by_invoice.start.parties = []
-            print_taxes_by_invoice.start.partner_type = 'suppliers'
-            print_taxes_by_invoice.start.grouping = 'invoice'
-            print_taxes_by_invoice.start.totals_only = False
-            print_taxes_by_invoice.start.output_format = 'pdf'
-            _, data = print_taxes_by_invoice.do_print_(None)
-            #Filter by periods
-            ids, parameters = self.taxes_by_invoice_report.prepare(data)
-            self.assertEqual(parameters['periods'], last_period.rec_name)
-            records = self.invoice_tax.browse(ids)
-            self.assertEqual(len(records), 0)
+            Invoice.post(invoices)
+        invoice1, invoice2 = invoices
+        session_id, _, _ = PrintTaxesByInvoice.create()
+        print_taxes_by_invoice = PrintTaxesByInvoice(session_id)
+        print_taxes_by_invoice.start.company = company
+        print_taxes_by_invoice.start.fiscalyear = fiscalyear
+        print_taxes_by_invoice.start.periods = []
+        print_taxes_by_invoice.start.parties = []
+        print_taxes_by_invoice.start.partner_type = 'customers'
+        print_taxes_by_invoice.start.grouping = 'invoice'
+        print_taxes_by_invoice.start.totals_only = False
+        print_taxes_by_invoice.start.output_format = 'pdf'
+        _, data = print_taxes_by_invoice.do_print_(None)
+        #Customer data
+        self.assertEqual(data['company'], company.id)
+        self.assertEqual(data['fiscalyear'], fiscalyear.id)
+        self.assertEqual(data['partner_type'], 'customers')
+        self.assertEqual(data['grouping'], 'invoice')
+        self.assertEqual(data['totals_only'], False)
+        self.assertEqual(len(data['periods']), 0)
+        self.assertEqual(len(data['parties']), 0)
+        self.assertEqual(data['output_format'], 'pdf')
+        ids, parameters = TaxesByInvoiceReport.prepare(data)
+        records = InvoiceTax.browse(ids)
+        self.assertEqual(len(records), 2)
+        self.assertEqual(parameters['fiscal_year'], fiscalyear.name)
+        self.assertEqual(parameters['parties'], '')
+        self.assertEqual(parameters['periods'], '')
+        self.assertEqual(parameters['TOTALS_ONLY'], False)
+        base = sum([m.base for m in records])
+        tax = sum([m.amount for m in records])
+        self.assertEqual(base, Decimal('100.0'))
+        self.assertEqual(tax, Decimal('7.0'))
+        for tax in records:
+            self.assertEqual(tax.invoice, invoice1)
+        session_id, _, _ = PrintTaxesByInvoice.create()
+        print_taxes_by_invoice = PrintTaxesByInvoice(session_id)
+        print_taxes_by_invoice.start.company = company
+        print_taxes_by_invoice.start.fiscalyear = fiscalyear
+        print_taxes_by_invoice.start.periods = []
+        print_taxes_by_invoice.start.parties = []
+        print_taxes_by_invoice.start.partner_type = 'suppliers'
+        print_taxes_by_invoice.start.grouping = 'invoice'
+        print_taxes_by_invoice.start.totals_only = False
+        print_taxes_by_invoice.start.output_format = 'pdf'
+        _, data = print_taxes_by_invoice.do_print_(None)
+        #Supplier data
+        ids, parameters = TaxesByInvoiceReport.prepare(data)
+        records = InvoiceTax.browse(ids)
+        self.assertEqual(len(records), 2)
+        base = sum([m.base for m in records])
+        tax = sum([m.amount for m in records])
+        self.assertEqual(base, Decimal('40.0'))
+        self.assertEqual(tax, Decimal('2.8'))
+        for tax in records:
+            self.assertEqual(tax.invoice, invoice2)
+        session_id, _, _ = PrintTaxesByInvoice.create()
+        print_taxes_by_invoice = PrintTaxesByInvoice(session_id)
+        print_taxes_by_invoice.start.company = company
+        print_taxes_by_invoice.start.fiscalyear = fiscalyear
+        print_taxes_by_invoice.start.periods = []
+        print_taxes_by_invoice.start.parties = [supplier2.id]
+        print_taxes_by_invoice.start.partner_type = 'suppliers'
+        print_taxes_by_invoice.start.grouping = 'invoice'
+        print_taxes_by_invoice.start.totals_only = False
+        print_taxes_by_invoice.start.output_format = 'pdf'
+        _, data = print_taxes_by_invoice.do_print_(None)
+        #Filter by supplier
+        ids, parameters = TaxesByInvoiceReport.prepare(data)
+        self.assertEqual(parameters['parties'], supplier2.rec_name)
+        records = InvoiceTax.browse(ids)
+        self.assertEqual(len(records), 0)
+        session_id, _, _ = PrintTaxesByInvoice.create()
+        print_taxes_by_invoice = PrintTaxesByInvoice(session_id)
+        print_taxes_by_invoice.start.company = company
+        print_taxes_by_invoice.start.fiscalyear = fiscalyear
+        print_taxes_by_invoice.start.periods = [last_period.id]
+        print_taxes_by_invoice.start.parties = []
+        print_taxes_by_invoice.start.partner_type = 'suppliers'
+        print_taxes_by_invoice.start.grouping = 'invoice'
+        print_taxes_by_invoice.start.totals_only = False
+        print_taxes_by_invoice.start.output_format = 'pdf'
+        _, data = print_taxes_by_invoice.do_print_(None)
+        #Filter by periods
+        ids, parameters = TaxesByInvoiceReport.prepare(data)
+        self.assertEqual(parameters['periods'], last_period.rec_name)
+        records = InvoiceTax.browse(ids)
+        self.assertEqual(len(records), 0)
 
-    def test0060_fiscalyear_not_closed(self):
+    @with_transaction()
+    def test_fiscalyear_not_closed(self):
         'Test fiscalyear not closed'
-        with Transaction().start(DB_NAME, USER, context=CONTEXT):
-            today = datetime.date.today()
-            fiscalyear, = self.fiscalyear.search([])
-            company = fiscalyear.company
-            invoice_sequence, = self.sequence_strict.create([{
-                        'name': '%s' % today.year,
-                        'code': 'account.invoice',
-                        'company': company.id,
-                        }])
-            fiscalyear.out_invoice_sequence = invoice_sequence
-            fiscalyear.in_invoice_sequence = invoice_sequence
-            fiscalyear.out_credit_note_sequence = invoice_sequence
-            fiscalyear.in_credit_note_sequence = invoice_sequence
-            fiscalyear.save()
-            next_invoice_sequence, = self.sequence_strict.create([{
-                        'name': 'Next year invoice',
-                        'code': 'account.invoice',
-                        'company': company.id,
-                        }])
-            next_sequence, = self.sequence.create([{
-                        'name': 'Next Year',
-                        'code': 'account.move',
-                        'company': fiscalyear.company.id,
-                        }])
-            next_fiscalyear, = self.fiscalyear.copy([fiscalyear],
-                default={
-                    'name': 'Next fiscalyear',
-                    'start_date': fiscalyear.start_date + relativedelta(
-                        years=1),
-                    'end_date': fiscalyear.end_date + relativedelta(years=1),
-                    'post_move_sequence': next_sequence.id,
-                    'out_invoice_sequence':  next_invoice_sequence,
-                    'in_invoice_sequence':  next_invoice_sequence,
-                    'out_credit_note_sequence':  next_invoice_sequence,
-                    'in_credit_note_sequence':  next_invoice_sequence,
-                    'periods': None,
-                    })
-            self.fiscalyear.create_period([next_fiscalyear])
-            self.create_moves(fiscalyear)
-            self.create_moves(next_fiscalyear)
+        pool = Pool()
+        FiscalYear = pool.get('account.fiscalyear')
+        PrintGeneralLedger = pool.get(
+            'account_jasper_reports.print_general_ledger', type='wizard')
+        GeneralLedgerReport = pool.get(
+            'account_jasper_reports.general_ledger', type='report')
+        PrintTrialBalance = pool.get(
+            'account_jasper_reports.print_trial_balance', type='wizard')
+        TrialBalanceReport = pool.get(
+            'account_jasper_reports.trial_balance', type='report')
+        company = create_company()
+        fiscalyear = self.create_moves(company)
+        next_fiscalyear = set_invoice_sequences(get_fiscalyear(company,
+                today=fiscalyear.end_date + relativedelta(days=1)))
+        next_fiscalyear.save()
+        FiscalYear.create_period([next_fiscalyear])
+        self.create_moves(company, next_fiscalyear, False)
 
-            # General ledger for the next year
-            period = next_fiscalyear.periods[0]
-            last_period = next_fiscalyear.periods[-1]
-            session_id, _, _ = self.print_general_ledger.create()
-            print_general_ledger = self.print_general_ledger(session_id)
-            print_general_ledger.start.company = company
-            print_general_ledger.start.fiscalyear = next_fiscalyear
-            print_general_ledger.start.start_period = period
-            print_general_ledger.start.end_period = last_period
-            print_general_ledger.start.parties = []
-            print_general_ledger.start.accounts = []
-            print_general_ledger.start.output_format = 'pdf'
-            _, data = print_general_ledger.do_print_(None)
-            records, parameters = self.general_ledger_report.prepare(data)
-            self.assertEqual(len(records), 12)
-            self.assertEqual(parameters['start_period'], period.name)
-            self.assertEqual(parameters['end_period'], last_period.name)
-            self.assertEqual(parameters['fiscal_year'], next_fiscalyear.name)
-            self.assertEqual(parameters['accounts'], '')
-            self.assertEqual(parameters['parties'], '')
-            credit = sum([m['credit'] for m in records])
-            debit = sum([m['debit'] for m in records])
-            self.assertEqual(credit, debit)
-            self.assertEqual(credit, Decimal('730.0'))
-            with_party = [m for m in records if m['party_name'] != '']
-            self.assertEqual(len(with_party), 6)
-            dates = sorted(set([r['date'] for r in records]))
-            for date, expected_value in zip(dates, [period.start_date,
-                        last_period.end_date]):
-                self.assertEqual(date, expected_value.strftime('%d/%m/%Y'))
-            balances = [
-                Decimal('160'),            # Expense
-                Decimal('210'),            # Expense
-                Decimal('260'),            # Expense
-                Decimal('-60'),            # Payable Party 1
-                Decimal('-150'),           # Payable Party 2
-                Decimal('-200'),           # Payable Party 2
-                Decimal('200'),            # Receivable Party 1
-                Decimal('700'),            # Receivable Party 2
-                Decimal('1000'),           # Receivable Party 2
-                Decimal('-700'),           # Revenue
-                Decimal('-900'),           # Revenue
-                Decimal('-1200'),          # Revenue
-                ]
-            for record, balance in zip(records, balances):
-                self.assertEqual(record['balance'], balance)
+        # General ledger for the next year
+        period = next_fiscalyear.periods[0]
+        last_period = next_fiscalyear.periods[-1]
+        session_id, _, _ = PrintGeneralLedger.create()
+        print_general_ledger = PrintGeneralLedger(session_id)
+        print_general_ledger.start.company = company
+        print_general_ledger.start.fiscalyear = next_fiscalyear
+        print_general_ledger.start.start_period = period
+        print_general_ledger.start.end_period = last_period
+        print_general_ledger.start.parties = []
+        print_general_ledger.start.accounts = []
+        print_general_ledger.start.output_format = 'pdf'
+        _, data = print_general_ledger.do_print_(None)
+        records, parameters = GeneralLedgerReport.prepare(data)
+        self.assertEqual(len(records), 12)
+        self.assertEqual(parameters['start_period'], period.name)
+        self.assertEqual(parameters['end_period'], last_period.name)
+        self.assertEqual(parameters['fiscal_year'], next_fiscalyear.name)
+        self.assertEqual(parameters['accounts'], '')
+        self.assertEqual(parameters['parties'], '')
+        credit = sum([m['credit'] for m in records])
+        debit = sum([m['debit'] for m in records])
+        self.assertEqual(credit, debit)
+        self.assertEqual(credit, Decimal('730.0'))
+        with_party = [m for m in records if m['party_name'] != '']
+        self.assertEqual(len(with_party), 6)
+        dates = sorted(set([r['date'] for r in records]))
+        for date, expected_value in zip(dates, [period.start_date,
+                    last_period.end_date]):
+            self.assertEqual(date, expected_value.strftime('%d/%m/%Y'))
+        balances = [
+            Decimal('160'),            # Expense
+            Decimal('210'),            # Expense
+            Decimal('260'),            # Expense
+            Decimal('-60'),            # Payable Party 1
+            Decimal('-150'),           # Payable Party 2
+            Decimal('-200'),           # Payable Party 2
+            Decimal('200'),            # Receivable Party 1
+            Decimal('700'),            # Receivable Party 2
+            Decimal('1000'),           # Receivable Party 2
+            Decimal('-700'),           # Revenue
+            Decimal('-900'),           # Revenue
+            Decimal('-1200'),          # Revenue
+            ]
+        for record, balance in zip(records, balances):
+            self.assertEqual(record['balance'], balance)
 
-            # Trial for the next year
-            session_id, _, _ = self.print_trial_balance.create()
-            print_trial_balance = self.print_trial_balance(session_id)
-            print_trial_balance.start.company = company
-            print_trial_balance.start.fiscalyear = next_fiscalyear
-            print_trial_balance.start.start_period = period
-            print_trial_balance.start.end_period = last_period
-            print_trial_balance.start.parties = []
-            print_trial_balance.start.accounts = []
-            print_trial_balance.start.show_digits = None
-            print_trial_balance.start.with_move_only = False
-            print_trial_balance.start.with_move_or_initial = False
-            print_trial_balance.start.split_parties = True
-            print_trial_balance.start.add_initial_balance = True
-            print_trial_balance.start.comparison_fiscalyear = next_fiscalyear
-            print_trial_balance.start.comparison_start_period = period
-            print_trial_balance.start.comparison_end_period = last_period
-            print_trial_balance.start.output_format = 'pdf'
-            _, data = print_trial_balance.do_print_(None)
+        # Trial for the next year
+        session_id, _, _ = PrintTrialBalance.create()
+        print_trial_balance = PrintTrialBalance(session_id)
+        print_trial_balance.start.company = company
+        print_trial_balance.start.fiscalyear = next_fiscalyear
+        print_trial_balance.start.start_period = period
+        print_trial_balance.start.end_period = last_period
+        print_trial_balance.start.parties = []
+        print_trial_balance.start.accounts = []
+        print_trial_balance.start.show_digits = None
+        print_trial_balance.start.with_move_only = False
+        print_trial_balance.start.with_move_or_initial = False
+        print_trial_balance.start.split_parties = True
+        print_trial_balance.start.add_initial_balance = True
+        print_trial_balance.start.comparison_fiscalyear = next_fiscalyear
+        print_trial_balance.start.comparison_start_period = period
+        print_trial_balance.start.comparison_end_period = last_period
+        print_trial_balance.start.output_format = 'pdf'
+        _, data = print_trial_balance.do_print_(None)
 
-            # Full trial_balance
-            records, parameters = self.trial_balance_report.prepare(data)
-            balances = {
-                'Main Cash': Decimal('0'),
-                'Main Tax': Decimal('0'),
-                'View': Decimal('0'),
-                'supplier1': Decimal('-30'),
-                'supplier2': Decimal('-100'),
-                'customer1': Decimal('100'),
-                'customer2': Decimal('500'),
-                'Main Expense': Decimal('130'),
-                'Main Revenue': Decimal('-600'),
-                }
-            for record in records:
-                self.assertEqual(record['period_initial_balance'],
-                    balances[record['name']])
-                self.assertEqual(record['initial_balance'],
-                    balances[record['name']])
+        # Full trial_balance
+        records, parameters = TrialBalanceReport.prepare(data)
+        balances = {
+            'Main Cash': Decimal('0'),
+            'Main Tax': Decimal('0'),
+            'View': Decimal('0'),
+            'supplier1': Decimal('-30'),
+            'supplier2': Decimal('-100'),
+            'customer1': Decimal('100'),
+            'customer2': Decimal('500'),
+            'Main Expense': Decimal('130'),
+            'Main Revenue': Decimal('-600'),
+            }
+        for record in records:
+            self.assertEqual(record['period_initial_balance'],
+                balances[record['name']])
+            self.assertEqual(record['initial_balance'],
+                balances[record['name']])
 
-            # Create another fiscalyear and test it cumulates correctly
-            future_invoice_sequence, = self.sequence_strict.create([{
-                        'name': 'Future year invoice',
-                        'code': 'account.invoice',
-                        'company': company.id,
-                        }])
-            future_sequence, = self.sequence.create([{
-                        'name': 'Future Year',
-                        'code': 'account.move',
-                        'company': fiscalyear.company.id,
-                        }])
-            future_fiscalyear, = self.fiscalyear.copy([fiscalyear],
-                default={
-                    'name': 'Future fiscalyear',
-                    'start_date': fiscalyear.start_date + relativedelta(
-                        years=2),
-                    'end_date': fiscalyear.end_date + relativedelta(years=2),
-                    'post_move_sequence': future_sequence.id,
-                    'out_invoice_sequence':  future_invoice_sequence,
-                    'in_invoice_sequence':  future_invoice_sequence,
-                    'out_credit_note_sequence':  future_invoice_sequence,
-                    'in_credit_note_sequence':  future_invoice_sequence,
-                    'periods': None,
-                    })
-            self.fiscalyear.create_period([future_fiscalyear])
-            self.create_moves(future_fiscalyear)
+        # Create another fiscalyear and test it cumulates correctly
+        future_fiscalyear = set_invoice_sequences(get_fiscalyear(company,
+                today=fiscalyear.end_date + relativedelta(days=1, years=1)))
+        future_fiscalyear.save()
+        FiscalYear.create_period([future_fiscalyear])
+        self.create_moves(company, future_fiscalyear, False)
 
-            period = future_fiscalyear.periods[0]
-            last_period = future_fiscalyear.periods[-1]
-            session_id, _, _ = self.print_trial_balance.create()
-            print_trial_balance = self.print_trial_balance(session_id)
-            print_trial_balance.start.company = company
-            print_trial_balance.start.fiscalyear = future_fiscalyear
-            print_trial_balance.start.start_period = period
-            print_trial_balance.start.end_period = last_period
-            print_trial_balance.start.parties = []
-            print_trial_balance.start.accounts = []
-            print_trial_balance.start.show_digits = None
-            print_trial_balance.start.with_move_only = False
-            print_trial_balance.start.with_move_or_initial = False
-            print_trial_balance.start.split_parties = True
-            print_trial_balance.start.add_initial_balance = True
-            print_trial_balance.start.comparison_fiscalyear = future_fiscalyear
-            print_trial_balance.start.comparison_start_period = period
-            print_trial_balance.start.comparison_end_period = last_period
-            print_trial_balance.start.output_format = 'pdf'
-            _, data = print_trial_balance.do_print_(None)
+        period = future_fiscalyear.periods[0]
+        last_period = future_fiscalyear.periods[-1]
+        session_id, _, _ = PrintTrialBalance.create()
+        print_trial_balance = PrintTrialBalance(session_id)
+        print_trial_balance.start.company = company
+        print_trial_balance.start.fiscalyear = future_fiscalyear
+        print_trial_balance.start.start_period = period
+        print_trial_balance.start.end_period = last_period
+        print_trial_balance.start.parties = []
+        print_trial_balance.start.accounts = []
+        print_trial_balance.start.show_digits = None
+        print_trial_balance.start.with_move_only = False
+        print_trial_balance.start.with_move_or_initial = False
+        print_trial_balance.start.split_parties = True
+        print_trial_balance.start.add_initial_balance = True
+        print_trial_balance.start.comparison_fiscalyear = future_fiscalyear
+        print_trial_balance.start.comparison_start_period = period
+        print_trial_balance.start.comparison_end_period = last_period
+        print_trial_balance.start.output_format = 'pdf'
+        _, data = print_trial_balance.do_print_(None)
 
-            # Full trial_balance
-            records, parameters = self.trial_balance_report.prepare(data)
-            balances = {
-                'Main Cash': Decimal('0'),
-                'Main Tax': Decimal('0'),
-                'View': Decimal('0'),
-                'supplier1': Decimal('-60'),
-                'supplier2': Decimal('-200'),
-                'customer1': Decimal('200'),
-                'customer2': Decimal('1000'),
-                'Main Expense': Decimal('260'),
-                'Main Revenue': Decimal('-1200'),
-                }
-            for record in records:
-                self.assertEqual(record['period_initial_balance'],
-                    balances[record['name']])
-                self.assertEqual(record['initial_balance'],
-                    balances[record['name']])
+        # Full trial_balance
+        records, parameters = TrialBalanceReport.prepare(data)
+        balances = {
+            'Main Cash': Decimal('0'),
+            'Main Tax': Decimal('0'),
+            'View': Decimal('0'),
+            'supplier1': Decimal('-60'),
+            'supplier2': Decimal('-200'),
+            'customer1': Decimal('200'),
+            'customer2': Decimal('1000'),
+            'Main Expense': Decimal('260'),
+            'Main Revenue': Decimal('-1200'),
+            }
+        for record in records:
+            self.assertEqual(record['period_initial_balance'],
+                balances[record['name']])
+            self.assertEqual(record['initial_balance'],
+                balances[record['name']])
 
 
 def suite():
     suite = trytond.tests.test_tryton.suite()
-    from trytond.modules.account.tests import test_account
-    for test in test_account.suite():
-        if test not in suite and not isinstance(test, doctest.DocTestCase):
-            suite.addTest(test)
     suite.addTests(unittest.TestLoader().loadTestsFromTestCase(
         AccountJasperReportsTestCase))
     return suite
