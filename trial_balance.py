@@ -1,19 +1,14 @@
-#This file is part of account_jasper_reports for tryton.  The COPYRIGHT file
-#at the top level of this repository contains the full copyright notices and
-#license terms.
+# The COPYRIGHT filei at the top level of this repository contains the full
+# copyright notices and License terms.
 
 from datetime import timedelta
 
-from sql.aggregate import Sum
-from sql.conditionals import Coalesce
-from sql.operators import In
 from decimal import Decimal
 from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.pyson import Eval, Bool
-from trytond.tools import reduce_ids
 from trytond.modules.jasper_reports.jasper import JasperReport
 import logging
 
@@ -32,7 +27,18 @@ class PrintTrialBalanceStart(ModelView):
     comparison_fiscalyear = fields.Many2One('account.fiscalyear',
             'Fiscal Year')
     show_digits = fields.Integer('Digits')
-    with_move_only = fields.Boolean('Only Accounts With Move')
+    with_move_only = fields.Boolean('Only Accounts With Move',
+        states={
+            'invisible': Bool(Eval('add_initial_balance') &
+                Eval('with_move_or_initial'))
+        },
+        depends=['with_move_or_initial'])
+    with_move_or_initial = fields.Boolean(
+        'Only Accounts With Moves or Initial Balance',
+        states={
+            'invisible': ~Bool(Eval('add_initial_balance'))
+        },
+        depends=['add_initial_balance'])
     accounts = fields.Many2Many('account.account', None, None, 'Accounts')
     split_parties = fields.Boolean('Split Parties')
     add_initial_balance = fields.Boolean('Add Initial Balance')
@@ -177,6 +183,7 @@ class PrintTrialBalance(Wizard):
             'digits': self.start.show_digits or None,
             'add_initial_balance': self.start.add_initial_balance,
             'with_move_only': self.start.with_move_only,
+            'with_move_or_initial': self.start.with_move_or_initial,
             'split_parties': self.start.split_parties,
             'accounts': [x.id for x in self.start.accounts],
             'parties': [x.id for x in self.start.parties],
@@ -209,55 +216,6 @@ class PrintTrialBalance(Wizard):
 
 class TrialBalanceReport(JasperReport):
     __name__ = 'account_jasper_reports.trial_balance'
-
-    @classmethod
-    def read_account_vals(cls, accounts, with_moves=False):
-        pool = Pool()
-        Account = pool.get('account.account')
-        Move = pool.get('account.move')
-        MoveLine = pool.get('account.move.line')
-        line = MoveLine.__table__()
-        move = Move.__table__()
-        table_a = Account.__table__()
-        table_c = Account.__table__()
-        in_max = 3000
-        values = {}
-        transaction = Transaction()
-        cursor = transaction.cursor
-        move_join = 'INNER' if with_moves else 'LEFT'
-        account_ids = [a.id for a in accounts]
-        group_by = (table_a.id,)
-        columns = (group_by + (Sum(Coalesce(line.debit, 0)).as_('debit'),
-                Sum(Coalesce(line.credit, 0)).as_('credit'),
-                (Sum(Coalesce(line.debit, 0)) -
-                    Sum(Coalesce(line.credit, 0))).as_('balance')))
-        for i in range(0, len(account_ids), in_max):
-            sub_ids = account_ids[i:i + in_max]
-            red_sql = reduce_ids(table_a.id, sub_ids)
-            where = red_sql
-            periods = transaction.context.get('periods', False)
-            if periods:
-                periods.append(0)
-                where = (where & In(Coalesce(move.period, 0), periods))
-            date = transaction.context.get('date')
-            if date:
-                where = (where & (move.date <= date))
-            cursor.execute(*table_a.join(table_c,
-                    condition=(table_c.left >= table_a.left)
-                    & (table_c.right <= table_a.right)
-                    ).join(line, move_join,
-                        condition=line.account == table_c.id
-                    ).join(move, move_join,
-                        condition=move.id == line.move
-                    ).select(*columns, where=where, group_by=group_by))
-
-            for x in cursor.dictfetchall():
-                values[x['id']] = {
-                    'credit': x['credit'],
-                    'debit': x['debit'],
-                    'balance': x['balance'],
-                    }
-        return values
 
     @classmethod
     def prepare(cls, data):
@@ -330,6 +288,11 @@ class TrialBalanceReport(JasperReport):
         digits = data['digits']
         add_initial_balance = data['add_initial_balance']
         with_moves = data['with_move_only']
+        with_moves_or_initial = data['with_move_or_initial']
+        if not add_initial_balance:
+            with_moves_or_initial = False
+        if with_moves_or_initial:
+            with_moves = True
 
         periods = [x.id for x in fiscalyear.get_periods(start_period,
                 end_period)]
@@ -359,29 +322,30 @@ class TrialBalanceReport(JasperReport):
         parameters['with_moves_only'] = with_moves or ''
         parameters['split_parties'] = split_parties or ''
 
-        if parties:
-            parties = Party.browse(parties)
-            parties_subtitle = []
-            for x in parties:
-                if len(parties_subtitle) > 4:
-                    parties_subtitle.append('...')
-                    break
-                parties_subtitle.append(x.name)
-            parties_subtitle = '; '.join(parties_subtitle)
-        else:
-            parties_subtitle = ''
+        with Transaction().set_context(active_test=False):
+            if parties:
+                parties = Party.browse(parties)
+                parties_subtitle = []
+                for x in parties:
+                    if len(parties_subtitle) > 4:
+                        parties_subtitle.append('...')
+                        break
+                    parties_subtitle.append(x.name)
+                parties_subtitle = '; '.join(parties_subtitle)
+            else:
+                parties_subtitle = ''
 
-        parameters['parties'] = parties_subtitle
-        logger.info('Search accounts')
-        accounts = []
-        for account in Account.search(domain, order=[('code', 'ASC')]):
-            if not account.code:
-                if not digits:
+            parameters['parties'] = parties_subtitle
+            logger.info('Search accounts')
+            accounts = []
+            for account in Account.search(domain, order=[('code', 'ASC')]):
+                if not account.code:
+                    if not digits:
+                        accounts.append(account)
+                elif not digits or len(account.code) == digits or \
+                    account.kind != 'view' and len(account.childs) == 0 and \
+                        len(account.code) < (digits or 9999):
                     accounts.append(account)
-            elif not digits or len(account.code) == digits or \
-                account.kind != 'view' and len(account.childs) == 0 and \
-                    len(account.code) < (digits or 9999):
-                accounts.append(account)
 
         if accounts_title:
             accounts_subtitle = []
@@ -399,7 +363,7 @@ class TrialBalanceReport(JasperReport):
         # Calc first period values
         with transaction.set_context(fiscalyear=fiscalyear.id,
                 periods=periods):
-            values = cls.read_account_vals(accounts, with_moves=with_moves)
+            values = Account.read_account_vals(accounts, with_moves=with_moves)
 
         # Calc Initial Balance for first period
         init_values = {}
@@ -407,7 +371,7 @@ class TrialBalanceReport(JasperReport):
             logger.info('Calc Initial Balance')
             initial_balance_date = start_period.start_date - timedelta(days=1)
             with transaction.set_context(date=initial_balance_date):
-                init_values = cls.read_account_vals(accounts,
+                init_values = Account.read_account_vals(accounts,
                     with_moves=with_moves)
 
         # Calc comparison period values.
@@ -415,10 +379,10 @@ class TrialBalanceReport(JasperReport):
         comparison_values = {}.fromkeys(accounts, Decimal('0.00'))
 
         if comparison_fiscalyear:
-        #    second_dict = {}.fromkeys(accounts, Decimal('0.00'))
+            # second_dict = {}.fromkeys(accounts, Decimal('0.00'))
             logger.info('Calc initial vals for comparison period')
             with transaction.set_context(periods=comparison_periods):
-                comparison_values = cls.read_account_vals(accounts,
+                comparison_values = Account.read_account_vals(accounts,
                     with_moves=with_moves)
 
             logger.info('Calc vals for comparison period')
@@ -426,7 +390,7 @@ class TrialBalanceReport(JasperReport):
                 timedelta(days=1))
             with transaction.set_context(date=initial_comparision_date):
                 comparison_initial_values.update(
-                    cls.read_account_vals(accounts, with_moves=with_moves))
+                    Account.read_account_vals(accounts, with_moves=with_moves))
         if split_parties:
 
             init_party_values = {}
@@ -468,17 +432,21 @@ class TrialBalanceReport(JasperReport):
                 if digits and account.code:
                     if len(account.code.strip()) < digits:
                         continue
-                    elif len(account.code) == digits and account.kind == 'view':
+                    elif (len(account.code) == digits and
+                            account.kind == 'view'):
                         account.kind = 'other'
 
                 vals = _amounts(account, init_values, values)
                 initial, credit, debit, balance = vals
 
-                if with_moves and credit == 0 and debit == 0:
+                if with_moves_or_initial:
+                    if credit == 0 and debit == 0 and initial == 0:
+                        continue
+                elif with_moves and credit == 0 and debit == 0:
                     continue
 
                 comp_vals = _amounts(account,
-                    comparison_initial_values,  comparison_values)
+                    comparison_initial_values, comparison_values)
                 comp_initial, comp_credit, comp_debit, comp_balance = \
                     comp_vals
 
@@ -505,8 +473,10 @@ class TrialBalanceReport(JasperReport):
                                 comparison_party_values)
                         init, credit, debit, balance = party_vals
 
-                        if with_moves and not debit and not credit and \
-                                not balance:
+                        if with_moves_or_initial:
+                            if credit == 0 and debit == 0 and initial == 0:
+                                continue
+                        elif with_moves and credit == 0 and debit == 0:
                             continue
 
                         record = _record(account, party,

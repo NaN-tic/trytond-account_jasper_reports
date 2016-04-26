@@ -1,6 +1,5 @@
-#This file is part of account_jasper_reports for tryton.  The COPYRIGHT file
-#at the top level of this repository contains the full copyright notices and
-#license terms.
+# The COPYRIGHT file at the top level of this repository contains the full
+# copyright notices and license terms.
 
 from trytond.pool import Pool
 from trytond.transaction import Transaction
@@ -129,7 +128,8 @@ class TaxesByInvoiceReport(JasperReport):
             periods = Period.search([('fiscalyear', '=', fiscalyear.id)])
             periods_subtitle = ''
 
-        parties = Party.browse(data.get('parties', []))
+        with Transaction().set_context(active_test=False):
+            parties = Party.browse(data.get('parties', []))
         if parties:
             parties_subtitle = []
             for x in parties:
@@ -147,7 +147,7 @@ class TaxesByInvoiceReport(JasperReport):
         parameters['periods'] = periods_subtitle
         parameters['TOTALS_ONLY'] = data['totals_only'] and True or False
 
-        domain = []
+        domain = [('invoice.state', 'in', ['posted', 'paid'])]
 
         if data['partner_type'] == 'customers':
             domain += [('invoice.type', 'in',
@@ -168,7 +168,8 @@ class TaxesByInvoiceReport(JasperReport):
 
     @classmethod
     def execute(cls, ids, data):
-        report_ids, parameters = cls.prepare(data)
+        with Transaction().set_context(active_test=False):
+            report_ids, parameters = cls.prepare(data)
         return super(TaxesByInvoiceReport, cls).execute(report_ids, {
                 'name': cls.__name__,
                 'parameters': parameters,

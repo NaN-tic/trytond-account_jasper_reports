@@ -1,11 +1,9 @@
 # coding=utf-8
-#This file is part of account_jasper_reports for tryton.  The COPYRIGHT file
-#at the top level of this repository contains the full copyright notices and
-#license terms.
+# The COPYRIGHT file at the top level of this repository contains the full
+# copyright notices and license terms.
 from decimal import Decimal
 from sql.aggregate import Sum
 from sql.conditionals import Coalesce
-from sql.operators import In
 
 from trytond.pool import Pool
 from trytond.transaction import Transaction
@@ -113,19 +111,20 @@ class AbreviatedJournalReport(JasperReport):
         # Calculate the account level
         account_ids = []
         level = data['level']
-        for account in Account.search([('company', '=', data['company'])],
-                order=[('code', 'ASC')]):
-            if not account.code:
-                continue
-            if len(account.code) == level or \
-                account.kind != 'view' and len(account.childs) == 0 and \
-                    len(account.code) < level:
-                account_ids.append(account.id)
+        with Transaction().set_context(active_test=False):
+            for account in Account.search([('company', '=', data['company'])],
+                    order=[('code', 'ASC')]):
+                if not account.code or not account.parent:
+                    continue
+                if len(account.code) == level or \
+                    account.kind != 'view' and len(account.childs) == 0 and \
+                        len(account.code) < level:
+                    account_ids.append(account.id)
+            accounts = Account.browse(account_ids)
         group_by = (table_a.id,)
         columns = (group_by + (Sum(Coalesce(line.debit, 0)).as_('debit'),
                 Sum(Coalesce(line.credit, 0)).as_('credit')))
         periods = Period.search([('fiscalyear', '=', fiscalyear)])
-        accounts = Account.browse(account_ids)
         for period in periods:
             all_accounts = {}
             for i in range(0, len(account_ids), in_max):

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- The COPYRIGHT file at the top level of this repository contains the full 
+<!-- The COPYRIGHT file at the top level of this repository contains the full
 copyright notices and license terms. -->
 <tryton>
     <data>
@@ -7,21 +7,20 @@ copyright notices and license terms. -->
             <field name="model">account_jasper_reports.print_journal.start</field>
             <field name="type">form</field>
             <field name="name">print_journal_start_form</field>
-        </record> 
+        </record>
         <record model="ir.action.wizard" id="wizard_print_journal">
             <field name="name">Print Journal</field>
             <field name="wiz_name">account_jasper_reports.print_journal</field>
         </record>
         <record model="ir.action.report" id="report_journal">
             <field name="name">Journal</field>
-            <field name="model">account.move.line</field> 
+            <field name="model">account.move.line</field>
             <field name="report_name">account_jasper_reports.journal</field>
             <field name="report">account_jasper_reports/journal.jrxml</field>
             <field name="extension">pdf</field>
         </record>
-        <menuitem parent="account.menu_reporting"
-            id="menu_reporting_es" name="Informes ES"/>
-        <menuitem parent="menu_reporting_es" action="wizard_print_journal"
-            id="menu_print_journal" icon="tryton-print"/>
+
+        <menuitem id="account.menu_print_general_journal" action="wizard_print_journal"
+            parent="account.menu_reporting" icon="tryton-print"/>
     </data>
 </tryton>

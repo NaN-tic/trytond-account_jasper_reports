@@ -1,5 +1,5 @@
-#The COPYRIGHT file at the top level of this repository contains the full
-#copyright notices and license terms.
+# The COPYRIGHT file at the top level of this repository contains the full
+# copyright notices and license terms.
 from trytond.pool import Pool
 from .common import *
 from .general_ledger import *
@@ -11,6 +11,7 @@ from .taxes_by_invoice import *
 
 def register():
     Pool.register(
+        Account,
         Party,
         PrintJournalStart,
         PrintAbreviatedJournalStart,
@@ -34,4 +35,3 @@ def register():
         TaxesByInvoiceReport,
         TaxesByInvoiceAndPeriodReport,
         module='account_jasper_reports', type_='report')
-

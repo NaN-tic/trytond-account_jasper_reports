@@ -1,13 +1,16 @@
-#This file is part of account_jasper_reports for tryton.  The COPYRIGHT file
-#at the top level of this repository contains the full copyright notices and
-#license terms.
+# This file is part of account_jasper_reports for tryton.  The COPYRIGHT file
+# at the top level of this repository contains the full copyright notices and
+# license terms.
+from decimal import Decimal
 from sql.aggregate import Sum
 from sql.conditionals import Coalesce
-from decimal import Decimal
+from sql.operators import In
+
 from trytond.pool import Pool, PoolMeta
+from trytond.tools import reduce_ids
 from trytond.transaction import Transaction
 
-__all__ = ['FiscalYear', 'Party']
+__all__ = ['FiscalYear', 'Account', 'Party']
 __metaclass__ = PoolMeta
 
 
@@ -30,6 +33,71 @@ class FiscalYear:
         return periods
 
 
+class Account:
+    __name__ = 'account.account'
+
+    @classmethod
+    def read_account_vals(cls, accounts, with_moves=False,
+            exclude_party_moves=False):
+        pool = Pool()
+        Account = pool.get('account.account')
+        Move = pool.get('account.move')
+        MoveLine = pool.get('account.move.line')
+        line = MoveLine.__table__()
+        move = Move.__table__()
+        table_a = Account.__table__()
+        table_c = Account.__table__()
+
+        in_max = 3000
+        values = {}
+        transaction = Transaction()
+        cursor = transaction.cursor
+        move_join = 'INNER' if with_moves else 'LEFT'
+        account_ids = [a.id for a in accounts]
+        group_by = (table_a.id,)
+        columns = (group_by + (Sum(Coalesce(line.debit, 0)).as_('debit'),
+                Sum(Coalesce(line.credit, 0)).as_('credit'),
+                (Sum(Coalesce(line.debit, 0)) -
+                    Sum(Coalesce(line.credit, 0))).as_('balance')))
+        for i in range(0, len(account_ids), in_max):
+            sub_ids = account_ids[i:i + in_max]
+            red_sql = reduce_ids(table_a.id, sub_ids)
+            where = red_sql
+            periods = transaction.context.get('periods', False)
+            if periods:
+                periods.append(0)
+                where = (where & In(Coalesce(move.period, 0), periods))
+            date = transaction.context.get('date')
+            if date:
+                where &= (move.date <= date)
+            if exclude_party_moves:
+                where = (where & (~In(table_a.kind, ['receivable', 'payable'])
+                        | (line.party == None)))
+            cursor.execute(*table_a.join(table_c,
+                    condition=(table_c.left >= table_a.left)
+                    & (table_c.right <= table_a.right)
+                    ).join(line, move_join,
+                        condition=line.account == table_c.id
+                    ).join(move, move_join,
+                        condition=move.id == line.move
+                    ).select(*columns, where=where, group_by=group_by))
+
+            for account, debit, credit, balance in cursor.fetchall():
+                # SQLite uses float for SUM
+                if not isinstance(credit, Decimal):
+                    credit = Decimal(str(credit))
+                if not isinstance(debit, Decimal):
+                    debit = Decimal(str(debit))
+                if not isinstance(balance, Decimal):
+                    balance = Decimal(str(balance))
+                values[account] = {
+                    'credit': credit,
+                    'debit': debit,
+                    'balance': balance,
+                    }
+        return values
+
+
 class Party:
     'Party'
     __name__ = 'party.party'
@@ -41,15 +109,18 @@ class Party:
         '''
         res = {}
         pool = Pool()
+        Move = pool.get('account.move')
         MoveLine = pool.get('account.move.line')
         Account = pool.get('account.account')
         transaction = Transaction()
+        context = transaction.context
         cursor = transaction.cursor
 
+        move = Move.__table__()
         line = MoveLine.__table__()
         account = Account.__table__()
 
-        company = transaction.context.get('company')
+        company = context.get('company')
         if not company:
             return res
 
@@ -59,6 +130,10 @@ class Party:
                 (Sum(Coalesce(line.debit, 0)) -
                     Sum(Coalesce(line.credit, 0))).as_('balance')))
         line_query, _ = MoveLine.query_get(line)
+        if context.get('date'):
+            # Cumulate data from previous fiscalyears
+            line_query = line.move.in_(move.select(move.id,
+                        where=move.date <= context.get('date')))
         where = (line_query & account.active &
             (account.company == company))
         if accounts:
@@ -81,8 +156,8 @@ class Party:
             if account not in res:
                 res[account] = {}
             res[account][party] = {
-                    'credit': credit,
-                    'debit': debit,
-                    'balance': balance,
+                'credit': credit,
+                'debit': debit,
+                'balance': balance,
                 }
         return res
