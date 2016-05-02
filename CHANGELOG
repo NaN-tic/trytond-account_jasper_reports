@@ -1,3 +1,4 @@
+Version 4.0.0 - 2016-05-03
 * Exclude root account on abreviated journal
 * Replace Tryton's journal menu with the journal report
 * Layout improvements in journal report
