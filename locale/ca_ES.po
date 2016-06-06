@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
@@ -232,10 +232,6 @@ msgid "Total Period: "
 msgstr "Total període:"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
-msgid " From"
-msgstr " De"
-
-msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "All Accounts"
 msgstr "Tots els comptes"
 
@@ -266,6 +262,10 @@ msgstr "Descripció"
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "Fiscal Year: "
 msgstr "Exercici fiscal:"
+
+msgctxt "jasper:account_jasper_reports.general_ledger:"
+msgid "From"
+msgstr "De"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "General Ledger"
@@ -304,10 +304,6 @@ msgstr ""
 "confirmat i el número que es mostra és el provisional."
 
 msgctxt "jasper:account_jasper_reports.journal:"
-msgid " From"
-msgstr " De"
-
-msgctxt "jasper:account_jasper_reports.journal:"
 msgid "Account"
 msgstr "Compte"
 
@@ -334,6 +330,10 @@ msgstr "Descripció"
 msgctxt "jasper:account_jasper_reports.journal:"
 msgid "Fiscal Year: "
 msgstr "Exercici fiscal: "
+
+msgctxt "jasper:account_jasper_reports.journal:"
+msgid "From"
+msgstr "De"
 
 msgctxt "jasper:account_jasper_reports.journal:"
 msgid "Journal"
@@ -670,6 +670,10 @@ msgstr "Imprimeix diari abreviat"
 msgctxt "model:ir.ui.menu,name:menu_print_taxes_by_invoice"
 msgid "Print Taxes by Invoice and Period"
 msgstr "Imprimeix impostos per factura i període"
+
+msgctxt "model:ir.ui.menu,name:menu_print_trial_balance"
+msgid "Print Trial Balance"
+msgstr "Imprimeix balanç de sumes i saldos"
 
 msgctxt ""
 "selection:account_jasper_reports.print_abreviated_journal.start,display_account:"
