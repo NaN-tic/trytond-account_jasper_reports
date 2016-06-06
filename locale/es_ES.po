@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
@@ -232,10 +232,6 @@ msgid "Total Period: "
 msgstr "Total Período:"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
-msgid " From"
-msgstr " De"
-
-msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "All Accounts"
 msgstr "Todas las cuentas"
 
@@ -266,6 +262,10 @@ msgstr "Descripción"
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "Fiscal Year: "
 msgstr "Ejercicio fiscal:"
+
+msgctxt "jasper:account_jasper_reports.general_ledger:"
+msgid "From"
+msgstr "De"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "General Ledger"
@@ -304,10 +304,6 @@ msgstr ""
 "confirmado y el número que se muestra es el provisional."
 
 msgctxt "jasper:account_jasper_reports.journal:"
-msgid " From"
-msgstr " De"
-
-msgctxt "jasper:account_jasper_reports.journal:"
 msgid "Account"
 msgstr "Cuenta"
 
@@ -334,6 +330,10 @@ msgstr "Descripción"
 msgctxt "jasper:account_jasper_reports.journal:"
 msgid "Fiscal Year: "
 msgstr "Ejercicio fiscal:"
+
+msgctxt "jasper:account_jasper_reports.journal:"
+msgid "From"
+msgstr "De"
 
 msgctxt "jasper:account_jasper_reports.journal:"
 msgid "Journal"
@@ -670,6 +670,10 @@ msgstr "Imprimir diario abreviado"
 msgctxt "model:ir.ui.menu,name:menu_print_taxes_by_invoice"
 msgid "Print Taxes by Invoice and Period"
 msgstr "Imprimir impuestos por factura y período"
+
+msgctxt "model:ir.ui.menu,name:menu_print_trial_balance"
+msgid "Print Trial Balance"
+msgstr "Imprimir balance de sumas y saldos"
 
 msgctxt ""
 "selection:account_jasper_reports.print_abreviated_journal.start,display_account:"
