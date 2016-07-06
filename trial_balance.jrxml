@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="901838a5-c3ed-4bbc-94e5-29788bc41da9">
-	<property name="ireport.zoom" value="1.3310000000000035"/>
+	<property name="ireport.zoom" value="1.3310000000000044"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<subDataset name="dataset1" uuid="a0e43402-0eae-4f3b-ac6f-f73084888591"/>
@@ -105,18 +105,17 @@
 	<background>
 		<band/>
 	</background>
-	<title>
-		<band height="100">
-			<printWhenExpression><![CDATA[$P{IS_IGNORE_PAGINATION} == false]]></printWhenExpression>
+	<pageHeader>
+		<band height="80">
 			<textField isBlankWhenNull="true">
-				<reportElement x="246" y="9" width="556" height="20" uuid="ba362ceb-b1ca-473a-bd7b-124882956b57"/>
+				<reportElement x="275" y="0" width="451" height="20" uuid="ba362ceb-b1ca-473a-bd7b-124882956b57"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="16" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Trial Balance")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="10" y="64" width="790" height="12" uuid="9f8133f1-283f-43f9-a910-bc38bb826e7e"/>
+				<reportElement x="10" y="60" width="790" height="10" uuid="9f8133f1-283f-43f9-a910-bc38bb826e7e"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
@@ -127,7 +126,7 @@
     tr($V{L},"Accounts") + ": " + $P{accounts}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="10" y="41" width="790" height="10" uuid="eeb3a345-f05c-4d8c-9d3a-e4acb5ccd4ba">
+				<reportElement x="10" y="40" width="790" height="10" uuid="eeb3a345-f05c-4d8c-9d3a-e4acb5ccd4ba">
 					<printWhenExpression><![CDATA[$P{fiscalyear} != ""]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
@@ -136,7 +135,7 @@
 				<textFieldExpression><![CDATA[tr($V{L},"First Balance") + " (" + $P{fiscalyear} + "): " + tr($V{L},"From") + ": " + $P{start_period} + "  " + tr($V{L},"To") + ": " + $P{end_period}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="10" y="76" width="790" height="12" uuid="3f831c81-35d5-4777-9498-562215b8a8ef"/>
+				<reportElement x="10" y="70" width="790" height="10" uuid="3f831c81-35d5-4777-9498-562215b8a8ef"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
@@ -147,7 +146,7 @@
     tr($V{L},"Parties") + ": " + $P{parties}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="10" y="52" width="790" height="10" uuid="3d29b973-81f4-4389-80b9-169b5bc33c63">
+				<reportElement x="10" y="50" width="790" height="10" uuid="3d29b973-81f4-4389-80b9-169b5bc33c63">
 					<printWhenExpression><![CDATA[$P{comparison_fiscalyear} != ""]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
@@ -165,7 +164,7 @@
 				<textFieldExpression><![CDATA[tr($V{L}, "VAT") + ": " + $P{company_vat}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement x="0" y="0" width="234" height="17" uuid="16bb6018-4d4f-41e3-8bc8-fd3a4d34b608">
+				<reportElement x="0" y="0" width="270" height="17" uuid="16bb6018-4d4f-41e3-8bc8-fd3a4d34b608">
 					<printWhenExpression><![CDATA[$P{company_rec_name} != ""]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Left">
@@ -174,56 +173,67 @@
 				<textFieldExpression><![CDATA[$P{company_rec_name}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="721" y="0" width="80" height="10" uuid="4156358c-3bf3-413f-bb7e-3bf77d26d6fa"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
+				<reportElement x="731" y="0" width="71" height="10" uuid="4156358c-3bf3-413f-bb7e-3bf77d26d6fa"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new Date()]]></textFieldExpression>
 			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="762" y="10" width="40" height="10" uuid="20e06edd-7ff7-442e-be7e-9f32e2e0036b"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="731" y="10" width="31" height="10" uuid="5c453037-df29-4baf-9133-42c61376175f"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}+" /"]]></textFieldExpression>
+			</textField>
 		</band>
-	</title>
-	<pageHeader>
-		<band/>
 	</pageHeader>
 	<columnHeader>
-		<band height="47">
+		<band height="50">
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="27" width="60" height="20" uuid="ff2bedbf-db28-41b6-a8fc-a243d8eeaa01"/>
+				<reportElement x="0" y="30" width="60" height="20" uuid="ff2bedbf-db28-41b6-a8fc-a243d8eeaa01"/>
 				<textElement verticalAlignment="Middle">
 					<font isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Account")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="60" y="27" width="224" height="20" uuid="4844b3bb-9297-4b40-bc19-af5251e0502b"/>
+				<reportElement x="60" y="30" width="224" height="20" uuid="4844b3bb-9297-4b40-bc19-af5251e0502b"/>
 				<textElement verticalAlignment="Middle">
 					<font isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Account Name")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="349" y="27" width="60" height="20" uuid="78619320-20b7-433f-b6b9-7d213c3d82a3"/>
+				<reportElement x="349" y="30" width="60" height="20" uuid="78619320-20b7-433f-b6b9-7d213c3d82a3"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Debit")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="409" y="27" width="60" height="20" uuid="105b8dfa-7b09-4cd6-aece-136d8168cc20"/>
+				<reportElement x="409" y="30" width="60" height="20" uuid="105b8dfa-7b09-4cd6-aece-136d8168cc20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Credit")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="469" y="27" width="60" height="20" uuid="d88c7728-e3a3-4e7c-87e8-02acef7d3cb1"/>
+				<reportElement x="469" y="30" width="60" height="20" uuid="d88c7728-e3a3-4e7c-87e8-02acef7d3cb1"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Balance")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="622" y="27" width="60" height="20" uuid="4dbd7977-dd96-4642-afd2-a9d6600d8f39">
+				<reportElement x="622" y="30" width="60" height="20" uuid="4dbd7977-dd96-4642-afd2-a9d6600d8f39">
 					<printWhenExpression><![CDATA[$P{SECOND_BALANCE}]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
@@ -232,7 +242,7 @@
 				<textFieldExpression><![CDATA[tr($V{L},"Debit")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="682" y="27" width="60" height="20" uuid="fbc1996a-3892-4501-b2c1-74870b742184">
+				<reportElement x="682" y="30" width="60" height="20" uuid="fbc1996a-3892-4501-b2c1-74870b742184">
 					<printWhenExpression><![CDATA[$P{SECOND_BALANCE}]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
@@ -241,7 +251,7 @@
 				<textFieldExpression><![CDATA[tr($V{L},"Credit")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="742" y="27" width="60" height="20" uuid="5ca28e32-bc7e-4838-8454-c67c37c2bce4">
+				<reportElement x="742" y="30" width="60" height="20" uuid="5ca28e32-bc7e-4838-8454-c67c37c2bce4">
 					<printWhenExpression><![CDATA[$P{SECOND_BALANCE}]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
@@ -250,14 +260,14 @@
 				<textFieldExpression><![CDATA[tr($V{L},"Balance")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="284" y="7" width="245" height="20" uuid="31faaa49-4f0e-44b4-b2ea-c528e48f9ff3"/>
+				<reportElement x="284" y="10" width="245" height="20" uuid="31faaa49-4f0e-44b4-b2ea-c528e48f9ff3"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"First Balance") + " (" + $P{fiscalyear} + ")"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="557" y="7" width="245" height="20" uuid="e3f255f1-3133-40f5-9328-f17ef33e2c10">
+				<reportElement x="557" y="10" width="245" height="20" uuid="e3f255f1-3133-40f5-9328-f17ef33e2c10">
 					<printWhenExpression><![CDATA[$P{SECOND_BALANCE}]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -266,7 +276,7 @@
 				<textFieldExpression><![CDATA[tr($V{L},"Second Balance") + " (" + $P{comparison_fiscalyear} + ")"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="557" y="27" width="65" height="20" uuid="b07d1a27-336e-4f12-bfae-17a8823ecfef">
+				<reportElement x="557" y="30" width="65" height="20" uuid="b07d1a27-336e-4f12-bfae-17a8823ecfef">
 					<printWhenExpression><![CDATA[$P{SECOND_BALANCE}]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
@@ -275,7 +285,7 @@
 				<textFieldExpression><![CDATA[tr($V{L},"Initial")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="284" y="27" width="65" height="20" uuid="7352c9eb-759f-4e46-b5c7-de08fedfbde6"/>
+				<reportElement x="284" y="30" width="65" height="20" uuid="7352c9eb-759f-4e46-b5c7-de08fedfbde6"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
@@ -368,24 +378,6 @@
 	<columnFooter>
 		<band/>
 	</columnFooter>
-	<pageFooter>
-		<band height="11">
-			<textField evaluationTime="Report">
-				<reportElement x="401" y="1" width="40" height="10" uuid="20e06edd-7ff7-442e-be7e-9f32e2e0036b"/>
-				<textElement>
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="370" y="1" width="31" height="10" uuid="5c453037-df29-4baf-9133-42c61376175f"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}+" /"]]></textFieldExpression>
-			</textField>
-		</band>
-	</pageFooter>
 	<summary>
 		<band height="54">
 			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
