@@ -251,6 +251,7 @@ class TrialBalanceReport(JasperReport):
             }
 
         pool = Pool()
+        Company = pool.get('company.company')
         FiscalYear = pool.get('account.fiscalyear')
         Period = pool.get('account.period')
         Account = pool.get('account.account')
@@ -274,6 +275,10 @@ class TrialBalanceReport(JasperReport):
         comparison_end_period = None
         if data['comparison_end_period']:
             comparison_end_period = Period(data['comparison_end_period'])
+
+        company = None
+        if data['company']:
+            company = Company(data['company'])
 
         split_parties = data['split_parties']
         accounts = data['accounts']
@@ -312,6 +317,8 @@ class TrialBalanceReport(JasperReport):
             comparison_start_period.name or ''
         parameters['comparison_end_period'] = comparison_end_period and\
             comparison_end_period.name or ''
+        parameters['company_rec_name'] = company and company.rec_name or ''
+        parameters['company_vat'] = company and company.party.vat_number or ''
         parameters['digits'] = digits or ''
         parameters['with_moves_only'] = with_moves or ''
         parameters['split_parties'] = split_parties or ''
