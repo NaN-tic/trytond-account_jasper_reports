@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="account_movements2.jrxml" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7e6f5ed5-9314-4647-bc83-20dadb015d73">
-	<property name="ireport.zoom" value="1.771561000000003"/>
+	<property name="ireport.zoom" value="1.9487171000000034"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="HEADER_DS" class="java.lang.Object"/>
@@ -11,12 +11,13 @@
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
 	<parameter name="COMMENT" class="java.lang.String"/>
-	<parameter name="company" class="java.lang.String"/>
 	<parameter name="start_period" class="java.lang.String"/>
 	<parameter name="fiscal_year" class="java.lang.String"/>
 	<parameter name="end_period" class="java.lang.String"/>
 	<parameter name="accounts" class="java.lang.String"/>
 	<parameter name="parties" class="java.lang.String"/>
+	<parameter name="company_rec_name" class="java.lang.String"/>
+	<parameter name="company_vat" class="java.lang.String"/>
 	<queryString language="xPath">
 		<![CDATA[]]>
 	</queryString>
@@ -124,7 +125,7 @@
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="15">
+			<band height="22">
 				<line>
 					<reportElement x="0" y="14" width="555" height="1" uuid="643a20c1-5541-4c73-abcb-103f086f5067"/>
 					<graphicElement>
@@ -183,56 +184,68 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="87" splitType="Stretch">
+		<band height="81" splitType="Stretch">
 			<printWhenExpression><![CDATA[$P{IS_IGNORE_PAGINATION} == false]]></printWhenExpression>
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="555" height="24" uuid="e1594aff-8b26-4ebd-b6a2-58cad72d56ec"/>
+				<reportElement x="246" y="9" width="309" height="20" uuid="e1594aff-8b26-4ebd-b6a2-58cad72d56ec"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="16" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"General Ledger")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="475" y="12" width="80" height="12" uuid="73390d63-cdcc-4c45-9908-685c9ba98497"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="7"/>
+				<reportElement x="10" y="62" width="545" height="10" uuid="6d1018df-ef69-4add-84be-1e136807a1f3"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Página: " + $V{PAGE_NUMBER}.toString()]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{accounts}==""
+?
+    tr($V{L},"All Accounts")
+:
+    tr($V{L},"Accounts") + ": " + $P{accounts}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="475" y="0" width="80" height="12" uuid="a32b5db7-25d2-4c4f-a70d-f33e8ba979c2"/>
+				<reportElement x="10" y="41" width="545" height="10" uuid="0b2e0fc4-de8a-43cf-930d-89fd89001125"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year: ") + $P{fiscal_year} +" "+ tr($V{L}," From") +": "+$P{start_period} +"  "+ tr($V{L},"To") +": "+ $P{end_period}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="52" width="545" height="10" uuid="4928ddc3-3ffa-43fc-ab3a-728ebf0b2893"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{parties}==""
+?
+    tr($V{L},"All Parties")
+:
+    tr($V{L},"Parties") + ": " + $P{parties}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="0" width="234" height="17" uuid="65c95a2e-c820-44f2-b395-887c5535cfeb">
+					<printWhenExpression><![CDATA[$P{company_rec_name} != ""]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font size="13" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{company_rec_name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement x="0" y="17" width="234" height="12" uuid="6fd8e4c0-e47c-43b4-b05e-3227f4da6e65">
+					<printWhenExpression><![CDATA[$P{company_vat} != ""]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L}, "VAT") + ": " + $P{company_vat}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="475" y="0" width="80" height="10" uuid="a32b5db7-25d2-4c4f-a70d-f33e8ba979c2"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new Date()]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="0" y="58" width="555" height="12" uuid="6d1018df-ef69-4add-84be-1e136807a1f3"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="7"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{accounts}==""?tr($V{L},"All Accounts"):$P{accounts}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="0" y="41" width="555" height="16" uuid="0b2e0fc4-de8a-43cf-930d-89fd89001125"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year: ") + $P{fiscal_year} +" "+ tr($V{L},"From") +": "+$P{start_period} +" "+ tr($V{L},"To") +": "+ $P{end_period}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="0" y="70" width="555" height="12" uuid="4928ddc3-3ffa-43fc-ab3a-728ebf0b2893"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="7"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{parties}==""?tr($V{L},"All Parties"):$P{parties}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="0" y="24" width="555" height="16" uuid="f86b52a8-51af-4e3e-bab1-6256c76c3dc5"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{company}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -364,23 +377,23 @@ $F{move_post_number} : "(" + $F{move_number} + ")"]]></textFieldExpression>
 		<band splitType="Stretch"/>
 	</columnFooter>
 	<pageFooter>
-		<band height="21" splitType="Stretch">
+		<band height="25" splitType="Stretch">
 			<textField evaluationTime="Report">
-				<reportElement x="271" y="10" width="40" height="10" uuid="08f5b6e7-5c4a-412f-a4d0-f64a9a126fd1"/>
+				<reportElement x="271" y="14" width="40" height="10" uuid="08f5b6e7-5c4a-412f-a4d0-f64a9a126fd1"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="240" y="10" width="31" height="10" uuid="049dae98-3586-458e-b796-9b676d768ba2"/>
+				<reportElement x="240" y="14" width="31" height="10" uuid="049dae98-3586-458e-b796-9b676d768ba2"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}+" /"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="0" width="555" height="10" uuid="b46ad7dd-d984-4de7-90de-685c0b46647b"/>
+				<reportElement x="0" y="2" width="555" height="10" uuid="b46ad7dd-d984-4de7-90de-685c0b46647b"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
