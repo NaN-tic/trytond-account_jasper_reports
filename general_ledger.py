@@ -117,6 +117,7 @@ class GeneralLedgerReport(JasperReport):
     @classmethod
     def prepare(cls, data):
         pool = Pool()
+        Company = pool.get('company.company')
         FiscalYear = pool.get('account.fiscalyear')
         Period = pool.get('account.period')
         Account = pool.get('account.account')
@@ -157,12 +158,18 @@ class GeneralLedgerReport(JasperReport):
             else:
                 parties_subtitle = ''
 
+        company = None
+        if data['company']:
+            company = Company(data['company'])
+
         parameters = {}
         parameters['start_period'] = start_period and start_period.name or ''
         parameters['end_period'] = end_period and end_period.name or ''
         parameters['fiscal_year'] = fiscalyear.name
         parameters['accounts'] = accounts_subtitle
         parameters['parties'] = parties_subtitle
+        parameters['company_rec_name'] = company and company.rec_name or ''
+        parameters['company_vat'] = company and company.party.vat_number or ''
 
         domain = []
         if accounts:

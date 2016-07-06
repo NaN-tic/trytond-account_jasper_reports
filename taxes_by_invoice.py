@@ -112,6 +112,7 @@ class TaxesByInvoiceReport(JasperReport):
     @classmethod
     def prepare(cls, data):
         pool = Pool()
+        Company = pool.get('company.company')
         FiscalYear = pool.get('account.fiscalyear')
         Period = pool.get('account.period')
         Party = pool.get('party.party')
@@ -141,11 +142,17 @@ class TaxesByInvoiceReport(JasperReport):
         else:
             parties_subtitle = ''
 
+        company = None
+        if data['company']:
+            company = Company(data['company'])
+
         parameters = {}
         parameters['fiscal_year'] = fiscalyear.rec_name
         parameters['parties'] = parties_subtitle
         parameters['periods'] = periods_subtitle
         parameters['TOTALS_ONLY'] = data['totals_only'] and True or False
+        parameters['company_rec_name'] = company and company.rec_name or ''
+        parameters['company_vat'] = company and company.party.vat_number or ''
 
         domain = [('invoice.state', 'in', ['posted', 'paid'])]
 

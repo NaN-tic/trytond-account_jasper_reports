@@ -93,6 +93,7 @@ class JournalReport(JasperReport):
     @classmethod
     def prepare(cls, data):
         pool = Pool()
+        Company = pool.get('company.company')
         FiscalYear = pool.get('account.fiscalyear')
         Journal = pool.get('account.journal')
         Period = pool.get('account.period')
@@ -106,6 +107,12 @@ class JournalReport(JasperReport):
         if data['end_period']:
             end_period = Period(data['end_period'])
         journals = Journal.browse(data.get('journals', []))
+
+        company = None
+        if data['company']:
+            company = Company(data['company'])
+        parameters['company_rec_name'] = company and company.rec_name or ''
+        parameters['company_vat'] = company and company.party.vat_number or ''
 
         parameters['start_period'] = start_period and start_period.name or ''
         parameters['end_period'] = end_period and end_period.name or ''

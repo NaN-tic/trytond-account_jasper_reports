@@ -33,6 +33,8 @@
 	<parameter name="start_period" class="java.lang.String"/>
 	<parameter name="end_period" class="java.lang.String"/>
 	<parameter name="journals" class="java.lang.String"/>
+	<parameter name="company_rec_name" class="java.lang.String"/>
+	<parameter name="company_vat" class="java.lang.String"/>
 	<queryString language="xPath">
 		<![CDATA[/data/record]]>
 	</queryString>
@@ -80,21 +82,21 @@
 		<groupFooter>
 			<band height="22">
 				<textField isBlankWhenNull="true">
-					<reportElement uuid="004d50ee-8673-402a-9960-81393ec31c69" x="284" y="4" width="96" height="13"/>
+					<reportElement x="284" y="4" width="96" height="13" uuid="004d50ee-8673-402a-9960-81393ec31c69"/>
 					<textElement verticalAlignment="Middle">
 						<font size="7" isBold="true" pdfFontName="Helvetica"/>
 					</textElement>
 					<textFieldExpression><![CDATA[tr($V{L},"Total Period: ") + ($F{month})]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
-					<reportElement uuid="287dafe7-5c7c-45a8-b3f3-bc856aa160c5" x="384" y="3" width="83" height="14"/>
+					<reportElement x="384" y="3" width="83" height="14" uuid="287dafe7-5c7c-45a8-b3f3-bc856aa160c5"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font size="7" isBold="true" pdfFontName="Helvetica"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{debit_1}]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
-					<reportElement uuid="019cb0f7-52e5-4bb7-8798-e79f114a34b5" x="467" y="3" width="88" height="14"/>
+					<reportElement x="467" y="3" width="88" height="14" uuid="019cb0f7-52e5-4bb7-8798-e79f114a34b5"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font size="7" isBold="true" pdfFontName="Helvetica"/>
 					</textElement>
@@ -107,25 +109,45 @@
 		<band/>
 	</background>
 	<title>
-		<band height="76">
+		<band height="62">
 			<textField>
-				<reportElement uuid="2924b266-8c5f-4a29-95ce-716893b1e31e" x="0" y="43" width="555" height="16"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<reportElement x="10" y="41" width="544" height="10" uuid="2924b266-8c5f-4a29-95ce-716893b1e31e"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year: ") + $P{fiscal_year}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="1c5d69f6-2c21-4835-a766-f7c5f5073beb" x="467" y="-1" width="88" height="15"/>
-				<textElement verticalAlignment="Middle"/>
+				<reportElement x="467" y="0" width="88" height="10" uuid="1c5d69f6-2c21-4835-a766-f7c5f5073beb"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
 				<textFieldExpression><![CDATA[new Date()]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="86eed93e-d9c9-4cf3-9c73-337ab7e7764f" x="102" y="0" width="365" height="24"/>
+				<reportElement x="250" y="9" width="305" height="20" uuid="86eed93e-d9c9-4cf3-9c73-337ab7e7764f"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="16" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Abreviated Journal")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="0" width="234" height="17" uuid="b8989e31-1ace-4f8a-8bc6-d20a174ee4f9">
+					<printWhenExpression><![CDATA[$P{company_rec_name} != ""]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font size="13" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{company_rec_name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement x="0" y="17" width="234" height="12" uuid="c4c6e23f-ecf0-4a89-97f1-5557a5f8797b">
+					<printWhenExpression><![CDATA[$P{company_vat} != ""]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L}, "VAT") + ": " + $P{company_vat}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -135,21 +157,21 @@
 	<columnHeader>
 		<band height="31">
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="5324f0c9-7c03-4b4e-a498-40830a8a2b39" x="2" y="11" width="382" height="20"/>
+				<reportElement x="2" y="11" width="382" height="20" uuid="5324f0c9-7c03-4b4e-a498-40830a8a2b39"/>
 				<textElement verticalAlignment="Middle">
 					<font size="7" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Account")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="d2f45331-65f9-4e93-9460-2d24bf13153b" x="384" y="11" width="83" height="20"/>
+				<reportElement x="384" y="11" width="83" height="20" uuid="d2f45331-65f9-4e93-9460-2d24bf13153b"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Debit")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="0597855d-37b3-4df8-8d6a-88a0d0570c4e" x="467" y="11" width="88" height="20"/>
+				<reportElement x="467" y="11" width="88" height="20" uuid="0597855d-37b3-4df8-8d6a-88a0d0570c4e"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
@@ -160,28 +182,28 @@
 	<detail>
 		<band height="13">
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="1a9998f1-c0b1-4767-8433-9154d70083a3" x="46" y="0" width="338" height="13"/>
+				<reportElement x="46" y="0" width="338" height="13" uuid="1a9998f1-c0b1-4767-8433-9154d70083a3"/>
 				<textElement verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
-				<reportElement uuid="5ce3a187-b5f2-425f-bf69-aa1eaf7f93cb" x="384" y="0" width="83" height="13"/>
+				<reportElement x="384" y="0" width="83" height="13" uuid="5ce3a187-b5f2-425f-bf69-aa1eaf7f93cb"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{debit}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
-				<reportElement uuid="693288c6-e063-46fc-bcd0-a8d045687e77" x="467" y="0" width="88" height="13"/>
+				<reportElement x="467" y="0" width="88" height="13" uuid="693288c6-e063-46fc-bcd0-a8d045687e77"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{credit}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="ee58c625-bb8f-4b16-ad3e-48e9938e0cec" x="2" y="0" width="44" height="13"/>
+				<reportElement x="2" y="0" width="44" height="13" uuid="ee58c625-bb8f-4b16-ad3e-48e9938e0cec"/>
 				<textElement verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
@@ -195,14 +217,14 @@
 	<pageFooter>
 		<band height="11">
 			<textField evaluationTime="Report">
-				<reportElement uuid="0925b80d-bf95-4c3b-bba8-eb9a16969602" x="281" y="0" width="40" height="10"/>
+				<reportElement x="281" y="0" width="40" height="10" uuid="0925b80d-bf95-4c3b-bba8-eb9a16969602"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="46a60c9b-8249-474a-ad1b-de670113b826" x="250" y="0" width="31" height="10"/>
+				<reportElement x="250" y="0" width="31" height="10" uuid="46a60c9b-8249-474a-ad1b-de670113b826"/>
 				<textElement textAlignment="Right">
 					<font size="7"/>
 				</textElement>
@@ -213,21 +235,21 @@
 	<summary>
 		<band height="20">
 			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
-				<reportElement uuid="0e739f22-6a4f-4a10-baf7-fdfa6d4d711c" x="467" y="4" width="87" height="13"/>
+				<reportElement x="467" y="4" width="87" height="13" uuid="0e739f22-6a4f-4a10-baf7-fdfa6d4d711c"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{credit_2}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="53cd792b-92c5-46cf-ae02-5753da6c4f1a" x="298" y="4" width="86" height="13"/>
+				<reportElement x="298" y="4" width="86" height="13" uuid="53cd792b-92c5-46cf-ae02-5753da6c4f1a"/>
 				<textElement verticalAlignment="Middle">
 					<font size="7" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Total"]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
-				<reportElement uuid="a74ed9c4-df2d-4b38-80a1-7266b57d5da1" x="384" y="4" width="83" height="13"/>
+				<reportElement x="384" y="4" width="83" height="13" uuid="a74ed9c4-df2d-4b38-80a1-7266b57d5da1"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
