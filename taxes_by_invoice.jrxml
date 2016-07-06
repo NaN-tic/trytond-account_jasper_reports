@@ -11,10 +11,11 @@
 	<parameter name="TOTALS_ONLY" class="java.lang.Boolean">
 		<defaultValueExpression><![CDATA[false]]></defaultValueExpression>
 	</parameter>
-	<parameter name="company" class="java.lang.String"/>
 	<parameter name="fiscal_year" class="java.lang.String"/>
 	<parameter name="periods" class="java.lang.String"/>
 	<parameter name="parties" class="java.lang.String"/>
+	<parameter name="company_rec_name" class="java.lang.String"/>
+	<parameter name="company_vat" class="java.lang.String"/>
 	<queryString language="xPath">
 		<![CDATA[/data/record]]>
 	</queryString>
@@ -148,48 +149,62 @@
 		<band/>
 	</background>
 	<title>
-		<band height="87">
+		<band height="74">
+			<textField>
+				<reportElement x="723" y="0" width="80" height="10" uuid="1d385ded-79f3-4bf0-99e9-7d63bd1c8b3d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new Date()]]></textFieldExpression>
+			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="7" width="802" height="24" uuid="e41fa99d-9a28-4922-9088-daefd288751e"/>
+				<reportElement x="246" y="9" width="556" height="20" uuid="e41fa99d-9a28-4922-9088-daefd288751e"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="16" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Taxes By Invoice")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="723" y="7" width="80" height="12" uuid="1d385ded-79f3-4bf0-99e9-7d63bd1c8b3d"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="7"/>
-				</textElement>
-				<textFieldExpression><![CDATA[new Date()]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="0" y="68" width="803" height="12" uuid="f35c74a1-790f-4153-97e1-4fea4897f89c"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="7"/>
-				</textElement>
-				<textFieldExpression><![CDATA[tr($V{L},"Parties: ")+ ($P{parties}==""?tr($V{L},"All Parties"):$P{parties})]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="723" y="19" width="80" height="12" uuid="7c95fab7-b74f-41ab-b944-3124d01eab8b"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="7"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Página: " + $V{PAGE_NUMBER}.toString()]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="0" y="49" width="802" height="16" uuid="77d8243f-2b04-402a-941b-c73f12d90afe"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<reportElement x="10" y="52" width="791" height="10" uuid="f35c74a1-790f-4153-97e1-4fea4897f89c"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year: ") + $P{fiscal_year} +" "+ tr($V{L},"Periods: ") +($P{periods}==""?tr($V{L},"All Periods"):$P{periods})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{parties} == ""
+?
+    tr($V{L},"All Parties")
+:
+    tr($V{L},"Parties: ") + $P{parties}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="31" width="802" height="16" uuid="fc561707-1b1a-4443-9771-ac0ce99895d9"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
+				<reportElement x="10" y="41" width="791" height="10" uuid="77d8243f-2b04-402a-941b-c73f12d90afe"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{company}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year: ") + $P{fiscal_year} + " " + (
+    $P{periods} == ""
+    ?
+        tr($V{L},"All Periods")
+    :
+        tr($V{L},"Periods: ") + $P{periods}
+    )]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="0" width="234" height="17" uuid="93948b01-3fd3-4aff-907b-d1a95a1e9dd0">
+					<printWhenExpression><![CDATA[$P{company_rec_name} != ""]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font size="13" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{company_rec_name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement x="0" y="17" width="234" height="12" uuid="931616a4-4d2b-4016-bc66-80699f4d21f9">
+					<printWhenExpression><![CDATA[$P{company_vat} != ""]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L}, "VAT") + ": " + $P{company_vat}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

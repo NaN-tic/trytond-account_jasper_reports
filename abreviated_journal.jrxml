@@ -29,11 +29,12 @@
 	<parameter name="SUBTITLE" class="java.lang.String"/>
 	<parameter name="HEADER_DS" class="java.lang.Object"/>
 	<parameter name="COMMENT" class="java.lang.String"/>
-	<parameter name="company" class="java.lang.String"/>
 	<parameter name="fiscal_year" class="java.lang.String"/>
 	<parameter name="start_period" class="java.lang.String"/>
 	<parameter name="end_period" class="java.lang.String"/>
 	<parameter name="journals" class="java.lang.String"/>
+	<parameter name="company_rec_name" class="java.lang.String"/>
+	<parameter name="company_vat" class="java.lang.String"/>
 	<queryString language="xPath">
 		<![CDATA[/data/record]]>
 	</queryString>
@@ -108,32 +109,45 @@
 		<band/>
 	</background>
 	<title>
-		<band height="76">
-			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="555" height="24" uuid="86eed93e-d9c9-4cf3-9c73-337ab7e7764f"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="16" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[tr($V{L},"Abreviated Journal")]]></textFieldExpression>
-			</textField>
+		<band height="62">
 			<textField>
-				<reportElement x="0" y="43" width="555" height="16" uuid="2924b266-8c5f-4a29-95ce-716893b1e31e"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<reportElement x="10" y="41" width="544" height="10" uuid="2924b266-8c5f-4a29-95ce-716893b1e31e"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year: ") + $P{fiscal_year}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="467" y="-1" width="88" height="15" uuid="1c5d69f6-2c21-4835-a766-f7c5f5073beb"/>
-				<textElement verticalAlignment="Middle"/>
+				<reportElement x="467" y="0" width="88" height="10" uuid="1c5d69f6-2c21-4835-a766-f7c5f5073beb"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
 				<textFieldExpression><![CDATA[new Date()]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="0" y="25" width="555" height="16" uuid="32a4fd6d-bf04-40d7-a595-0e6076bc2dd0"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="250" y="9" width="305" height="20" uuid="86eed93e-d9c9-4cf3-9c73-337ab7e7764f"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
+					<font size="16" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{company}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[tr($V{L},"Abreviated Journal")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="0" width="234" height="17" uuid="b8989e31-1ace-4f8a-8bc6-d20a174ee4f9">
+					<printWhenExpression><![CDATA[$P{company_rec_name} != ""]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font size="13" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{company_rec_name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement x="0" y="17" width="234" height="12" uuid="c4c6e23f-ecf0-4a89-97f1-5557a5f8797b">
+					<printWhenExpression><![CDATA[$P{company_vat} != ""]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L}, "VAT") + ": " + $P{company_vat}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

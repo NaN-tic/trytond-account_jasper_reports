@@ -86,6 +86,7 @@ class AbreviatedJournalReport(JasperReport):
     @classmethod
     def prepare(cls, data):
         pool = Pool()
+        Company = pool.get('company.company')
         Account = pool.get('account.account')
         Move = pool.get('account.move')
         MoveLine = pool.get('account.move.line')
@@ -105,6 +106,12 @@ class AbreviatedJournalReport(JasperReport):
         parameters = {}
         parameters['company'] = fiscalyear.company.rec_name
         parameters['fiscal_year'] = fiscalyear.rec_name
+
+        company = None
+        if data['company']:
+            company = Company(data['company'])
+        parameters['company_rec_name'] = company and company.rec_name or ''
+        parameters['company_vat'] = company and company.party.vat_number or ''
 
         move_join = 'LEFT'
         if data['display_account'] == 'bal_movement':
