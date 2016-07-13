@@ -152,7 +152,7 @@ class TaxesByInvoiceReport(JasperReport):
         parameters['periods'] = periods_subtitle
         parameters['TOTALS_ONLY'] = data['totals_only'] and True or False
         parameters['company_rec_name'] = company and company.rec_name or ''
-        parameters['company_vat'] = company and company.party.vat_number or ''
+        parameters['company_vat'] = company and company.party.vat_code or ''
 
         domain = [('invoice.state', 'in', ['posted', 'paid'])]
 
