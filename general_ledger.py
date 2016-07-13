@@ -168,7 +168,7 @@ class GeneralLedgerReport(JasperReport):
         parameters['accounts'] = accounts_subtitle
         parameters['parties'] = parties_subtitle
         parameters['company_rec_name'] = company and company.rec_name or ''
-        parameters['company_vat'] = company and company.party.vat_number or ''
+        parameters['company_vat'] = company and company.party.vat_code or ''
 
         domain = []
         if accounts:
