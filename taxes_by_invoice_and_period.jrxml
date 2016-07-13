@@ -281,7 +281,7 @@
 				<textFieldExpression><![CDATA[tr($V{L},"Account")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="328" y="13" width="64" height="12" uuid="8dfcbddc-e7a2-4e3b-9211-c81048878534"/>
+				<reportElement x="326" y="13" width="66" height="12" uuid="8dfcbddc-e7a2-4e3b-9211-c81048878534"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
@@ -378,7 +378,7 @@
 				<textFieldExpression><![CDATA[$F{number}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="150" y="0" width="178" height="12" uuid="92eb121b-e066-462f-9522-b0b857322560">
+				<reportElement x="150" y="0" width="176" height="12" uuid="92eb121b-e066-462f-9522-b0b857322560">
 					<printWhenExpression><![CDATA[$V{invoice_id_COUNT}==1]]></printWhenExpression>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -396,7 +396,7 @@
 				<textFieldExpression><![CDATA[$F{account_move_date}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="328" y="0" width="65" height="12" uuid="5551245c-dd89-4fd6-9a32-f6638482b163">
+				<reportElement x="326" y="0" width="67" height="12" uuid="5551245c-dd89-4fd6-9a32-f6638482b163">
 					<printWhenExpression><![CDATA[$V{invoice_id_COUNT}==1]]></printWhenExpression>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
