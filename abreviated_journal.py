@@ -111,7 +111,7 @@ class AbreviatedJournalReport(JasperReport):
         if data['company']:
             company = Company(data['company'])
         parameters['company_rec_name'] = company and company.rec_name or ''
-        parameters['company_vat'] = company and company.party.vat_number or ''
+        parameters['company_vat'] = company and company.party.vat_code or ''
 
         move_join = 'LEFT'
         if data['display_account'] == 'bal_movement':
