@@ -112,7 +112,9 @@ class JournalReport(JasperReport):
         if data['company']:
             company = Company(data['company'])
         parameters['company_rec_name'] = company and company.rec_name or ''
-        parameters['company_vat'] = company and company.party.vat_code or ''
+        parameters['company_vat'] = (company
+            and company.party.tax_identifier and
+            company.party.tax_identifier.code) or ''
 
         parameters['start_period'] = start_period and start_period.name or ''
         parameters['end_period'] = end_period and end_period.name or ''

@@ -318,7 +318,9 @@ class TrialBalanceReport(JasperReport):
         parameters['comparison_end_period'] = comparison_end_period and\
             comparison_end_period.name or ''
         parameters['company_rec_name'] = company and company.rec_name or ''
-        parameters['company_vat'] = company and company.party.vat_code or ''
+        parameters['company_vat'] = (company
+            and company.party.tax_identifier and
+            company.party.tax_identifier.code) or ''
         parameters['digits'] = digits or ''
         parameters['with_moves_only'] = with_moves or ''
         parameters['split_parties'] = split_parties or ''

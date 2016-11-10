@@ -32,7 +32,7 @@
 		<fieldDescription><![CDATA[invoice-invoice/party-party/rec_name-rec_name]]></fieldDescription>
 	</field>
 	<field name="partner_vat" class="java.lang.String">
-		<fieldDescription><![CDATA[invoice-invoice/party-party/vat_code-vat_code]]></fieldDescription>
+        <fieldDescription><![CDATA[invoice-invoice/party-party/tax_identifier/code]]></fieldDescription>
 	</field>
 	<field name="date_invoice" class="java.sql.Timestamp">
 		<fieldDescription><![CDATA[invoice-invoice/invoice_date-invoice_date]]></fieldDescription>
