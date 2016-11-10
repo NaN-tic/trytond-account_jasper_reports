@@ -18,7 +18,7 @@ msgstr "Ejercicio fiscal"
 
 msgctxt "field:account_jasper_reports.print_abreviated_journal.start,id:"
 msgid "ID"
-msgstr "Identificador"
+msgstr "ID"
 
 msgctxt "field:account_jasper_reports.print_abreviated_journal.start,level:"
 msgid "Level"
@@ -47,7 +47,7 @@ msgstr "Ejercicio fiscal"
 
 msgctxt "field:account_jasper_reports.print_general_ledger.start,id:"
 msgid "ID"
-msgstr "Identificador"
+msgstr "ID"
 
 msgctxt ""
 "field:account_jasper_reports.print_general_ledger.start,output_format:"
@@ -77,7 +77,7 @@ msgstr "Ejercicio fiscal"
 
 msgctxt "field:account_jasper_reports.print_journal.start,id:"
 msgid "ID"
-msgstr "Identificador"
+msgstr "ID"
 
 msgctxt "field:account_jasper_reports.print_journal.start,journals:"
 msgid "Journals"
@@ -106,7 +106,7 @@ msgstr "Agrupación"
 
 msgctxt "field:account_jasper_reports.print_taxes_by_invoice.start,id:"
 msgid "ID"
-msgstr "Identificador"
+msgstr "ID"
 
 msgctxt ""
 "field:account_jasper_reports.print_taxes_by_invoice.start,output_format:"
@@ -169,7 +169,7 @@ msgstr "Ejercicio fiscal"
 
 msgctxt "field:account_jasper_reports.print_trial_balance.start,id:"
 msgid "ID"
-msgstr "Identificador"
+msgstr "ID"
 
 msgctxt ""
 "field:account_jasper_reports.print_trial_balance.start,output_format:"
