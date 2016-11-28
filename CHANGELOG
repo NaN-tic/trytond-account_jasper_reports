@@ -1,3 +1,6 @@
+Version 4.2.0 - 2016-11-28
+* Bug fixes (see mercurial logs for details)
+
 Version 4.0.0 - 2016-05-03
 * Exclude root account on abreviated journal
 * Replace Tryton's journal menu with the journal report
