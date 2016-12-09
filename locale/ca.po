@@ -699,6 +699,10 @@ msgctxt "model:ir.ui.menu,name:menu_print_abreviated_journal"
 msgid "Print Abreviated Journal"
 msgstr "Imprimeix diari abreviat"
 
+msgctxt "model:ir.ui.menu,name:menu_print_general_journal"
+msgid "Print Journal"
+msgstr "Imprimeix diari"
+
 msgctxt "model:ir.ui.menu,name:menu_print_taxes_by_invoice"
 msgid "Print Taxes by Invoice and Period"
 msgstr "Imprimeix impostos per factura i període"
