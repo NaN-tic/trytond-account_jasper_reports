@@ -20,7 +20,7 @@ copyright notices and license terms. -->
             <field name="extension">pdf</field>
         </record>
 
-        <menuitem parent="account.menu_reporting"
+        <menuitem parent="account.menu_reporting" sequence="100"
              action="wizard_print_trial_balance"
             id="menu_print_trial_balance" icon="tryton-print"/>
 

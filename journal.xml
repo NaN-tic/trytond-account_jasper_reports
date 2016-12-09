@@ -25,7 +25,7 @@ copyright notices and license terms. -->
             <field name="active" eval="False"/>
         </record>
         <menuitem id="menu_print_general_journal" action="wizard_print_journal"
-            parent="account.menu_reporting" icon="tryton-print"
+            parent="account.menu_reporting" icon="tryton-print" sequence="110"
             name="Print Journal"/>
 
     </data>

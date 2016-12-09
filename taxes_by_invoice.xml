@@ -28,7 +28,7 @@ copyright notices and license terms. -->
             <field name="extension">pdf</field>
         </record>
 
-        <menuitem id="menu_print_taxes_by_invoice"
+        <menuitem id="menu_print_taxes_by_invoice" sequence="140"
             action="wizard_print_taxes_by_invoice"
             parent="account.menu_reporting" icon="tryton-print"/>
     </data>
