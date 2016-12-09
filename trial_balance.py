@@ -207,9 +207,7 @@ class PrintTrialBalance(Wizard):
                     account_ids.append(party.account_receivable.id)
                 party_ids.append(party.id)
         return {
-            'all_accounts': not account_ids,
             'accounts': account_ids,
-            'all_parties': not party_ids,
             'parties': party_ids,
             }
 
