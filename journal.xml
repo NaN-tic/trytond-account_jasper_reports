@@ -23,8 +23,5 @@ copyright notices and license terms. -->
         <menuitem id="account.menu_print_general_journal" action="wizard_print_journal"
             parent="account.menu_reporting" icon="tryton-print"/>
 
-        <record model="ir.ui.menu" id="account.menu_aged_balance">
-            <field name="active" eval="False"/>
-        </record>
     </data>
 </tryton>
