@@ -4,7 +4,7 @@ from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateReport, Button
-from trytond.pyson import Eval
+from trytond.pyson import Eval, If, Bool
 from trytond.modules.jasper_reports.jasper import JasperReport
 
 __all__ = ['PrintJournalStart', 'PrintJournal', 'JournalReport']
@@ -16,16 +16,20 @@ class PrintJournalStart(ModelView):
     fiscalyear = fields.Many2One('account.fiscalyear', 'Fiscal Year',
             required=True)
     start_period = fields.Many2One('account.period', 'Start Period',
-        required=True,
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
-            ('start_date', '<=', (Eval('end_period'), 'start_date')),
+            If(Bool(Eval('end_period')),
+                ('start_date', '<=', (Eval('end_period'), 'start_date')),
+                (),
+                )
             ], depends=['fiscalyear', 'end_period'])
     end_period = fields.Many2One('account.period', 'End Period',
-        required=True,
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
-            ('start_date', '>=', (Eval('start_period'), 'start_date'))
+            If(Bool(Eval('start_period')),
+                ('start_date', '>=', (Eval('start_period'), 'start_date')),
+                (),
+                )
             ],
         depends=['fiscalyear', 'start_period'])
     journals = fields.Many2Many('account.journal', None, None, 'Journals')
@@ -66,10 +70,10 @@ class PrintJournal(Wizard):
     print_ = StateReport('account_jasper_reports.journal')
 
     def do_print_(self, action):
-        start_period = None
+        start_period = self.start.fiscalyear.periods[0].id
         if self.start.start_period:
             start_period = self.start.start_period.id
-        end_period = None
+        end_period = self.start.fiscalyear.periods[-1].id
         if self.start.end_period:
             end_period = self.start.end_period.id
         data = {

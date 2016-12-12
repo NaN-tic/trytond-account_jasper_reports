@@ -6,7 +6,7 @@ from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateReport, Button
-from trytond.pyson import Eval, Bool
+from trytond.pyson import Eval, Bool, If
 from trytond.modules.jasper_reports.jasper import JasperReport
 import logging
 
@@ -45,21 +45,21 @@ class PrintTrialBalanceStart(ModelView):
     start_period = fields.Many2One('account.period', 'Start Period',
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
-            ('start_date', '<=', (Eval('end_period'), 'start_date')),
+            If(Bool(Eval('end_period')),
+                ('start_date', '<=', (Eval('end_period'), 'start_date')),
+                (),
+                ),
             ],
-        states={
-            'required': Bool(Eval('fiscalyear'))
-        },
         depends=['fiscalyear', 'end_period']
         )
     end_period = fields.Many2One('account.period', 'End Period',
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
-            ('start_date', '>=', (Eval('start_period'), 'start_date'))
+            If(Bool(Eval('start_period')),
+                ('start_date', '>=', (Eval('start_period'), 'start_date')),
+                (),
+                )
             ],
-        states={
-            'required': Bool(Eval('fiscalyear'))
-        },
         depends=['fiscalyear', 'start_period'])
 
     comparison_start_period = fields.Many2One('account.period', 'Start Period',
@@ -68,19 +68,13 @@ class PrintTrialBalanceStart(ModelView):
             ('start_date', '<=', (Eval('comparison_end_period'),
                     'start_date')),
             ],
-        states={
-            'required': Bool(Eval('comparison_fiscalyear'))
-        }, depends=['comparison_fiscalyear', 'comparison_end_period'])
-
+        depends=['comparison_fiscalyear', 'comparison_end_period'])
     comparison_end_period = fields.Many2One('account.period', 'End Period',
         domain=[
             ('fiscalyear', '=', Eval('comparison_fiscalyear')),
             ('start_date', '>=', (Eval('comparison_start_period'),
                     'start_date'))
             ],
-        states={
-            'required': Bool(Eval('comparison_fiscalyear'))
-        },
         depends=['comparison_fiscalyear', 'comparison_start_period'])
     output_format = fields.Selection([
             ('pdf', 'PDF'),
@@ -158,23 +152,35 @@ class PrintTrialBalance(Wizard):
     print_ = StateReport('account_jasper_reports.trial_balance')
 
     def do_print_(self, action):
-        start_period = None
+        start_period = self.start.fiscalyear.periods[0].id
         if self.start.start_period:
             start_period = self.start.start_period.id
-        end_period = None
+        end_period = self.start.fiscalyear.periods[-1].id
         if self.start.end_period:
             end_period = self.start.end_period.id
+        comparison_start_period = None
+        if self.start.comparison_start_period:
+            comparison_start_period = self.start.comparison_start_period.id
+        elif (self.start.comparison_fiscalyear
+                and self.start.comparison_fiscalyear.periods):
+            comparison_start_period = (
+                self.start.comparison_fiscalyear.periods[0].id)
+        comparison_end_period = None
+        if self.start.comparison_end_period:
+            comparison_end_period = self.start.comparison_end_period.id
+        elif (self.start.comparison_fiscalyear
+                and self.start.comparison_fiscalyear.periods):
+            comparison_end_period = (
+                self.start.comparison_fiscalyear.periods[-1].id)
         data = {
             'company': self.start.company.id,
             'fiscalyear': self.start.fiscalyear.id,
-            'comparison_fiscalyear': self.start.comparison_fiscalyear and
-                self.start.comparison_fiscalyear.id or None,
+            'comparison_fiscalyear': (self.start.comparison_fiscalyear and
+                self.start.comparison_fiscalyear.id or None),
             'start_period': start_period,
             'end_period': end_period,
-            'comparison_start_period': self.start.comparison_start_period and
-                self.start.comparison_start_period.id or None,
-            'comparison_end_period': self.start.comparison_end_period and
-                self.start.comparison_end_period.id or None,
+            'comparison_start_period': comparison_start_period,
+            'comparison_end_period': comparison_end_period,
             'digits': self.start.show_digits or None,
             'add_initial_balance': self.start.add_initial_balance,
             'with_move_only': self.start.with_move_only,

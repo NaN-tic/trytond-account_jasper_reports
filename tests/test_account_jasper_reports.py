@@ -1037,6 +1037,46 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         balance = sum([Decimal(str(m['period_balance'])) for m in records])
         self.assertEqual(credit, Decimal('730.0'))
         self.assertEqual(debit, Decimal('730.0'))
+        # If we do not indicate periods we get the full definition
+        session_id, _, _ = PrintTrialBalance.create()
+        print_trial_balance = PrintTrialBalance(session_id)
+        print_trial_balance.start.company = company
+        print_trial_balance.start.fiscalyear = fiscalyear
+        print_trial_balance.start.start_period = None
+        print_trial_balance.start.end_period = None
+        print_trial_balance.start.parties = []
+        print_trial_balance.start.accounts = []
+        print_trial_balance.start.show_digits = None
+        print_trial_balance.start.with_move_only = False
+        print_trial_balance.start.with_move_or_initial = False
+        print_trial_balance.start.split_parties = False
+        print_trial_balance.start.add_initial_balance = False
+        print_trial_balance.start.comparison_fiscalyear = fiscalyear
+        print_trial_balance.start.comparison_start_period = None
+        print_trial_balance.start.comparison_end_period = None
+        print_trial_balance.start.output_format = 'pdf'
+        _, data = print_trial_balance.do_print_(None)
+        self.assertEqual(data['start_period'], period.id)
+        self.assertEqual(data['end_period'], last_period.id)
+        self.assertEqual(data['comparison_start_period'], period.id)
+        self.assertEqual(data['comparison_end_period'], last_period.id)
+        records, parameters = TrialBalanceReport.prepare(data)
+        self.assertEqual(len(records), 7)
+        self.assertEqual(parameters['start_period'], period.name)
+        self.assertEqual(parameters['end_period'], last_period.name)
+        self.assertEqual(parameters['fiscalyear'], fiscalyear.name)
+        credit = sum([Decimal(str(m['period_credit'])) for m in records])
+        debit = sum([Decimal(str(m['period_debit'])) for m in records])
+        balance = sum([Decimal(str(m['period_balance'])) for m in records])
+        self.assertEqual(credit, debit)
+        self.assertEqual(credit, Decimal('730.0'))
+        self.assertEqual(balance, Decimal('0.0'))
+        credit = sum([Decimal(str(m['credit'])) for m in records])
+        debit = sum([Decimal(str(m['debit'])) for m in records])
+        balance = sum([Decimal(str(m['balance'])) for m in records])
+        self.assertEqual(credit, debit)
+        self.assertEqual(credit, Decimal('730.0'))
+        self.assertEqual(balance, Decimal('0.0'))
 
     @with_transaction()
     def test_taxes_by_invoice(self):
