@@ -468,7 +468,7 @@ class TrialBalanceReport(JasperReport):
                         if account.id in init_party_values:
                             pids |= set(init_party_values[account.id].keys())
                         account_parties = [None] if None in pids else []
-                        #Using search insted of browse to get ordered records
+                        # Using search insted of browse to get ordered records
                         with transaction.set_context(active_test=False):
                             account_parties += Party.search([
                                     ('id', 'in', [p for p in pids if p])
@@ -515,4 +515,4 @@ class TrialBalanceReport(JasperReport):
                 'records': records,
                 'parameters': parameters,
                 'output_format': data['output_format'],
-            })
+                })

@@ -3,7 +3,6 @@
 # copyright notices and license terms.
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
-import doctest
 import unittest
 from trytond.pool import Pool
 import trytond.tests.test_tryton
@@ -155,7 +154,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         receivable = accounts['receivable']
         expense = accounts['expense']
         payable = accounts['payable']
-        #Create some parties
+        # Create some parties
         if create_chart:
             customer1, customer2, supplier1, supplier2 = self.create_parties(
                 company)
@@ -292,7 +291,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_journal.start.journals = []
         print_journal.start.output_format = 'pdf'
         _, data = print_journal.do_print_(None)
-        #Full Journall
+        # Full Journall
         self.assertEqual(data['company'], company.id)
         self.assertEqual(data['fiscalyear'], fiscalyear.id)
         self.assertEqual(data['start_period'], period.id)
@@ -312,7 +311,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         self.assertEqual(credit, Decimal('730.0'))
         with_party = [m for m in records if m.party]
         self.assertEqual(len(with_party), 6)
-        #Filtering periods
+        # Filtering periods
         session_id, _, _ = PrintJournal.create()
         print_journal = PrintJournal(session_id)
         print_journal.start.company = company
@@ -329,7 +328,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         debit = sum([m.debit for m in records])
         self.assertEqual(credit, debit)
         self.assertEqual(credit, Decimal('380.0'))
-        #Filtering journals
+        # Filtering journals
         journals = self.get_journals()
         journal_revenue = journals['REV']
         journal_expense = journals['EXP']
@@ -389,7 +388,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                 if m['month'] == period.rec_name])
         self.assertEqual(debit, 80.0)
         self.assertEqual(credit, 300.0)
-        #Only with moves
+        # Only with moves
         print_abreviated_journal = PrintAbreviatedJournal(
             session_id)
         print_abreviated_journal.start.company = company
@@ -400,7 +399,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         _, data = print_abreviated_journal.do_print_(None)
         records, parameters = AbreviatedJournalReport.prepare(data)
         self.assertEqual(len(records), 4)
-        #With two digits
+        # With two digits
         session_id, _, _ = PrintAbreviatedJournal.create()
         print_abreviated_journal = PrintAbreviatedJournal(
             session_id)
@@ -412,7 +411,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         _, data = print_abreviated_journal.do_print_(None)
         records, parameters = AbreviatedJournalReport.prepare(data)
         self.assertEqual(len(records), 4 * 12)
-        #With two digits and movements
+        # With two digits and movements
         session_id, _, _ = PrintAbreviatedJournal.create()
         print_abreviated_journal = PrintAbreviatedJournal(
             session_id)
@@ -495,7 +494,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         dates = [r['date'] for r in records]
         for date in dates:
             self.assertEqual(date, period.start_date.strftime('%d/%m/%Y'))
-        #Filtered by accounts
+        # Filtered by accounts
         expense, = Account.search([
                 ('kind', '=', 'expense'),
                 ])
@@ -516,7 +515,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         debit = sum([m['debit'] for m in records])
         self.assertEqual(credit, Decimal('0.0'))
         self.assertEqual(debit, Decimal('130.0'))
-        #Filter by parties
+        # Filter by parties
         customer1 = self.get_parties()[0]
         session_id, _, _ = PrintGeneralLedger.create()
         print_general_ledger = PrintGeneralLedger(session_id)
@@ -626,7 +625,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_trial_balance.start.comparison_end_period = None
         print_trial_balance.start.output_format = 'pdf'
         _, data = print_trial_balance.do_print_(None)
-        #Full trial_balance
+        # Full trial_balance
         self.assertEqual(data['company'], company.id)
         self.assertEqual(data['fiscalyear'], fiscalyear.id)
         self.assertEqual(data['start_period'], period.id)
@@ -654,7 +653,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         self.assertEqual(credit, debit)
         self.assertEqual(credit, Decimal('730.0'))
         self.assertEqual(balance, Decimal('0.0'))
-        #Comparision data
+        # Comparision data
         credit = sum([Decimal(str(m['credit'])) for m in records])
         debit = sum([Decimal(str(m['debit'])) for m in records])
         balance = sum([Decimal(str(m['balance'])) for m in records])
@@ -679,7 +678,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_trial_balance.start.comparison_end_period = None
         print_trial_balance.start.output_format = 'pdf'
         _, data = print_trial_balance.do_print_(None)
-        #With 1 digit
+        # With 1 digit
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 3)
         self.assertEqual(parameters['digits'], 1)
@@ -707,7 +706,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_trial_balance.start.comparison_end_period = None
         print_trial_balance.start.output_format = 'pdf'
         _, data = print_trial_balance.do_print_(None)
-        #With 2 digits
+        # With 2 digits
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 2)
         credit = sum([Decimal(str(m['period_credit'])) for m in records])
@@ -734,7 +733,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_trial_balance.start.comparison_end_period = None
         print_trial_balance.start.output_format = 'pdf'
         _, data = print_trial_balance.do_print_(None)
-        #With 1 digits and only with moves
+        # With 1 digits and only with moves
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 2)
         self.assertEqual(parameters['with_moves_only'], True)
@@ -762,7 +761,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_trial_balance.start.comparison_end_period = None
         print_trial_balance.start.output_format = 'pdf'
         _, data = print_trial_balance.do_print_(None)
-        #With 2 digits and splited with parties
+        # With 2 digits and splited with parties
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 4)
         self.assertEqual(parameters['split_parties'], True)
@@ -789,7 +788,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_trial_balance.start.comparison_end_period = None
         print_trial_balance.start.output_format = 'pdf'
         _, data = print_trial_balance.do_print_(None)
-        #Full splited with parties
+        # Full splited with parties
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 9)
         self.assertEqual(parameters['split_parties'], True)
@@ -817,7 +816,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_trial_balance.start.comparison_end_period = None
         print_trial_balance.start.output_format = 'pdf'
         _, data = print_trial_balance.do_print_(None)
-        #Customer 1 and splited with parties
+        # Customer 1 and splited with parties
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 7)
         self.assertEqual(parameters['parties'], customer1.rec_name)
@@ -849,7 +848,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_trial_balance.start.comparison_end_period = None
         print_trial_balance.start.output_format = 'pdf'
         _, data = print_trial_balance.do_print_(None)
-        #Only revenue account
+        # Only revenue account
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 1)
         self.assertEqual(parameters['accounts'], revenue.code)
@@ -877,7 +876,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_trial_balance.start.comparison_end_period = last_period
         print_trial_balance.start.output_format = 'pdf'
         _, data = print_trial_balance.do_print_(None)
-        #With moves and add initial balance
+        # With moves and add initial balance
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 4)
         initial = sum([Decimal(str(m['period_initial_balance']))
@@ -923,7 +922,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_trial_balance.start.comparison_end_period = last_period
         print_trial_balance.start.output_format = 'pdf'
         _, data = print_trial_balance.do_print_(None)
-        #With moves, split parties and add initial balance
+        # With moves, split parties and add initial balance
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 4)
         results = {
@@ -956,7 +955,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_trial_balance.start.comparison_end_period = period
         print_trial_balance.start.output_format = 'pdf'
         _, data = print_trial_balance.do_print_(None)
-        #With moves and comparing period
+        # With moves and comparing period
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(parameters['comparison_fiscalyear'],
             fiscalyear.rec_name)
@@ -971,7 +970,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         self.assertEqual(credit, debit)
         self.assertEqual(debit, Decimal('350.0'))
         self.assertEqual(balance, Decimal('0.0'))
-        #Comparision data
+        # Comparision data
         credit = sum([Decimal(str(m['credit'])) for m in records])
         debit = sum([Decimal(str(m['debit'])) for m in records])
         balance = sum([Decimal(str(m['balance'])) for m in records])
@@ -997,7 +996,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_trial_balance.start.comparison_end_period = None
         print_trial_balance.start.output_format = 'pdf'
         _, data = print_trial_balance.do_print_(None)
-        #Splited by parties but move doesn't have any party defined
+        # Splited by parties but move doesn't have any party defined
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 1)
         self.assertEqual(parameters['accounts'], receivable.code)
@@ -1007,7 +1006,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         self.assertEqual(debit, Decimal('300.0'))
         self.assertEqual(credit, Decimal('0.0'))
         self.assertEqual(balance, Decimal('300.0'))
-        #Inactive customers should always apear on trial balance
+        # Inactive customers should always apear on trial balance
         customer1.active = False
         customer1.save()
         session_id, _, _ = PrintTrialBalance.create()
@@ -1028,7 +1027,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_trial_balance.start.comparison_end_period = None
         print_trial_balance.start.output_format = 'pdf'
         _, data = print_trial_balance.do_print_(None)
-        #Full splited with parties
+        # Full splited with parties
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 9)
         self.assertEqual(parameters['split_parties'], True)
@@ -1209,7 +1208,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                                             ('add', [tax1.id, tax2.id])],
                                         }])],
                         },
-                ])
+                    ])
             Invoice.post(invoices)
         invoice1, invoice2 = invoices
         session_id, _, _ = PrintTaxesByInvoice.create()
@@ -1223,7 +1222,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_taxes_by_invoice.start.totals_only = False
         print_taxes_by_invoice.start.output_format = 'pdf'
         _, data = print_taxes_by_invoice.do_print_(None)
-        #Customer data
+        # Customer data
         self.assertEqual(data['company'], company.id)
         self.assertEqual(data['fiscalyear'], fiscalyear.id)
         self.assertEqual(data['partner_type'], 'customers')
@@ -1256,7 +1255,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_taxes_by_invoice.start.totals_only = False
         print_taxes_by_invoice.start.output_format = 'pdf'
         _, data = print_taxes_by_invoice.do_print_(None)
-        #Supplier data
+        # Supplier data
         ids, parameters = TaxesByInvoiceReport.prepare(data)
         records = InvoiceTax.browse(ids)
         self.assertEqual(len(records), 2)
@@ -1277,7 +1276,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_taxes_by_invoice.start.totals_only = False
         print_taxes_by_invoice.start.output_format = 'pdf'
         _, data = print_taxes_by_invoice.do_print_(None)
-        #Filter by supplier
+        # Filter by supplier
         ids, parameters = TaxesByInvoiceReport.prepare(data)
         self.assertEqual(parameters['parties'], supplier2.rec_name)
         records = InvoiceTax.browse(ids)
@@ -1293,7 +1292,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_taxes_by_invoice.start.totals_only = False
         print_taxes_by_invoice.start.output_format = 'pdf'
         _, data = print_taxes_by_invoice.do_print_(None)
-        #Filter by periods
+        # Filter by periods
         ids, parameters = TaxesByInvoiceReport.prepare(data)
         self.assertEqual(parameters['periods'], last_period.rec_name)
         records = InvoiceTax.browse(ids)

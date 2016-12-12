@@ -170,7 +170,7 @@ class AbreviatedJournalReport(JasperReport):
                             'name': account.name,
                             'debit': all_accounts[account.id]['debit'],
                             'credit': all_accounts[account.id]['credit'],
-                        })
+                            })
                 elif data['display_account'] == 'bal_all':
                     res.append({
                             'month': period.rec_name,
@@ -179,7 +179,7 @@ class AbreviatedJournalReport(JasperReport):
                             'name': account.name,
                             'debit': Decimal('0.0'),
                             'credit': Decimal('0.0'),
-                        })
+                            })
         return res, parameters
 
     @classmethod
