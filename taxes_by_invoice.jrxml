@@ -107,7 +107,7 @@
 				<textField>
 					<reportElement x="132" y="0" width="361" height="16" uuid="3e0cf51a-3925-4fc8-9de0-6f42137ffb1b"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font size="8" isBold="true" pdfFontName="Helvetica"/>
+						<font size="8" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[tr($V{L},"Total")+" "+ ($F{base_code_name} == null || $F{base_code_name}.equalsIgnoreCase("") ?
     tr($V{L}, "Without taxes") : $F{base_code_name} )]]></textFieldExpression>
@@ -115,14 +115,14 @@
 				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
 					<reportElement x="571" y="0" width="98" height="16" uuid="1ef2d9a7-d9da-49a9-bc37-eaf0a7343d00"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font size="8" isBold="true" pdfFontName="Helvetica"/>
+						<font size="8" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{tax_amount_1} != null ? $V{tax_amount_1} : 0.0]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
 					<reportElement x="493" y="0" width="78" height="16" uuid="a256c7c5-7ee3-4932-9c77-26c324ef9538"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font size="8" isBold="true" pdfFontName="Helvetica"/>
+						<font size="8" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{base_amount_1} != null ? $V{base_amount_1} : 0.0]]></textFieldExpression>
 				</textField>
@@ -153,63 +153,63 @@
 			<textField>
 				<reportElement positionType="Float" x="461" y="70" width="57" height="12" uuid="3add4ca4-3ef5-4c48-a750-4ffd64fe4af6"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="true" pdfFontName="Helvetica"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Invoice Date")]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement positionType="Float" x="572" y="70" width="97" height="12" uuid="0669953b-6439-4a25-a04e-e59d4582132f"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true" pdfFontName="Helvetica"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Tax")]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement positionType="Float" x="738" y="70" width="64" height="12" uuid="811f7bdb-a249-4ee3-9770-2f1899223b65"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true" pdfFontName="Helvetica"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Invoice Total")]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement positionType="Float" x="518" y="70" width="54" height="12" uuid="f78ff485-fcac-4a17-a31d-916ed3ac9a2b"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true" pdfFontName="Helvetica"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Base")]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement positionType="Float" x="392" y="70" width="69" height="12" uuid="f27594b3-5181-4c1e-aa67-9242412e3f3e"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="true" pdfFontName="Helvetica"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Invoice")]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement positionType="Float" x="93" y="70" width="235" height="12" uuid="0097eeb4-b6b7-478a-8a49-002609c4bf10"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="true" pdfFontName="Helvetica"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Account")]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement positionType="Float" x="328" y="70" width="64" height="12" uuid="8dfcbddc-e7a2-4e3b-9211-c81048878534"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="true" pdfFontName="Helvetica"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"VAT")]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement positionType="Float" x="0" y="70" width="93" height="12" uuid="2f507c88-890c-4ab0-85c1-b9e5c257ccc2"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="true" pdfFontName="Helvetica"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Move Date")]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement positionType="Float" x="669" y="70" width="69" height="12" uuid="a0e48cd0-7cac-4701-8c3e-98bb152e1f09"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true" pdfFontName="Helvetica"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Base+Tax")]]></textFieldExpression>
 			</textField>
@@ -315,7 +315,7 @@
 			<textField pattern="#,##0.00" isBlankWhenNull="false">
 				<reportElement x="738" y="0" width="64" height="12" uuid="a60563f3-207d-48db-813e-d65c570ba121"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true" pdfFontName="Helvetica"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{type}.equalsIgnoreCase("out_credit_note") || $F{type}.equalsIgnoreCase("in_credit_note")
 ?
