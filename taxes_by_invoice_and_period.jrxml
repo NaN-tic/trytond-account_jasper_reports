@@ -104,10 +104,10 @@
     $F{invoice_total_amount}]]></variableExpression>
 	</variable>
 	<variable name="total_base_tax" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{tax_amount}==null?$F{base_amount}:$F{base_amount}+$F{tax_amount}]]></variableExpression>
+		<variableExpression><![CDATA[$F{tax_amount}==null?$F{base_amount}:($F{base_amount}*$F{base_sign})+($F{tax_amount}*$F{tax_sign})]]></variableExpression>
 	</variable>
 	<variable name="total_tax" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{tax_amount}]]></variableExpression>
+		<variableExpression><![CDATA[$F{tax_amount}*$F{tax_sign}]]></variableExpression>
 	</variable>
 	<group name="quarter" isStartNewPage="true">
 		<groupExpression><![CDATA[$F{period}]]></groupExpression>
