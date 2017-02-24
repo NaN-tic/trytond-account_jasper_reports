@@ -41,7 +41,11 @@ class PrintTrialBalanceStart(ModelView):
     accounts = fields.Many2Many('account.account', None, None, 'Accounts')
     split_parties = fields.Boolean('Split Parties')
     add_initial_balance = fields.Boolean('Add Initial Balance')
-    parties = fields.Many2Many('party.party', None, None, 'Parties')
+    parties = fields.Many2Many('party.party', None, None, 'Parties',
+        states={
+            'invisible': ~Bool(Eval('split_parties', False)),
+            },
+        depends=['split_parties'])
     start_period = fields.Many2One('account.period', 'Start Period',
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
@@ -139,6 +143,11 @@ class PrintTrialBalanceStart(ModelView):
     def on_change_comparison_fiscalyear(self):
         self.comparison_start_period = None
         self.comparison_end_period = None
+
+    @classmethod
+    def view_attributes(cls):
+        return [('/form//label[@id="all_parties"]', 'states',
+                {'invisible': ~Bool(Eval('split_parties'))})]
 
 
 class PrintTrialBalance(Wizard):
