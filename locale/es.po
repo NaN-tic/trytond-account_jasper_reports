@@ -664,8 +664,8 @@ msgid "Print Trial Balance"
 msgstr "Imprimir balance de sumas y saldos"
 
 msgctxt "model:ir.ui.menu,name:menu_print_general_ledger"
-msgid "General Ledger"
-msgstr "Libro mayor"
+msgid "Print General Ledger"
+msgstr "Imprimir libro mayor"
 
 msgctxt "model:ir.ui.menu,name:menu_print_abreviated_journal"
 msgid "Print Abreviated Journal"
