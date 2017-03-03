@@ -20,7 +20,8 @@ copyright notices and license terms. -->
             <field name="extension">pdf</field>
         </record>
 
-        <menuitem id="account.menu_general_ledger"
-            action="wizard_print_general_ledger" icon="tryton-print"/>
+        <menuitem id="menu_print_general_ledger" name="General Ledger"
+            parent="account.menu_reporting" action="wizard_print_general_ledger"
+            icon="tryton-print" sequence="9"/>
     </data>
 </tryton>
