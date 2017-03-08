@@ -8,7 +8,7 @@ from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateReport, Button
-from trytond.pyson import Eval
+from trytond.pyson import Eval, Bool, If
 from trytond.modules.jasper_reports.jasper import JasperReport
 
 __all__ = ['PrintGeneralLedgerStart', 'PrintGeneralLedger',
@@ -21,16 +21,20 @@ class PrintGeneralLedgerStart(ModelView):
     fiscalyear = fields.Many2One('account.fiscalyear', 'Fiscal Year',
             required=True)
     start_period = fields.Many2One('account.period', 'Start Period',
-        required=True,
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
-            ('start_date', '<=', (Eval('end_period'), 'start_date')),
+            If(Bool(Eval('end_period')),
+                ('start_date', '<=', (Eval('end_period'), 'start_date')),
+                (),
+                ),
             ], depends=['fiscalyear', 'end_period'])
     end_period = fields.Many2One('account.period', 'End Period',
-        required=True,
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
-            ('start_date', '>=', (Eval('start_period'), 'start_date'))
+            If(Bool(Eval('start_period')),
+                ('start_date', '>=', (Eval('start_period'), 'start_date')),
+                (),
+                ),
             ],
         depends=['fiscalyear', 'start_period'])
     accounts = fields.Many2Many('account.account', None, None, 'Accounts')
@@ -220,7 +224,10 @@ class GeneralLedgerReport(JasperReport):
                 """ % ','.join([str(x.id) for x in lines]))
             line_ids = [x[0] for x in cursor.fetchall()]
 
-        initial_balance_date = start_period.start_date - timedelta(days=1)
+        start_date = fiscalyear.start_date
+        if start_period:
+            start_date = start_period.start_date
+        initial_balance_date = start_date - timedelta(days=1)
         with Transaction().set_context(date=initial_balance_date):
             init_values = Account.read_account_vals(accounts, with_moves=False,
                 exclude_party_moves=True)

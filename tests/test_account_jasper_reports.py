@@ -570,8 +570,8 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_general_ledger = PrintGeneralLedger(session_id)
         print_general_ledger.start.company = company
         print_general_ledger.start.fiscalyear = fiscalyear
-        print_general_ledger.start.start_period = period
-        print_general_ledger.start.end_period = last_period
+        print_general_ledger.start.start_period = None
+        print_general_ledger.start.end_period = None
         print_general_ledger.start.parties = []
         print_general_ledger.start.accounts = []
         print_general_ledger.start.output_format = 'pdf'
