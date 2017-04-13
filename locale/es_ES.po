@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
@@ -63,6 +63,11 @@ msgctxt ""
 msgid "Start Period"
 msgstr "Período inicial"
 
+msgctxt ""
+"field:account_jasper_reports.print_journal.start,close_move_description:"
+msgid "Close Move Descriptiona"
+msgstr "Descripción del asiento de cierre"
+
 msgctxt "field:account_jasper_reports.print_journal.start,company:"
 msgid "Company"
 msgstr "Empresa"
@@ -82,6 +87,16 @@ msgstr "ID"
 msgctxt "field:account_jasper_reports.print_journal.start,journals:"
 msgid "Journals"
 msgstr "Diarios"
+
+msgctxt ""
+"field:account_jasper_reports.print_journal.start,open_close_account_moves:"
+msgid "Create Open/Close Moves"
+msgstr "Crea asiento de Apertura/Cierre"
+
+msgctxt ""
+"field:account_jasper_reports.print_journal.start,open_move_description:"
+msgid "Open Move Description"
+msgstr "Descrpción del asiento de apertura"
 
 msgctxt "field:account_jasper_reports.print_journal.start,output_format:"
 msgid "Output Format"
@@ -207,6 +222,19 @@ msgctxt "help:account_jasper_reports.print_abreviated_journal.start,level:"
 msgid "Display accounts of this level"
 msgstr "Muestra las cuentas de este nivel."
 
+msgctxt ""
+"help:account_jasper_reports.print_journal.start,open_close_account_moves:"
+msgid ""
+"If this field is checked and Start Period is 01 and the fiscal year before "
+"are closed, an open move of this year will be created. And if 12 is in End "
+"Period and the fiscal year are closed a close move of the year are created. "
+"And will use all journals."
+msgstr ""
+"Si este campo esta marcado y el periodo inicial es 01 y el año fiscal "
+"anterior esta cerrado, un asiento de apertura del mismo año será credo. Y si"
+" el periodo final es 12 y el año fiscal en cuestión esta cerrado un asiento "
+"de cierre del mismo año serà creado. Y se usaran todos los diarios."
+
 msgctxt "jasper:account_jasper_reports.abreviated_journal:"
 msgid "Abreviated Journal"
 msgstr "Diario Abreviado"
@@ -231,9 +259,17 @@ msgctxt "jasper:account_jasper_reports.abreviated_journal:"
 msgid "Total Period: "
 msgstr "Total Período:"
 
+msgctxt "jasper:account_jasper_reports.abreviated_journal:"
+msgid "VAT"
+msgstr "NIF"
+
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid " From"
 msgstr " De"
+
+msgctxt "jasper:account_jasper_reports.general_ledger:"
+msgid "Accounts"
+msgstr "Cuentas"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "All Accounts"
@@ -276,6 +312,10 @@ msgid "Number"
 msgstr "Número"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
+msgid "Parties"
+msgstr "Terceros"
+
+msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "Party"
 msgstr "Tercero"
 
@@ -294,6 +334,10 @@ msgstr "Hasta"
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "Total"
 msgstr "Total"
+
+msgctxt "jasper:account_jasper_reports.general_ledger:"
+msgid "VAT"
+msgstr "NIF"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid ""
@@ -340,6 +384,10 @@ msgid "Journal"
 msgstr "Diario"
 
 msgctxt "jasper:account_jasper_reports.journal:"
+msgid "Journals"
+msgstr "Diarios"
+
+msgctxt "jasper:account_jasper_reports.journal:"
 msgid "Move"
 msgstr "Asiento"
 
@@ -350,6 +398,10 @@ msgstr "Tercero"
 msgctxt "jasper:account_jasper_reports.journal:"
 msgid "To"
 msgstr "Hasta"
+
+msgctxt "jasper:account_jasper_reports.journal:"
+msgid "VAT"
+msgstr "NIF"
 
 msgctxt "jasper:account_jasper_reports.journal:"
 msgid ""
@@ -504,6 +556,10 @@ msgid "Account Name"
 msgstr "Cuenta"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
+msgid "Accounts"
+msgstr "Cuentas"
+
+msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "All Accounts"
 msgstr "Todas las cuentas"
 
@@ -514,10 +570,6 @@ msgstr "Todos los terceros"
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Balance"
 msgstr "Saldo"
-
-msgctxt "jasper:account_jasper_reports.trial_balance:"
-msgid "Comparison Fiscal Year: "
-msgstr "Ejercicio fiscal de comparación:"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Credit"
@@ -532,16 +584,16 @@ msgid "First Balance"
 msgstr "Primer balance"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
-msgid "Fiscal Year: "
-msgstr "Ejercicio fiscal:"
-
-msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "From"
 msgstr "De"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Initial"
 msgstr "Inicial"
+
+msgctxt "jasper:account_jasper_reports.trial_balance:"
+msgid "Parties"
+msgstr "Terceros"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Second Balance"
@@ -554,6 +606,10 @@ msgstr "Hasta"
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Trial Balance"
 msgstr "Balance de sumas y saldos"
+
+msgctxt "jasper:account_jasper_reports.trial_balance:"
+msgid "VAT"
+msgstr "NIF"
 
 msgctxt "model:account_jasper_reports.print_abreviated_journal.start,name:"
 msgid "Print Abreviated Journal"

@@ -4,8 +4,10 @@ from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateAction, Button
-from trytond.pyson import Eval
+from trytond.pyson import Bool, Eval
 from trytond.modules.jasper_reports.jasper import JasperReport
+from decimal import Decimal
+from datetime import timedelta
 
 __all__ = ['PrintJournalStart', 'PrintJournal', 'JournalReport']
 
@@ -28,7 +30,23 @@ class PrintJournalStart(ModelView):
             ('start_date', '>=', (Eval('start_period'), 'start_date'))
             ],
         depends=['fiscalyear', 'start_period'])
-    journals = fields.Many2Many('account.journal', None, None, 'Journals')
+    open_close_account_moves = fields.Boolean('Create Open/Close Moves',
+        help="If this field is checked and Start Period is 01 and the fiscal "
+        "year before are closed, an open move of this year will be created. "
+        "And if 12 is in End Period and the fiscal year are closed a "
+        "close move of the year are created. And will use all journals.")
+    open_move_description = fields.Char('Open Move Description',
+        states={
+            'invisible': ~Bool(Eval('open_close_account_moves')),
+            }, depends=['open_close_account_moves'])
+    close_move_description = fields.Char('Close Move Description',
+        states={
+            'invisible': ~Bool(Eval('open_close_account_moves')),
+            }, depends=['open_close_account_moves'])
+    journals = fields.Many2Many('account.journal', None, None, 'Journals',
+        states={
+            'readonly': Bool(Eval('open_close_account_moves')),
+            }, depends=['open_close_account_moves'])
     output_format = fields.Selection([
             ('pdf', 'PDF'),
             ('xls', 'XLS'),
@@ -75,6 +93,9 @@ class PrintJournal(Wizard):
             end_period = self.start.end_period.id
         data = {
             'company': self.start.company.id,
+            'open_close_account_moves': self.start.open_close_account_moves,
+            'open_move_description': self.start.open_move_description,
+            'close_move_description': self.start.close_move_description,
             'fiscalyear': self.start.fiscalyear.id,
             'start_period': start_period,
             'end_period': end_period,
@@ -91,10 +112,96 @@ class JournalReport(JasperReport):
     __name__ = 'account_jasper_reports.journal'
 
     @classmethod
+    def _get_open_close_moves(cls, _type, description, fiscalyear, accounts,
+            init_values, init_party_values, line):
+        pool = Pool()
+        Party = pool.get('party.party')
+        Line = pool.get('account.move.line')
+        Sequence = pool.get('ir.sequence')
+
+        move = Line(line).move
+        sequence = Sequence.search([
+                ('id', '=', move.period.post_move_sequence_used.id),
+                ])[0]
+        sequence_prefix = Sequence._process(sequence.prefix, date=move.date)
+        sequence_sufix = Sequence._process(sequence.suffix, date=move.date)
+        number = move.post_number.replace(sequence_prefix, '').replace(
+            sequence_sufix, '')
+        if _type == 'open':
+            number = int(number) - 1
+        else:
+            number = int(number) + 1
+        move_post_number = '%s%s%s' % (
+            sequence_prefix,
+            number,
+            sequence_sufix,
+        )
+
+        moves = []
+        for account in accounts:
+            main_value = {}
+            if _type == 'open':
+                main_value['date'] = fiscalyear.start_date.strftime("%d-%m-%Y")
+                main_value['month'] = fiscalyear.start_date.month
+                main_value['move_post_number'] =move_post_number
+                main_value['move_number'] = move_post_number
+                main_value['move_line_description'] = description
+            else:
+                main_value['date'] = fiscalyear.end_date.strftime("%d-%m-%Y")
+                main_value['month'] = fiscalyear.end_date.month
+                main_value['move_post_number'] = move_post_number
+                main_value['move_number'] = move_post_number
+                main_value['move_line_description'] = description
+            main_value['account_name'] = account.rec_name
+            main_value['account_kind'] = account.kind
+
+            value = {}
+            value.update(main_value)
+            value['party_name'] = ''
+            account_values = init_values.get(account.id, None)
+            if account_values:
+                balance = account_values.get('balance', 0)
+                if balance:
+                    if _type == 'open':
+                        value['debit'] = (float(balance)
+                            if balance >= 0 else 0)
+                        value['credit'] = (-float(balance)
+                            if balance < 0 else 0)
+                    else:
+                        value['debit'] = (-float(balance)
+                            if balance < 0 else 0)
+                        value['credit'] = (float(balance)
+                            if balance >= 0 else 0)
+                    moves.append(value)
+
+            parties = init_party_values.get(account.id, None)
+            if parties:
+                for party_id, values in parties.iteritems():
+                    balance = values.get('balance', 0)
+                    if balance:
+                        value = {}
+                        value.update(main_value)
+                        if _type == 'open':
+                            value['debit'] = (float(balance)
+                                if balance >= 0 else 0)
+                            value['credit'] = (-float(balance)
+                                if balance < 0 else 0)
+                        else:
+                            value['debit'] = (-float(balance)
+                                if balance < 0 else 0)
+                            value['credit'] = (float(balance)
+                                if balance >= 0 else 0)
+                        value['party_name'] = Party(party_id).name
+                        moves.append(value)
+        return moves
+
+    @classmethod
     def prepare(cls, data):
         pool = Pool()
         Company = pool.get('company.company')
         FiscalYear = pool.get('account.fiscalyear')
+        Account = pool.get('account.account')
+        Party = pool.get('party.party')
         Journal = pool.get('account.journal')
         Period = pool.get('account.period')
         Line = pool.get('account.move.line')
@@ -106,7 +213,10 @@ class JournalReport(JasperReport):
         end_period = None
         if data['end_period']:
             end_period = Period(data['end_period'])
-        journals = Journal.browse(data.get('journals', []))
+        if data.get('open_close_account_moves'):
+            journals = Journal.browse([])
+        else:
+            journals = Journal.browse(data.get('journals', []))
 
         company = None
         if data['company']:
@@ -123,17 +233,17 @@ class JournalReport(JasperReport):
             parameters['journals'] = ''
 
         if journals:
-            journals = ','.join([str(x.id) for x in journals])
-            journals = 'am.journal IN (%s) AND' % journals
+            journal_ids = ','.join([str(x.id) for x in journals])
+            journals_domain = 'am.journal IN (%s) AND' % journal_ids
         else:
-            journals = ''
+            journals_domain = ''
 
         periods = fiscalyear.get_periods(start_period, end_period)
         if periods:
-            periods = ','.join([str(x.id) for x in periods])
-            periods = 'am.period IN (%s) AND' % periods
+            period_ids = ','.join([str(x.id) for x in periods])
+            periods_domain = 'am.period IN (%s) AND' % period_ids
         else:
-            periods = ''
+            periods_domain = ''
 
         cursor = Transaction().cursor
         cursor.execute("""
@@ -149,21 +259,92 @@ class JournalReport(JasperReport):
             ORDER BY
                 am.date, am.number, aml.id
         """ % (
-                journals,
-                periods,
+                journals_domain,
+                periods_domain,
                 ))
         ids = [x[0] for x in cursor.fetchall()]
-        # Pass through access rights and rules
-        records = [x.id for x in Line.browse(ids)]
+
+        open_moves = []
+        close_moves = []
+        # Preapre structure for the open/close move, if it's needed.
+        if data.get('open_close_account_moves'):
+            # First cehck if fiscal year before are closed
+            fiscalyear_before_start_date = fiscalyear.start_date.replace(
+                year = fiscalyear.start_date.year - 1)
+            fiscalyear_before_end_date = fiscalyear.end_date.replace(
+                year = fiscalyear.start_date.year - 1)
+            fiscalyear_before = FiscalYear.search([
+                    ('start_date', '=', fiscalyear_before_start_date),
+                    ('end_date', '=', fiscalyear_before_end_date),
+                    ])
+            fiscalyear_before = (fiscalyear_before and fiscalyear_before[0] or
+                None)
+
+            with Transaction().set_context(active_test=False):
+                accounts = Account.search([
+                        ('parent', '!=', None),
+                        ('kind', '!=', 'view'),
+                        ])
+                parties = Party.search([
+                        ('active', 'in', [True, False]),
+                        ])
+
+            if fiscalyear_before and fiscalyear_before.state =='closed':
+                # check if the first month of fiscal year is January (01)
+                if (start_period.start_date and
+                        start_period.start_date.month == 1):
+                    initial_balance_date = (
+                        start_period.start_date - timedelta(days=1))
+                    with Transaction().set_context(date=initial_balance_date):
+                        init_values = Account.read_account_vals(accounts,
+                            with_moves=True, exclude_party_moves=True)
+                        init_party_values = Party.get_account_values_by_party(
+                            parties, accounts)
+
+                    open_moves.extend(cls._get_open_close_moves('open',
+                        data.get('open_move_description'), fiscalyear,
+                        accounts, init_values, init_party_values, ids[0]))
+
+            if fiscalyear.state =='closed':
+                # check if the last month of fiscal year is December (12)
+                if end_period.end_date and end_period.end_date.month == 12:
+                    with Transaction().set_context(date=end_period.end_date):
+                        init_values = Account.read_account_vals(accounts,
+                            with_moves=True, exclude_party_moves=True)
+                        init_party_values = Party.get_account_values_by_party(
+                            parties, accounts)
+
+                    close_moves.extend(cls._get_open_close_moves('close',
+                        data.get('close_move_description'), fiscalyear,
+                        accounts, init_values, init_party_values, ids[-1]))
+
+        records = []
+        records.extend(open_moves)
+        for line in Line.browse(ids):
+            records.append({
+                    'date': line.date,
+                    'month': line.date.month,
+                    'account_name': line.account.rec_name,
+                    'move_number': line.move.number,
+                    'move_post_number': line.move.post_number,
+                    'move_line_description': line.description,
+                    'debit': line.debit,
+                    'credit': line.credit,
+                    'party_name': line.party and line.party.name or '',
+                    'account_kind': line.account.kind,
+                    })
+        records.extend(close_moves)
         return records, parameters
 
     @classmethod
     def execute(cls, ids, data):
-        ids, parameters = cls.prepare(data)
+        with Transaction().set_context(active_test=False):
+            records, parameters = cls.prepare(data)
         return super(JournalReport, cls).execute(ids, {
                 'name': 'account_jasper_reports.journal',
                 'model': 'account.move.line',
-                'data_source': 'model',
+                'data_source': 'records',
+                'records': records,
                 'parameters': parameters,
                 'output_format': data['output_format'],
                 })

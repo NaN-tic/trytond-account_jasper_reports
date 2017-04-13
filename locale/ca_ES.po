@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
@@ -63,6 +63,11 @@ msgctxt ""
 msgid "Start Period"
 msgstr "Període inicial"
 
+msgctxt ""
+"field:account_jasper_reports.print_journal.start,close_move_description:"
+msgid "Close Move Descriptiona"
+msgstr "Descrpció de l'assentament de tancament"
+
 msgctxt "field:account_jasper_reports.print_journal.start,company:"
 msgid "Company"
 msgstr "Empresa"
@@ -82,6 +87,16 @@ msgstr "ID"
 msgctxt "field:account_jasper_reports.print_journal.start,journals:"
 msgid "Journals"
 msgstr "Diaris"
+
+msgctxt ""
+"field:account_jasper_reports.print_journal.start,open_close_account_moves:"
+msgid "Create Open/Close Moves"
+msgstr "Crea l'assentament d'Obertura/Tancament"
+
+msgctxt ""
+"field:account_jasper_reports.print_journal.start,open_move_description:"
+msgid "Open Move Description"
+msgstr "Descripció de l'assentament d'obertura"
 
 msgctxt "field:account_jasper_reports.print_journal.start,output_format:"
 msgid "Output Format"
@@ -207,6 +222,20 @@ msgctxt "help:account_jasper_reports.print_abreviated_journal.start,level:"
 msgid "Display accounts of this level"
 msgstr "Mostra els comptes d'aquest nivell."
 
+msgctxt ""
+"help:account_jasper_reports.print_journal.start,open_close_account_moves:"
+msgid ""
+"If this field is checked and Start Period is 01 and the fiscal year before "
+"are closed, an open move of this year will be created. And if 12 is in End "
+"Period and the fiscal year are closed a close move of the year are created. "
+"And will use all journals."
+msgstr ""
+"Si aquest camp està marcat i el període inicial és 01 i l'any fiscal "
+"anterior està tancat, un assentament d'obertura del mateix any serà creat. I"
+" si el període final és 12 i l'any fiscal en qüestió està tancat un "
+"assentament de tancament del mateix any serà creat. I es faran servir tots "
+"els diaris."
+
 msgctxt "jasper:account_jasper_reports.abreviated_journal:"
 msgid "Abreviated Journal"
 msgstr "Diari Abreviat"
@@ -231,9 +260,17 @@ msgctxt "jasper:account_jasper_reports.abreviated_journal:"
 msgid "Total Period: "
 msgstr "Total període:"
 
+msgctxt "jasper:account_jasper_reports.abreviated_journal:"
+msgid "VAT"
+msgstr "NIF"
+
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid " From"
 msgstr " De"
+
+msgctxt "jasper:account_jasper_reports.general_ledger:"
+msgid "Accounts"
+msgstr "Comptes"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "All Accounts"
@@ -276,6 +313,10 @@ msgid "Number"
 msgstr "Número"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
+msgid "Parties"
+msgstr "Tercers"
+
+msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "Party"
 msgstr "Tercer"
 
@@ -294,6 +335,10 @@ msgstr "A"
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "Total"
 msgstr "Total"
+
+msgctxt "jasper:account_jasper_reports.general_ledger:"
+msgid "VAT"
+msgstr "NIF"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid ""
@@ -340,6 +385,10 @@ msgid "Journal"
 msgstr "Diari"
 
 msgctxt "jasper:account_jasper_reports.journal:"
+msgid "Journals"
+msgstr "Diaris"
+
+msgctxt "jasper:account_jasper_reports.journal:"
 msgid "Move"
 msgstr "Assentament"
 
@@ -350,6 +399,10 @@ msgstr "Tercer"
 msgctxt "jasper:account_jasper_reports.journal:"
 msgid "To"
 msgstr "A"
+
+msgctxt "jasper:account_jasper_reports.journal:"
+msgid "VAT"
+msgstr "NIF"
 
 msgctxt "jasper:account_jasper_reports.journal:"
 msgid ""
@@ -504,6 +557,10 @@ msgid "Account Name"
 msgstr "Compte"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
+msgid "Accounts"
+msgstr "Comptes"
+
+msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "All Accounts"
 msgstr "Tots els comptes"
 
@@ -514,10 +571,6 @@ msgstr "Tots els tercers"
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Balance"
 msgstr "Saldo"
-
-msgctxt "jasper:account_jasper_reports.trial_balance:"
-msgid "Comparison Fiscal Year: "
-msgstr "Exercici fiscal de comparació:"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Credit"
@@ -532,16 +585,16 @@ msgid "First Balance"
 msgstr "Primer balanç"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
-msgid "Fiscal Year: "
-msgstr "Exercici fiscal:"
-
-msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "From"
 msgstr "De"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Initial"
 msgstr "Inicial"
+
+msgctxt "jasper:account_jasper_reports.trial_balance:"
+msgid "Parties"
+msgstr "Tercers"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Second Balance"
@@ -554,6 +607,10 @@ msgstr "A"
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Trial Balance"
 msgstr "Balanç de sumes i saldos"
+
+msgctxt "jasper:account_jasper_reports.trial_balance:"
+msgid "VAT"
+msgstr "NIF"
 
 msgctxt "model:account_jasper_reports.print_abreviated_journal.start,name:"
 msgid "Print Abreviated Journal"
