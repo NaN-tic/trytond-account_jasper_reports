@@ -36,22 +36,22 @@
 	<parameter name="company_rec_name" class="java.lang.String"/>
 	<parameter name="company_vat" class="java.lang.String"/>
 	<queryString language="xPath">
-		<![CDATA[/data/record]]>
+		<![CDATA[]]>
 	</queryString>
-	<field name="date" class="java.util.Date">
+	<field name="date" class="java.lang.String">
 		<fieldDescription><![CDATA[date]]></fieldDescription>
 	</field>
 	<field name="account_name" class="java.lang.String">
-		<fieldDescription><![CDATA[account/rec_name]]></fieldDescription>
+		<fieldDescription><![CDATA[account_name]]></fieldDescription>
 	</field>
 	<field name="move_number" class="java.lang.String">
-		<fieldDescription><![CDATA[move/number]]></fieldDescription>
+		<fieldDescription><![CDATA[move_number]]></fieldDescription>
 	</field>
 	<field name="move_post_number" class="java.lang.String">
-		<fieldDescription><![CDATA[move/post_number]]></fieldDescription>
+		<fieldDescription><![CDATA[move_post_number]]></fieldDescription>
 	</field>
 	<field name="move_line_description" class="java.lang.String">
-		<fieldDescription><![CDATA[description]]></fieldDescription>
+		<fieldDescription><![CDATA[move_line_description]]></fieldDescription>
 	</field>
 	<field name="debit" class="java.lang.Number">
 		<fieldDescription><![CDATA[debit]]></fieldDescription>
@@ -59,14 +59,14 @@
 	<field name="credit" class="java.lang.Number">
 		<fieldDescription><![CDATA[credit]]></fieldDescription>
 	</field>
-	<field name="account_number" class="java.lang.String">
-		<fieldDescription><![CDATA[account/code]]></fieldDescription>
-	</field>
 	<field name="party_name" class="java.lang.String">
-		<fieldDescription><![CDATA[party/name]]></fieldDescription>
+		<fieldDescription><![CDATA[party_name]]></fieldDescription>
 	</field>
 	<field name="account_kind" class="java.lang.String">
-		<fieldDescription><![CDATA[account/kind]]></fieldDescription>
+		<fieldDescription><![CDATA[account_kind]]></fieldDescription>
+	</field>
+	<field name="month" class="java.lang.String">
+		<fieldDescription><![CDATA[month]]></fieldDescription>
 	</field>
 	<field name="id" class="java.lang.Number">
 		<fieldDescription><![CDATA[id]]></fieldDescription>
@@ -92,28 +92,25 @@
 		<initialValueExpression><![CDATA[$P{REPORT_LOCALE}]]></initialValueExpression>
 	</variable>
 	<group name="mes">
-		<groupExpression><![CDATA[$F{date}.getMonth()]]></groupExpression>
-		<groupHeader>
-			<band/>
-		</groupHeader>
+		<groupExpression><![CDATA[$F{month}]]></groupExpression>
 		<groupFooter>
 			<band height="17">
 				<textField isBlankWhenNull="true">
-					<reportElement x="314" y="4" width="100" height="13" uuid="004d50ee-8673-402a-9960-81393ec31c69"/>
+					<reportElement x="314" y="2" width="100" height="14" uuid="004d50ee-8673-402a-9960-81393ec31c69"/>
 					<textElement verticalAlignment="Middle">
 						<font size="7" isBold="true" pdfFontName="Helvetica"/>
 					</textElement>
-					<textFieldExpression><![CDATA["Total mes " + ($F{date}.getMonth()+1)]]></textFieldExpression>
+					<textFieldExpression><![CDATA["Total mes " + ($F{month})]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
-					<reportElement x="424" y="3" width="65" height="14" uuid="287dafe7-5c7c-45a8-b3f3-bc856aa160c5"/>
+					<reportElement x="424" y="2" width="65" height="14" uuid="287dafe7-5c7c-45a8-b3f3-bc856aa160c5"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font size="7" isBold="true" pdfFontName="Helvetica"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{debit_1}]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
-					<reportElement x="490" y="3" width="65" height="14" uuid="019cb0f7-52e5-4bb7-8798-e79f114a34b5"/>
+					<reportElement x="490" y="2" width="65" height="14" uuid="019cb0f7-52e5-4bb7-8798-e79f114a34b5"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font size="7" isBold="true" pdfFontName="Helvetica"/>
 					</textElement>
@@ -122,9 +119,6 @@
 			</band>
 		</groupFooter>
 	</group>
-	<background>
-		<band/>
-	</background>
 	<pageHeader>
 		<band height="65">
 			<textField>
@@ -267,8 +261,11 @@
 				<textElement verticalAlignment="Top">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[($F{move_post_number} != null && $F{move_post_number} != "") ?
-$F{move_post_number} : "(" + $F{move_number} + ")"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{move_post_number} != null && $F{move_post_number} != ""
+?
+    $F{move_post_number}
+:
+    "(" + $F{move_number} + ")"]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement x="380" y="0" width="55" height="13" uuid="6c5aadd2-49f9-406a-9421-4a3b56e44a03"/>
@@ -302,9 +299,6 @@ $F{move_post_number} : "(" + $F{move_number} + ")"]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
-	<columnFooter>
-		<band/>
-	</columnFooter>
 	<pageFooter>
 		<band height="12">
 			<textField>
