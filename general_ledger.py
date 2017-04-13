@@ -224,7 +224,6 @@ class GeneralLedgerReport(JasperReport):
         with Transaction().set_context(date=initial_balance_date):
             init_values = Account.read_account_vals(accounts, with_moves=True,
                 exclude_party_moves=True)
-        with Transaction().set_context(date=initial_balance_date):
             init_party_values = Party.get_account_values_by_party(
                 parties, accounts, fiscalyear.company)
 

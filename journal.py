@@ -30,7 +30,6 @@ class PrintJournalStart(ModelView):
             ('start_date', '>=', (Eval('start_period'), 'start_date'))
             ],
         depends=['fiscalyear', 'start_period'])
-    journals = fields.Many2Many('account.journal', None, None, 'Journals')
     open_close_account_moves = fields.Boolean('Create Open/Close Moves',
         help="If this field is checked and Start Period is 01 and the fiscal "
         "year before are closed, an open move of this year will be created. "
