@@ -68,7 +68,12 @@
 	<field name="account_kind" class="java.lang.String">
 		<fieldDescription><![CDATA[account/kind]]></fieldDescription>
 	</field>
+	<field name="id" class="java.lang.Number">
+		<fieldDescription><![CDATA[id]]></fieldDescription>
+	</field>
 	<sortField name="date"/>
+	<sortField name="move_post_number"/>
+	<sortField name="id"/>
 	<sortField name="move_number"/>
 	<variable name="debit_1" class="java.lang.Number" resetType="Group" resetGroup="mes" calculation="Sum">
 		<variableExpression><![CDATA[$F{debit}]]></variableExpression>
