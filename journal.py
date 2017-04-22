@@ -131,6 +131,7 @@ class JournalReport(JasperReport):
             number = int(number) - 1
         else:
             number = int(number) + 1
+        number = '%%0%sd' % sequence.padding % number
         move_post_number = '%s%s%s' % (
             sequence_prefix,
             number,
@@ -257,7 +258,7 @@ class JournalReport(JasperReport):
                 %s
                 am.id=aml.move
             ORDER BY
-                am.date, am.number, aml.id
+                am.date, am.post_number, aml.id
         """ % (
                 journals_domain,
                 periods_domain,
@@ -289,10 +290,12 @@ class JournalReport(JasperReport):
                         ('active', 'in', [True, False]),
                         ])
 
-            if fiscalyear_before and fiscalyear_before.state =='closed':
-                # check if the first month of fiscal year is January (01)
+            if fiscalyear_before and fiscalyear_before.state =='close':
+                # check if the first month is the same of the start month on
+                #    fiscal year before
                 if (start_period.start_date and
-                        start_period.start_date.month == 1):
+                        start_period.start_date.month ==
+                        fiscalyear_before.start_date.month):
                     initial_balance_date = (
                         start_period.start_date - timedelta(days=1))
                     with Transaction().set_context(date=initial_balance_date):
@@ -305,9 +308,11 @@ class JournalReport(JasperReport):
                         data.get('open_move_description'), fiscalyear,
                         accounts, init_values, init_party_values, ids[0]))
 
-            if fiscalyear.state =='closed':
-                # check if the last month of fiscal year is December (12)
-                if end_period.end_date and end_period.end_date.month == 12:
+            if fiscalyear.state =='close':
+                # check if the last month is the same of the end month on
+                #    fiscal year
+                if (end_period.end_date and end_period.end_date.month ==
+                        fiscalyear.end_date.month):
                     with Transaction().set_context(date=end_period.end_date):
                         init_values = Account.read_account_vals(accounts,
                             with_moves=True, exclude_party_moves=True)
