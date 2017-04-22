@@ -6,6 +6,8 @@ from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateReport, Button
 from trytond.pyson import Eval
 from trytond.modules.jasper_reports.jasper import JasperReport
+from decimal import Decimal
+from datetime import timedelta
 
 __all__ = ['PrintJournalStart', 'PrintJournal', 'JournalReport']
 
