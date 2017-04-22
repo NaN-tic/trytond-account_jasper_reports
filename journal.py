@@ -346,7 +346,7 @@ class JournalReport(JasperReport):
 
     @classmethod
     def execute(cls, ids, data):
-        ids, parameters = cls.prepare(data)
+        records, parameters = cls.prepare(data)
         return super(JournalReport, cls).execute(ids, {
                 'name': 'account_jasper_reports.journal',
                 'model': 'account.move.line',
