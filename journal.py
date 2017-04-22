@@ -4,7 +4,7 @@ from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateReport, Button
-from trytond.pyson import Eval
+from trytond.pyson import Bool, Eval
 from trytond.modules.jasper_reports.jasper import JasperReport
 from decimal import Decimal
 from datetime import timedelta
