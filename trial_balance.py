@@ -390,8 +390,8 @@ class TrialBalanceReport(JasperReport):
             with transaction.set_context(date=initial_comparision_date):
                 comparison_initial_values.update(
                     Account.read_account_vals(accounts, with_moves=with_moves))
-        if split_parties:
 
+        if split_parties:
             init_party_values = {}
             if add_initial_balance:
                 logger.info('Calc initial values for parties')
@@ -451,7 +451,7 @@ class TrialBalanceReport(JasperReport):
                 comp_initial, comp_credit, comp_debit, comp_balance = \
                     comp_vals
 
-                if split_parties and account.kind in ['payable', 'receivable']:
+                if split_parties and account.party_required:
                     account_parties = parties
                     if not account_parties:
                         pids = set()
