@@ -223,7 +223,7 @@ class GeneralLedgerReport(JasperReport):
             init_values = Account.read_account_vals(accounts, with_moves=False,
                 exclude_party_moves=True)
             init_party_values = Party.get_account_values_by_party(
-                parties, accounts)
+                parties, accounts, fiscalyear.company)
 
         records = []
         lastKey = None
