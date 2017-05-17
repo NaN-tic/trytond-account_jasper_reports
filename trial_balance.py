@@ -158,23 +158,35 @@ class PrintTrialBalance(Wizard):
     print_ = StateReport('account_jasper_reports.trial_balance')
 
     def do_print_(self, action):
-        start_period = None
+        start_period = self.start.fiscalyear.periods[0].id
         if self.start.start_period:
             start_period = self.start.start_period.id
-        end_period = None
+        end_period = self.start.fiscalyear.periods[-1].id
         if self.start.end_period:
             end_period = self.start.end_period.id
+        comparison_start_period = None
+        if self.start.comparison_start_period:
+            comparison_start_period = self.start.comparison_start_period.id
+        elif (self.start.comparison_fiscalyear
+                and self.start.comparison_fiscalyear.periods):
+            comparison_start_period = (
+                self.start.comparison_fiscalyear.periods[0].id)
+        comparison_end_period = None
+        if self.start.comparison_end_period:
+            comparison_end_period = self.start.comparison_end_period.id
+        elif (self.start.comparison_fiscalyear
+                and self.start.comparison_fiscalyear.periods):
+            comparison_end_period = (
+                self.start.comparison_fiscalyear.periods[-1].id)
         data = {
             'company': self.start.company.id,
             'fiscalyear': self.start.fiscalyear.id,
-            'comparison_fiscalyear': self.start.comparison_fiscalyear and
-                self.start.comparison_fiscalyear.id or None,
+            'comparison_fiscalyear': (self.start.comparison_fiscalyear and
+                self.start.comparison_fiscalyear.id or None),
             'start_period': start_period,
             'end_period': end_period,
-            'comparison_start_period': self.start.comparison_start_period and
-                self.start.comparison_start_period.id or None,
-            'comparison_end_period': self.start.comparison_end_period and
-                self.start.comparison_end_period.id or None,
+            'comparison_start_period': comparison_start_period,
+            'comparison_end_period': comparison_end_period,
             'digits': self.start.show_digits or None,
             'add_initial_balance': self.start.add_initial_balance,
             'with_move_only': self.start.with_move_only,
@@ -462,7 +474,7 @@ class TrialBalanceReport(JasperReport):
                         if account.id in init_party_values:
                             pids |= set(init_party_values[account.id].keys())
                         account_parties = [None] if None in pids else []
-                        #Using search insted of browse to get ordered records
+                        # Using search insted of browse to get ordered records
                         with transaction.set_context(active_test=False):
                             account_parties += Party.search([
                                     ('id', 'in', [p for p in pids if p])
@@ -509,4 +521,4 @@ class TrialBalanceReport(JasperReport):
                 'records': records,
                 'parameters': parameters,
                 'output_format': data['output_format'],
-            })
+                })
