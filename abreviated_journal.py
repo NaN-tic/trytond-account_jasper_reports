@@ -104,6 +104,7 @@ class AbreviatedJournalReport(JasperReport):
 
         res = []
         parameters = {}
+        parameters['company'] = fiscalyear.company.rec_name
         parameters['fiscal_year'] = fiscalyear.rec_name
 
         company = None

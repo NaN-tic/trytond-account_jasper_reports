@@ -163,6 +163,7 @@ class GeneralLedgerReport(JasperReport):
             company = Company(data['company'])
 
         parameters = {}
+        parameters['company'] = fiscalyear.company.rec_name
         parameters['start_period'] = start_period and start_period.name or ''
         parameters['end_period'] = end_period and end_period.name or ''
         parameters['fiscal_year'] = fiscalyear.name
@@ -221,10 +222,10 @@ class GeneralLedgerReport(JasperReport):
 
         initial_balance_date = start_period.start_date - timedelta(days=1)
         with Transaction().set_context(date=initial_balance_date):
-            init_values = Account.read_account_vals(accounts, with_moves=True,
+            init_values = Account.read_account_vals(accounts, with_moves=False,
                 exclude_party_moves=True)
             init_party_values = Party.get_account_values_by_party(
-                parties, accounts)
+                parties, accounts, fiscalyear.company)
 
         records = []
         lastKey = None

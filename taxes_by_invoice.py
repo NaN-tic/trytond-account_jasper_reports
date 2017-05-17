@@ -117,6 +117,7 @@ class TaxesByInvoiceReport(JasperReport):
         Period = pool.get('account.period')
         Party = pool.get('party.party')
         AccountInvoiceTax = pool.get('account.invoice.tax')
+
         fiscalyear = FiscalYear(data['fiscalyear'])
         periods = []
         if data.get('periods'):
@@ -147,6 +148,7 @@ class TaxesByInvoiceReport(JasperReport):
             company = Company(data['company'])
 
         parameters = {}
+        parameters['company'] = fiscalyear.company.rec_name
         parameters['fiscal_year'] = fiscalyear.rec_name
         parameters['parties'] = parties_subtitle
         parameters['periods'] = periods_subtitle

@@ -85,10 +85,10 @@ class PrintJournal(Wizard):
     print_ = StateAction('account_jasper_reports.report_journal')
 
     def do_print_(self, action):
-        start_period = None
+        start_period = self.start.fiscalyear.periods[0].id
         if self.start.start_period:
             start_period = self.start.start_period.id
-        end_period = None
+        end_period = self.start.fiscalyear.periods[-1].id
         if self.start.end_period:
             end_period = self.start.end_period.id
         data = {
@@ -206,6 +206,7 @@ class JournalReport(JasperReport):
         Journal = pool.get('account.journal')
         Period = pool.get('account.period')
         Line = pool.get('account.move.line')
+
         parameters = {}
         fiscalyear = FiscalYear(data['fiscalyear'])
         start_period = None
@@ -302,7 +303,7 @@ class JournalReport(JasperReport):
                         init_values = Account.read_account_vals(accounts,
                             with_moves=True, exclude_party_moves=True)
                         init_party_values = Party.get_account_values_by_party(
-                            parties, accounts)
+                            parties, accounts, fiscalyear.company)
 
                     open_moves.extend(cls._get_open_close_moves('open',
                         data.get('open_move_description'), fiscalyear,
@@ -317,7 +318,7 @@ class JournalReport(JasperReport):
                         init_values = Account.read_account_vals(accounts,
                             with_moves=True, exclude_party_moves=True)
                         init_party_values = Party.get_account_values_by_party(
-                            parties, accounts)
+                            parties, accounts, fiscalyear.company)
 
                     close_moves.extend(cls._get_open_close_moves('close',
                         data.get('close_move_description'), fiscalyear,

@@ -11,11 +11,10 @@ from trytond.tools import reduce_ids
 from trytond.transaction import Transaction
 
 __all__ = ['FiscalYear', 'Account', 'Party']
-__metaclass__ = PoolMeta
 
 
 class FiscalYear:
-    'Fiscal Year'
+    __metaclass__ = PoolMeta
     __name__ = 'account.fiscalyear'
 
     def get_periods(self, start_period, end_period):
@@ -34,6 +33,7 @@ class FiscalYear:
 
 
 class Account:
+    __metaclass__ = PoolMeta
     __name__ = 'account.account'
 
     @classmethod
@@ -99,11 +99,11 @@ class Account:
 
 
 class Party:
-    'Party'
+    __metaclass__ = PoolMeta
     __name__ = 'party.party'
 
     @classmethod
-    def get_account_values_by_party(cls, parties, accounts):
+    def get_account_values_by_party(cls, parties, accounts, company):
         '''
         Function to compute credit,debit and balance for party ids.
         '''
@@ -120,10 +120,6 @@ class Party:
         line = MoveLine.__table__()
         account = Account.__table__()
 
-        company = context.get('company')
-        if not company:
-            return res
-
         group_by = (line.party, line.account,)
         columns = (group_by + (Sum(Coalesce(line.debit, 0)).as_('debit'),
                 Sum(Coalesce(line.credit, 0)).as_('credit'),
@@ -135,7 +131,7 @@ class Party:
             line_query = line.move.in_(move.select(move.id,
                         where=move.date <= context.get('date')))
         where = (line_query & account.active &
-            (account.company == company))
+            (account.company == company.id))
         if accounts:
             where = where & line.account.in_([a.id for a in accounts])
         if parties:
