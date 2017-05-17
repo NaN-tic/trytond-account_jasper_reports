@@ -84,10 +84,10 @@ class PrintJournal(Wizard):
     print_ = StateReport('account_jasper_reports.journal')
 
     def do_print_(self, action):
-        start_period = None
+        start_period = self.start.fiscalyear.periods[0].id
         if self.start.start_period:
             start_period = self.start.start_period.id
-        end_period = None
+        end_period = self.start.fiscalyear.periods[-1].id
         if self.start.end_period:
             end_period = self.start.end_period.id
         data = {
