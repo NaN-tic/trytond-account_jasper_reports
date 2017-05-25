@@ -292,6 +292,7 @@ class JournalReport(JasperReport):
                 accounts = Account.search([
                         ('parent', '!=', None),
                         ('kind', '!=', 'view'),
+                        ('active', 'in', [True, False]),
                         ])
                 parties = Party.search([
                         ('active', 'in', [True, False]),

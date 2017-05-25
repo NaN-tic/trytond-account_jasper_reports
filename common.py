@@ -71,8 +71,13 @@ class Account:
             if date:
                 where &= (move.date <= date)
             if exclude_party_moves:
-                where = (where & (~In(table_a.kind, ['receivable', 'payable'])
-                        | (line.party == None)))
+                # This "where" not use account kind (before a change use it)
+                # because there are some companies that the accounts kind and
+                # party_required use in a different way that "standard".
+                # For example if you check the aprty_required an account with
+                # the kind equal to 'other'
+                where = (where & (line.party == None))
+
             cursor.execute(*table_a.join(table_c,
                     condition=(table_c.left >= table_a.left)
                     & (table_c.right <= table_a.right)
