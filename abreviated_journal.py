@@ -132,7 +132,10 @@ class AbreviatedJournalReport(JasperReport):
         group_by = (table_a.id,)
         columns = (group_by + (Sum(Coalesce(line.debit, 0)).as_('debit'),
                 Sum(Coalesce(line.credit, 0)).as_('credit')))
-        periods = Period.search([('fiscalyear', '=', fiscalyear)])
+        periods = Period.search([
+                ('fiscalyear', '=', fiscalyear),
+                ('type', '=', 'standard'),
+                ])
         for period in periods:
             all_accounts = {}
             for i in range(0, len(account_ids), in_max):
