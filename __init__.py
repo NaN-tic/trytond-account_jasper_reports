@@ -7,6 +7,8 @@ from .abreviated_journal import *
 from .journal import *
 from .trial_balance import *
 from .taxes_by_invoice import *
+from .move import *
+from .invoice import *
 
 
 def register():
@@ -19,6 +21,9 @@ def register():
         PrintTrialBalanceStart,
         PrintTaxesByInvoiceAndPeriodStart,
         FiscalYear,
+        Reconciliation,
+        NotReconciledStart,
+        Invoice,
         module='account_jasper_reports', type_='model')
     Pool.register(
         PrintJournal,
@@ -26,6 +31,7 @@ def register():
         PrintGeneralLedger,
         PrintTrialBalance,
         PrintTaxesByInvoiceAndPeriod,
+        NotReconciled,
         module='account_jasper_reports', type_='wizard')
     Pool.register(
         JournalReport,
