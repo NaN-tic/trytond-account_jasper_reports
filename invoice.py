@@ -4,26 +4,9 @@ from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.transaction import Transaction
 from trytond.pyson import PYSONEncoder
-from trytond.pool import Pool, PoolMeta
+from trytond.pool import Pool
 
-__all__ = ['Invoice', 'NotReconciledStart', 'NotReconciled']
-
-
-class Invoice:
-    'Account Invoice'
-    __name__ = 'account.invoice'
-    __metaclass__ = PoolMeta
-
-    maturity_date = fields.Function(fields.Date('Maturity Date'),
-        'get_maturity_date')
-
-    def get_maturity_date(self, name):
-        maturity_dates = []
-        if self.move and self.move.lines:
-            for line in self.move.lines:
-                if line.maturity_date:
-                    maturity_dates.append(line.maturity_date)
-            return max(maturity_dates)
+__all__ = ['NotReconciledStart', 'NotReconciled']
 
 
 class NotReconciledStart(ModelView):
@@ -60,23 +43,16 @@ class NotReconciled(Wizard):
     def do_not_reconciled(self, action):
         pool = Pool()
         MoveLine = pool.get('account.move.line')
-
-        domain = [('date', '<=', self.start.date), ('maturity_date', '<=',
-                self.start.date), ('move.company', '=', self.start.company)]
+        domain = [('maturity_date', '<=', self.start.date),
+            ('move.company', '=', self.start.company),
+            ('reconciliation_date', '>=', self.start.date)]
         active_ids = Transaction().context['active_ids']
         if active_ids:
             domain.append(('origin.id', 'in', active_ids, 'account.invoice'))
         if self.start.parties:
             domain.append(('party', 'in', self.start.parties))
         move_lines = MoveLine.search(domain)
-        not_reconciled_move_lines = []
-        for move_line in move_lines:
-            if not move_line.reconciliation or (move_line.reconciliation.date >=
-                    self.start.date):
-                not_reconciled_move_lines.append(move_line)
-
-        not_reconciled_moves = [move_line.move.id for move_line in
-            not_reconciled_move_lines]
+        not_reconciled_moves = [move_line.move.id for move_line in move_lines]
         action['pyson_domain'] = PYSONEncoder().encode([('move', 'in',
                     not_reconciled_moves)])
         return action, {}

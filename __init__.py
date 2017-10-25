@@ -23,7 +23,7 @@ def register():
         FiscalYear,
         Reconciliation,
         NotReconciledStart,
-        Invoice,
+        Line,
         module='account_jasper_reports', type_='model')
     Pool.register(
         PrintJournal,
