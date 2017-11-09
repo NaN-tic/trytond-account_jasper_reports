@@ -2,6 +2,10 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
+msgctxt "field:account.move.line,reconciliation_date:"
+msgid "Reconciliation Date"
+msgstr "Fecha de conciliación"
+
 msgctxt "field:account_jasper_reports.print_abreviated_journal.start,company:"
 msgid "Company"
 msgstr "Empresa"
@@ -611,6 +615,10 @@ msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "VAT"
 msgstr "NIF"
 
+msgctxt "model:account.not_reconciled.start,name:"
+msgid "Not Reconciled Start"
+msgstr "Inicio sin conciliar"
+
 msgctxt "model:account_jasper_reports.print_abreviated_journal.start,name:"
 msgid "Print Abreviated Journal"
 msgstr "Imprimir diario abreviado"
@@ -630,6 +638,10 @@ msgstr "Imprimir impuestos por factura y período"
 msgctxt "model:account_jasper_reports.print_trial_balance.start,name:"
 msgid "Print Trial Balance Start"
 msgstr "Inicio imprimir balance de sumas y saldos"
+
+msgctxt "model:ir.action,name:None"
+msgid "Not Reconciled"
+msgstr "Sin conciliar"
 
 msgctxt "model:ir.action,name:report_abreviated_journal"
 msgid "Abreviated Journal"
@@ -654,6 +666,10 @@ msgstr "Impuestos por factura y período"
 msgctxt "model:ir.action,name:report_trial_balance"
 msgid "Trial Balance"
 msgstr "Balance de sumas y saldos"
+
+msgctxt "model:ir.action,name:wizard_not_reconciled"
+msgid "Not Reconciled"
+msgstr "Sin conciliar"
 
 msgctxt "model:ir.action,name:wizard_print_abreviated_journal"
 msgid "Print Abreviated Journal"
@@ -804,6 +820,10 @@ msgctxt ""
 "selection:account_jasper_reports.print_trial_balance.start,output_format:"
 msgid "XLS"
 msgstr "XLS"
+
+msgctxt "view:account.not_reconciled.start:"
+msgid "Not reconciled"
+msgstr "Sin conciliar"
 
 msgctxt "view:account_jasper_reports.print_abreviated_journal.start:"
 msgid "Journal Report"
