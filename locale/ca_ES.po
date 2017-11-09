@@ -616,8 +616,8 @@ msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "VAT"
 msgstr "NIF"
 
-msgctxt "model:account.not_reconciled.start,name:"
-msgid "Not Reconciled Start"
+msgctxt "model:account.unreconciled.start,name:"
+msgid "Unreconciled Start"
 msgstr "Inici sense conciliar"
 
 msgctxt "model:account_jasper_reports.print_abreviated_journal.start,name:"
@@ -641,7 +641,7 @@ msgid "Print Trial Balance Start"
 msgstr "Inici imprimeix balanç de sumes i saldos"
 
 msgctxt "model:ir.action,name:None"
-msgid "Not Reconciled"
+msgid "Unreconciled"
 msgstr "Sense conciliar"
 
 msgctxt "model:ir.action,name:report_abreviated_journal"
@@ -668,8 +668,8 @@ msgctxt "model:ir.action,name:report_trial_balance"
 msgid "Trial Balance"
 msgstr "Balanç de sumes i saldos"
 
-msgctxt "model:ir.action,name:wizard_not_reconciled"
-msgid "Not Reconciled"
+msgctxt "model:ir.action,name:wizard_unreconciled"
+msgid "Unreconciled"
 msgstr "Sense conciliar"
 
 msgctxt "model:ir.action,name:wizard_print_abreviated_journal"
@@ -822,8 +822,8 @@ msgctxt ""
 msgid "XLS"
 msgstr "XLS"
 
-msgctxt "view:account.not_reconciled.start:"
-msgid "Not reconciled"
+msgctxt "view:account.unreconciled.start:"
+msgid "Unreconciled"
 msgstr "Sense conciliar"
 
 msgctxt "view:account_jasper_reports.print_abreviated_journal.start:"

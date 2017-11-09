@@ -6,12 +6,12 @@ from trytond.transaction import Transaction
 from trytond.pyson import PYSONEncoder
 from trytond.pool import Pool
 
-__all__ = ['NotReconciledStart', 'NotReconciled']
+__all__ = ['UnreconciledStart', 'Unreconciled']
 
 
-class NotReconciledStart(ModelView):
-    'Not Reconciled Start'
-    __name__ = 'account.not_reconciled.start'
+class UnreconciledStart(ModelView):
+    'Unreconciled Start'
+    __name__ = 'account.unreconciled.start'
 
     company = fields.Many2One('company.company', 'Company', required=True,
         readonly=True)
@@ -29,18 +29,18 @@ class NotReconciledStart(ModelView):
         return Date.today()
 
 
-class NotReconciled(Wizard):
-    'Not Reconciled'
-    __name__ = 'account.not_reconciled'
+class Unreconciled(Wizard):
+    'Unreconciled'
+    __name__ = 'account.unreconciled'
 
-    start = StateView('account.not_reconciled.start',
-        'account_jasper_reports.not_reconciled_start_view_form', [
+    start = StateView('account.unreconciled.start',
+        'account_jasper_reports.unreconciled_start_view_form', [
             Button('Cancel', 'end', 'tryton-cancel'),
-            Button('Ok', 'not_reconciled', 'tryton-ok', default=True),
+            Button('Ok', 'unreconciled', 'tryton-ok', default=True),
             ])
-    not_reconciled = StateAction('account_invoice.act_invoice_form')
+    unreconciled = StateAction('account_invoice.act_invoice_form')
 
-    def do_not_reconciled(self, action):
+    def do_unreconciled(self, action):
         pool = Pool()
         MoveLine = pool.get('account.move.line')
         domain = [('maturity_date', '<=', self.start.date),
@@ -52,7 +52,7 @@ class NotReconciled(Wizard):
         if self.start.parties:
             domain.append(('party', 'in', self.start.parties))
         move_lines = MoveLine.search(domain)
-        not_reconciled_moves = [move_line.move.id for move_line in move_lines]
+        unreconciled_moves = [move_line.move.id for move_line in move_lines]
         action['pyson_domain'] = PYSONEncoder().encode([('move', 'in',
-                    not_reconciled_moves)])
+                    unreconciled_moves)])
         return action, {}

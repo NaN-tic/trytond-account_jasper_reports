@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<form string="Not reconciled" col="2">
+<form string="Unreconciled" col="2">
     <label name="company"/>
     <field name="company"/>
     <label name="date"/>

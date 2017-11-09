@@ -22,7 +22,7 @@ def register():
         PrintTaxesByInvoiceAndPeriodStart,
         FiscalYear,
         Reconciliation,
-        NotReconciledStart,
+        UnreconciledStart,
         Line,
         module='account_jasper_reports', type_='model')
     Pool.register(
@@ -31,7 +31,7 @@ def register():
         PrintGeneralLedger,
         PrintTrialBalance,
         PrintTaxesByInvoiceAndPeriod,
-        NotReconciled,
+        Unreconciled,
         module='account_jasper_reports', type_='wizard')
     Pool.register(
         JournalReport,
