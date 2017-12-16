@@ -18,6 +18,7 @@ copyright notices and license terms. -->
             <field name="report_name">account_jasper_reports.taxes_by_invoice</field>
             <field name="report">account_jasper_reports/taxes_by_invoice.jrxml</field>
             <field name="extension">pdf</field>
+            <field name="template_extension">jrxml</field>
         </record>
 
         <record model="ir.action.report" id="report_taxes_by_invoice_and_period">
@@ -26,6 +27,7 @@ copyright notices and license terms. -->
             <field name="report_name">account_jasper_reports.taxes_by_invoice_and_period</field>
             <field name="report">account_jasper_reports/taxes_by_invoice_and_period.jrxml</field>
             <field name="extension">pdf</field>
+            <field name="template_extension">jrxml</field>
         </record>
 
         <menuitem id="menu_print_taxes_by_invoice" sequence="140"

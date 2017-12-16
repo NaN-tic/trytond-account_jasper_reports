@@ -18,6 +18,7 @@ copyright notices and license terms. -->
             <field name="report_name">account_jasper_reports.trial_balance</field>
             <field name="report">account_jasper_reports/trial_balance.jrxml</field>
             <field name="extension">pdf</field>
+            <field name="template_extension">jrxml</field>
         </record>
 
         <menuitem parent="account.menu_reporting" sequence="100"

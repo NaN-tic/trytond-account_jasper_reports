@@ -17,6 +17,7 @@ copyright notices and license terms. -->
             <field name="report_name">account_jasper_reports.abreviated_journal</field>
             <field name="report">account_jasper_reports/abreviated_journal.jrxml</field>
             <field name="extension">pdf</field>
+            <field name="template_extension">jrxml</field>
         </record>
 
         <menuitem id="menu_print_abreviated_journal" sequence="120"

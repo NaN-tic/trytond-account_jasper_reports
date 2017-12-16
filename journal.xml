@@ -18,6 +18,7 @@ copyright notices and license terms. -->
             <field name="report_name">account_jasper_reports.journal</field>
             <field name="report">account_jasper_reports/journal.jrxml</field>
             <field name="extension">pdf</field>
+            <field name="template_extension">jrxml</field>
         </record>
 
         <!-- Create a new menu so translations are rendered correctly -->
