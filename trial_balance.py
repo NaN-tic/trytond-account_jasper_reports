@@ -295,9 +295,12 @@ class TrialBalanceReport(JasperReport):
         if data['company']:
             company = Company(data['company'])
 
-        split_parties = data['split_parties']
         accounts = data['accounts']
         parties = data['parties']
+        if parties:
+            split_parties = True
+        else:
+            split_parties = data['split_parties']
         digits = data['digits']
         add_initial_balance = data['add_initial_balance']
         with_moves = data['with_move_only']
