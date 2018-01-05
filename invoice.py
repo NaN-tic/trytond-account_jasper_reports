@@ -48,14 +48,16 @@ class Unreconciled(Wizard):
     def do_unreconciled(self, action):
         pool = Pool()
         MoveLine = pool.get('account.move.line')
+        context = Transaction().context
+        active_ids = context['active_ids']
+        active_model = context['active_model']
         domain = [
             ('move.company', '=', self.start.company),
             ('reconciliation_date', '>=', self.start.date)
             ]
         if self.start.maturated:
             domain.append(('maturity_date', '<=', self.start.date))
-        active_ids = Transaction().context['active_ids']
-        if active_ids:
+        if active_ids and active_model == 'account.invoice':
             domain.append(('origin.id', 'in', active_ids, 'account.invoice'))
         if self.start.parties:
             domain.append(('party', 'in', self.start.parties))

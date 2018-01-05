@@ -3,7 +3,6 @@
     <data>
         <record model="ir.action.wizard" id="wizard_unreconciled">
             <field name="name">Unreconciled</field>
-            <field name="model">account.invoice</field>
             <field name="wiz_name">account.unreconciled</field>
         </record>
         <record model="ir.action.keyword" id="act_unreconciled_keyword">
@@ -16,5 +15,7 @@
             <field name="type">form</field>
             <field name="name">unreconciled_start_view_form</field>
         </record>
+        <menuitem parent="account_invoice.menu_invoice_out_invoice_form"
+            id="menu_unreconciled" action="wizard_unreconciled"/>
     </data>
 </tryton>
