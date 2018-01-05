@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
-<form string="Unreconciled" col="2">
+<form string="Unreconciled">
     <label name="company"/>
-    <field name="company"/>
+    <field name="company" colspan="3"/>
     <label name="date"/>
     <field name="date"/>
-    <label name="parties"/>
-    <field name="parties"/>
+    <label name="maturated"/>
+    <field name="maturated"/>
+    <field name="parties" colspan="4"/>
 </form>

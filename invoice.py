@@ -16,6 +16,7 @@ class UnreconciledStart(ModelView):
     company = fields.Many2One('company.company', 'Company', required=True,
         readonly=True)
     date = fields.Date('Date', required=True)
+    maturated = fields.Boolean('Maturated')
     parties = fields.Many2Many('party.party', None, None, 'Parties')
 
     @staticmethod
@@ -27,6 +28,10 @@ class UnreconciledStart(ModelView):
         pool = Pool()
         Date = pool.get('ir.date')
         return Date.today()
+
+    @staticmethod
+    def default_maturated():
+        return True
 
 
 class Unreconciled(Wizard):
@@ -43,9 +48,12 @@ class Unreconciled(Wizard):
     def do_unreconciled(self, action):
         pool = Pool()
         MoveLine = pool.get('account.move.line')
-        domain = [('maturity_date', '<=', self.start.date),
+        domain = [
             ('move.company', '=', self.start.company),
-            ('reconciliation_date', '>=', self.start.date)]
+            ('reconciliation_date', '>=', self.start.date)
+            ]
+        if self.start.maturated:
+            domain.append(('maturity_date', '<=', self.start.date))
         active_ids = Transaction().context['active_ids']
         if active_ids:
             domain.append(('origin.id', 'in', active_ids, 'account.invoice'))
