@@ -6,6 +6,30 @@ msgctxt "field:account.move.line,reconciliation_date:"
 msgid "Reconciliation Date"
 msgstr "Data de conciliació"
 
+msgctxt "field:account.move.reconciliation,date:"
+msgid "Date"
+msgstr "Data"
+
+msgctxt "field:account.unreconciled.start,company:"
+msgid "Company"
+msgstr "Empresa"
+
+msgctxt "field:account.unreconciled.start,date:"
+msgid "Date"
+msgstr "Data"
+
+msgctxt "field:account.unreconciled.start,id:"
+msgid "ID"
+msgstr "Identificador"
+
+msgctxt "field:account.unreconciled.start,maturated:"
+msgid "Maturated"
+msgstr "Vençut"
+
+msgctxt "field:account.unreconciled.start,parties:"
+msgid "Parties"
+msgstr "Tercers"
+
 msgctxt "field:account_jasper_reports.print_abreviated_journal.start,company:"
 msgid "Company"
 msgstr "Empresa"
@@ -69,7 +93,7 @@ msgstr "Període inicial"
 
 msgctxt ""
 "field:account_jasper_reports.print_journal.start,close_move_description:"
-msgid "Close Move Descriptiona"
+msgid "Close Move Description"
 msgstr "Descrpció de l'assentament de tancament"
 
 msgctxt "field:account_jasper_reports.print_journal.start,company:"
@@ -640,8 +664,12 @@ msgctxt "model:account_jasper_reports.print_trial_balance.start,name:"
 msgid "Print Trial Balance Start"
 msgstr "Inici imprimeix balanç de sumes i saldos"
 
+msgctxt "model:ir.action,name:"
+msgid "Not Reconciled"
+msgstr "Sense conciliar"
+
 msgctxt "model:ir.action,name:None"
-msgid "Unreconciled"
+msgid "Not Reconciled"
 msgstr "Sense conciliar"
 
 msgctxt "model:ir.action,name:report_abreviated_journal"
@@ -668,10 +696,6 @@ msgctxt "model:ir.action,name:report_trial_balance"
 msgid "Trial Balance"
 msgstr "Balanç de sumes i saldos"
 
-msgctxt "model:ir.action,name:wizard_unreconciled"
-msgid "Unreconciled"
-msgstr "Sense conciliar"
-
 msgctxt "model:ir.action,name:wizard_print_abreviated_journal"
 msgid "Print Abreviated Journal"
 msgstr "Imprimeix diari abreviat"
@@ -691,6 +715,10 @@ msgstr "Imprimeix impostos per factura i període"
 msgctxt "model:ir.action,name:wizard_print_trial_balance"
 msgid "Print Trial Balance"
 msgstr "Imprimeix balanç de sumes i saldos"
+
+msgctxt "model:ir.action,name:wizard_unreconciled"
+msgid "Unreconciled"
+msgstr "Sense conciliar"
 
 msgctxt "model:ir.action.report,name:report_abreviated_journal"
 msgid "Abreviated Journal"
@@ -743,6 +771,10 @@ msgstr "Imprimeix diari abreviat"
 msgctxt "model:ir.ui.menu,name:menu_print_taxes_by_invoice"
 msgid "Print Taxes by Invoice and Period"
 msgstr "Imprimeix impostos per factura i període"
+
+msgctxt "model:ir.ui.menu,name:menu_unreconciled"
+msgid "Unreconciled"
+msgstr "Sense conciliar"
 
 msgctxt ""
 "selection:account_jasper_reports.print_abreviated_journal.start,display_account:"
@@ -877,6 +909,14 @@ msgstr "Període de comparació"
 msgctxt "view:account_jasper_reports.print_trial_balance.start:"
 msgid "Trial Balance Report"
 msgstr "Informe balanç de sumes i saldos"
+
+msgctxt "wizard_button:account.unreconciled,start,end:"
+msgid "Cancel"
+msgstr "Cancel·lat"
+
+msgctxt "wizard_button:account.unreconciled,start,unreconciled:"
+msgid "Ok"
+msgstr "D'acord"
 
 msgctxt ""
 "wizard_button:account_jasper_reports.print_abreviated_journal,start,end:"
