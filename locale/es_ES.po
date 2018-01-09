@@ -667,10 +667,6 @@ msgctxt "model:ir.action,name:"
 msgid "Not Reconciled"
 msgstr "Sin conciliar"
 
-msgctxt "model:ir.action,name:None"
-msgid "Not Reconciled"
-msgstr "Sin conciliar"
-
 msgctxt "model:ir.action,name:report_abreviated_journal"
 msgid "Abreviated Journal"
 msgstr "Diario abreviado"
