@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<data>
+    <xpath expr="//field[@name='reconciliation']" position="after">
+        <label name="reconciliation_date"/>
+        <field name="reconciliation_date"/>
+    </xpath>
+</data>
