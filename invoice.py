@@ -61,6 +61,8 @@ class Unreconciled(Wizard):
             domain.append(('origin.id', 'in', active_ids, 'account.invoice'))
         if self.start.parties:
             domain.append(('party', 'in', self.start.parties))
+        else:
+            domain.append(('party', '!=', None))
         move_lines = MoveLine.search(domain)
         unreconciled_moves = [move_line.move.id for move_line in move_lines]
         action['pyson_domain'] = PYSONEncoder().encode([('move', 'in',
