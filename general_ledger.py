@@ -131,13 +131,13 @@ class GeneralLedgerReport(JasperReport):
         end_period = None
         if data['end_period']:
             end_period = Period(data['end_period'])
+
         with Transaction().set_context(active_test=False):
             accounts = Account.browse(data.get('accounts', []))
             parties = Party.browse(data.get('parties', []))
             if accounts:
-                js = Account.search([('id', 'in', [x.id for x in accounts])])
                 accounts_subtitle = []
-                for x in js:
+                for x in accounts:
                     if len(accounts_subtitle) > 4:
                         accounts_subtitle.append('...')
                         break
@@ -147,9 +147,8 @@ class GeneralLedgerReport(JasperReport):
                 accounts_subtitle = ''
 
             if parties:
-                js = Party.search([('id', 'in', [x.id for x in parties])])
                 parties_subtitle = []
-                for x in js:
+                for x in parties:
                     if len(parties_subtitle) > 4:
                         parties_subtitle.append('...')
                         break
@@ -172,53 +171,47 @@ class GeneralLedgerReport(JasperReport):
         parameters['company_rec_name'] = company and company.rec_name or ''
         parameters['company_vat'] = company and company.party.vat_code or ''
 
-        domain = []
+        where = ''
         if accounts:
-            domain += [('account', 'in', accounts)]
+            where += "aml.account in (%s) " % (
+                ",".join([str(a.id) for a in accounts]))
         else:
-            with Transaction().set_context(active_test=False):
-                accounts = Account.search([('parent', '!=', None)])
+            where += "aa.parent is not null and party_required = true "
 
         filter_periods = fiscalyear.get_periods(start_period, end_period)
-        domain += [('period', 'in', filter_periods)]
 
-        parties_domain = []
+        where += "and am.period in (%s) " % (
+            ",".join([str(a.id) for a in filter_periods]))
+
         if parties:
-            parties_domain = [
-                'OR', [
-                    ('account.kind', 'in', ['receivable', 'payable']),
-                    ('party', 'in', [p.id for p in parties])],
-                [
-                    ('account.kind', 'not in', ['receivable', 'payable'])
-                ]]
-            domain.append(parties_domain)
+            where += """ and ((aa.kind in ('receivable', 'payable') and
+                aml.party in (%s)) or
+                    (aa.kind not in ('receivable', 'payable'))) """ % (
+                ",".join([str(a.id) for a in parties]))
 
-        lines = Line.search(domain)
-        line_ids = []
-        if lines:
-            cursor = Transaction().cursor
-            cursor.execute("""
-                SELECT
-                    aml.id
-                FROM
-                    account_move_line aml,
-                    account_move am,
-                    account_account aa
-                WHERE
-                    am.id = aml.move AND
-                    aa.id = aml.account AND
-                    aml.id in (%s)
-                ORDER BY
-                    aml.account,
-                    -- Sort by party only when account is of
-                    -- type 'receivable' or 'payable'
-                    CASE WHEN aa.kind in ('receivable', 'payable') THEN
-                           aml.party ELSE 0 END,
-                    am.date,
-                    am.description,
-                    aml.id
-                """ % ','.join([str(x.id) for x in lines]))
-            line_ids = [x[0] for x in cursor.fetchall()]
+        cursor = Transaction().cursor
+        cursor.execute("""
+            SELECT
+                aml.id
+            FROM
+                account_move_line aml,
+                account_move am,
+                account_account aa
+            WHERE
+                am.id = aml.move AND
+                aa.id = aml.account AND
+                %s
+            ORDER BY
+                aml.account,
+                -- Sort by party only when account is of
+                -- type 'receivable' or 'payable'
+                CASE WHEN aa.kind in ('receivable', 'payable') THEN
+                       aml.party ELSE 0 END,
+                am.date,
+                am.description,
+                aml.id
+            """ % where)
+        line_ids = [x[0] for x in cursor.fetchall()]
 
         initial_balance_date = start_period.start_date - timedelta(days=1)
         with Transaction().set_context(date=initial_balance_date):
