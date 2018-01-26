@@ -2,6 +2,34 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
+msgctxt "field:account.move.line,reconciliation_date:"
+msgid "Reconciliation Date"
+msgstr "Fecha de conciliación"
+
+msgctxt "field:account.move.reconciliation,date:"
+msgid "Date"
+msgstr "Fecha"
+
+msgctxt "field:account.unreconciled.start,company:"
+msgid "Company"
+msgstr "Empresa"
+
+msgctxt "field:account.unreconciled.start,date:"
+msgid "Date"
+msgstr "Fecha"
+
+msgctxt "field:account.unreconciled.start,id:"
+msgid "ID"
+msgstr "Identificador"
+
+msgctxt "field:account.unreconciled.start,maturated:"
+msgid "Maturated"
+msgstr "Vencido"
+
+msgctxt "field:account.unreconciled.start,parties:"
+msgid "Parties"
+msgstr "Terceros"
+
 msgctxt "field:account_jasper_reports.print_abreviated_journal.start,company:"
 msgid "Company"
 msgstr "Empresa"
@@ -65,7 +93,7 @@ msgstr "Período inicial"
 
 msgctxt ""
 "field:account_jasper_reports.print_journal.start,close_move_description:"
-msgid "Close Move Descriptiona"
+msgid "Close Move Description"
 msgstr "Descripción del asiento de cierre"
 
 msgctxt "field:account_jasper_reports.print_journal.start,company:"
@@ -611,6 +639,10 @@ msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "VAT"
 msgstr "NIF"
 
+msgctxt "model:account.unreconciled.start,name:"
+msgid "Unreconciled Start"
+msgstr "Inicio sin conciliar"
+
 msgctxt "model:account_jasper_reports.print_abreviated_journal.start,name:"
 msgid "Print Abreviated Journal"
 msgstr "Imprimir diario abreviado"
@@ -630,6 +662,10 @@ msgstr "Imprimir impuestos por factura y período"
 msgctxt "model:account_jasper_reports.print_trial_balance.start,name:"
 msgid "Print Trial Balance Start"
 msgstr "Inicio imprimir balance de sumas y saldos"
+
+msgctxt "model:ir.action,name:"
+msgid "Not Reconciled"
+msgstr "Sin conciliar"
 
 msgctxt "model:ir.action,name:report_abreviated_journal"
 msgid "Abreviated Journal"
@@ -674,6 +710,10 @@ msgstr "Imprimir impuestos por factura y período"
 msgctxt "model:ir.action,name:wizard_print_trial_balance"
 msgid "Print Trial Balance"
 msgstr "Imprimir balance de sumas y saldos"
+
+msgctxt "model:ir.action,name:wizard_unreconciled"
+msgid "Unreconciled"
+msgstr "Sin conciliar"
 
 msgctxt "model:ir.action.report,name:report_abreviated_journal"
 msgid "Abreviated Journal"
@@ -726,6 +766,10 @@ msgstr "Imprimir diario abreviado"
 msgctxt "model:ir.ui.menu,name:menu_print_taxes_by_invoice"
 msgid "Print Taxes by Invoice and Period"
 msgstr "Imprimir impuestos por factura y período"
+
+msgctxt "model:ir.ui.menu,name:menu_unreconciled"
+msgid "Unreconciled"
+msgstr "Sin conciliar"
 
 msgctxt ""
 "selection:account_jasper_reports.print_abreviated_journal.start,display_account:"
@@ -805,6 +849,10 @@ msgctxt ""
 msgid "XLS"
 msgstr "XLS"
 
+msgctxt "view:account.unreconciled.start:"
+msgid "Unreconciled"
+msgstr "Sin conciliar"
+
 msgctxt "view:account_jasper_reports.print_abreviated_journal.start:"
 msgid "Journal Report"
 msgstr "Informe diario"
@@ -856,6 +904,14 @@ msgstr "Período de comparación"
 msgctxt "view:account_jasper_reports.print_trial_balance.start:"
 msgid "Trial Balance Report"
 msgstr "Informe balance de sumas y saldos"
+
+msgctxt "wizard_button:account.unreconciled,start,end:"
+msgid "Cancel"
+msgstr "Cancel·lar"
+
+msgctxt "wizard_button:account.unreconciled,start,unreconciled:"
+msgid "Ok"
+msgstr "Aceptar"
 
 msgctxt ""
 "wizard_button:account_jasper_reports.print_abreviated_journal,start,end:"
