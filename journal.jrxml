@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="diary" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a2e6542d-192c-4c06-aba2-26e19b94d2f3">
-	<property name="ireport.zoom" value="1.4641000000000022"/>
+	<property name="ireport.zoom" value="1.771561000000003"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<property name="ireport.layers" value="##Tue Jun 25 17:11:49 CEST 2013\nlayer.0.name=Background\nlayer.0.visible=true\nlayer.0.id=0"/>
@@ -73,6 +73,7 @@
 	</field>
 	<sortField name="date"/>
 	<sortField name="move_post_number"/>
+	<sortField name="account_name"/>
 	<sortField name="id"/>
 	<sortField name="move_number"/>
 	<variable name="debit_1" class="java.lang.Number" resetType="Group" resetGroup="mes" calculation="Sum">
@@ -289,13 +290,15 @@
 				<textFieldExpression><![CDATA[$F{credit}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="225" y="0" width="155" height="13" uuid="cd673f2d-6d74-43c8-8525-b49a56bd01aa">
-					<printWhenExpression><![CDATA[$F{account_kind} == "receivable" || $F{account_kind} == "payable"]]></printWhenExpression>
-				</reportElement>
+				<reportElement x="225" y="0" width="155" height="13" uuid="cd673f2d-6d74-43c8-8525-b49a56bd01aa"/>
 				<textElement verticalAlignment="Top">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{party_name}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{party_name} != null && $F{party_name} != ""
+?
+    $F{party_name}
+:
+    ""]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
