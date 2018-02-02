@@ -74,7 +74,7 @@ class Account:
                 # This "where" not use account kind (before a change use it)
                 # because there are some companies that the accounts kind and
                 # party_required use in a different way that "standard".
-                # For example if you check the aprty_required an account with
+                # For example if you check the prty_required an account with
                 # the kind equal to 'other'
                 where = (where & (line.party == None))
 
