@@ -188,7 +188,7 @@ class GeneralLedgerReport(JasperReport):
                     (aa.kind not in ('receivable', 'payable'))) """ % (
                 ",".join([str(a.id) for a in parties]))
 
-        cursor = Transaction().cursor
+        cursor = Transaction().connection.cursor()
         cursor.execute("""
             SELECT
                 aml.id
