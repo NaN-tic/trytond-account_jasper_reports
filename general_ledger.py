@@ -174,7 +174,7 @@ class GeneralLedgerReport(JasperReport):
             where += "aml.account in (%s) " % (
                 ",".join([str(a.id) for a in accounts]))
         else:
-            where += "aa.parent is not null and party_required = true "
+            where += "aa.parent is not null "
 
         filter_periods = fiscalyear.get_periods(start_period, end_period)
 
