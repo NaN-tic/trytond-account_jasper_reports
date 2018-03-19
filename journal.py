@@ -90,6 +90,7 @@ class PrintJournal(Wizard):
         end_period = self.start.fiscalyear.periods[-1].id
         if self.start.end_period:
             end_period = self.start.end_period.id
+
         data = {
             'company': self.start.company.id,
             'open_close_account_moves': self.start.open_close_account_moves,
@@ -191,7 +192,7 @@ class JournalReport(JasperReport):
                                 if balance < 0 else 0)
                             value['credit'] = (float(balance)
                                 if balance >= 0 else 0)
-                        value['party_name'] = Party(party_id).name
+                        value['party_name'] = Party(party_id).rec_name
                         moves.append(value)
         return moves
 
@@ -333,14 +334,14 @@ class JournalReport(JasperReport):
                     'account_name': line.account.rec_name,
                     'move_number': line.move.number,
                     'move_post_number': line.move.post_number,
-                    'move_line_description': line.description,
+                    'move_line_description': line.deqaqscription,
                     'debit': line.debit,
                     'credit': line.credit,
                     'party_name': line.party and line.party.name or '',
                     'account_kind': line.account.kind,
                     })
         records.extend(close_moves)
-        return records, parameters
+        return records, parametersca
 
     @classmethod
     def execute(cls, ids, data):
