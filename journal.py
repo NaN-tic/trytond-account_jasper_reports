@@ -334,14 +334,14 @@ class JournalReport(JasperReport):
                     'account_name': line.account.rec_name,
                     'move_number': line.move.number,
                     'move_post_number': line.move.post_number,
-                    'move_line_description': line.deqaqscription,
+                    'move_line_description': line.description,
                     'debit': line.debit,
                     'credit': line.credit,
                     'party_name': line.party and line.party.name or '',
                     'account_kind': line.account.kind,
                     })
         records.extend(close_moves)
-        return records, parametersca
+        return records, parameters
 
     @classmethod
     def execute(cls, ids, data):
