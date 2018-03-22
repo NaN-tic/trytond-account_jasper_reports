@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="diary" pageWidth="595" pageHeight="842" columnWidth="575" leftMargin="10" rightMargin="10" topMargin="20" bottomMargin="20" uuid="a2e6542d-192c-4c06-aba2-26e19b94d2f3">
 	<property name="ireport.zoom" value="2.3579476910000063"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="144"/>
 	<property name="ireport.layers" value="##Tue Jun 25 17:11:49 CEST 2013\nlayer.0.name=Background\nlayer.0.visible=true\nlayer.0.id=0"/>
 	<style name="table">
 		<box>
@@ -210,14 +210,14 @@
 	<columnHeader>
 		<band height="31">
 			<textField isBlankWhenNull="true">
-				<reportElement x="58" y="10" width="20" height="20" uuid="15796cd5-41e5-4c93-a6b0-0fd1f6e18c09"/>
+				<reportElement x="58" y="10" width="31" height="20" uuid="15796cd5-41e5-4c93-a6b0-0fd1f6e18c09"/>
 				<textElement textAlignment="Justified" verticalAlignment="Middle">
 					<font size="7" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Date")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="10" width="54" height="20" uuid="b9f83569-3c87-4bb5-ab3d-54e8bf3dd1bb"/>
+				<reportElement x="0" y="10" width="58" height="20" uuid="b9f83569-3c87-4bb5-ab3d-54e8bf3dd1bb"/>
 				<textElement verticalAlignment="Middle">
 					<font size="7" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
@@ -300,7 +300,7 @@
 				<textFieldExpression><![CDATA[$F{credit}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="54" height="10" uuid="5ec77feb-a0e9-4077-af13-19d4c57180fd"/>
+				<reportElement x="0" y="0" width="58" height="10" uuid="5ec77feb-a0e9-4077-af13-19d4c57180fd"/>
 				<textElement verticalAlignment="Top">
 					<font size="7" isBold="true"/>
 					<paragraph lineSpacing="Fixed"/>
