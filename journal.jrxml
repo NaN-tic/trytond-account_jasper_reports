@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="diary" pageWidth="595" pageHeight="842" columnWidth="575" leftMargin="10" rightMargin="10" topMargin="20" bottomMargin="20" uuid="a2e6542d-192c-4c06-aba2-26e19b94d2f3">
-	<property name="ireport.zoom" value="2.853116706110008"/>
+	<property name="ireport.zoom" value="2.3579476910000063"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<property name="ireport.layers" value="##Tue Jun 25 17:11:49 CEST 2013\nlayer.0.name=Background\nlayer.0.visible=true\nlayer.0.id=0"/>
@@ -92,6 +92,9 @@
 		<variableExpression><![CDATA[$P{REPORT_LOCALE}]]></variableExpression>
 		<initialValueExpression><![CDATA[$P{REPORT_LOCALE}]]></initialValueExpression>
 	</variable>
+	<variable name="last_move" class="java.lang.String">
+		<initialValueExpression><![CDATA[$F{move_number}]]></initialValueExpression>
+	</variable>
 	<group name="mes">
 		<groupExpression><![CDATA[$F{month}]]></groupExpression>
 		<groupFooter>
@@ -117,6 +120,22 @@
 					</textElement>
 					<textFieldExpression><![CDATA[$V{credit_1}]]></textFieldExpression>
 				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="move Group">
+		<groupExpression><![CDATA[$F{move_number}]]></groupExpression>
+		<groupHeader>
+			<band height="3"/>
+		</groupHeader>
+		<groupFooter>
+			<band height="4">
+				<line>
+					<reportElement x="10" y="0" width="555" height="1" uuid="5b7b489a-d758-4e17-ae93-e4f269ca9d1d"/>
+					<graphicElement>
+						<pen lineWidth="0.5"/>
+					</graphicElement>
+				</line>
 			</band>
 		</groupFooter>
 	</group>
@@ -235,7 +254,7 @@
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="10">
+		<band height="14">
 			<textField isStretchWithOverflow="true" evaluationTime="Auto" pattern="dd-MM-yy" isBlankWhenNull="true">
 				<reportElement x="58" y="0" width="31" height="10" uuid="1c9db27b-6139-4f15-9e41-eedce506576f"/>
 				<textElement textAlignment="Justified" verticalAlignment="Top">
@@ -255,18 +274,6 @@
     new String($F{account_name}).split('-')[0].trim() + " / " + $F{party_name}
 :
     $F{account_name}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="54" height="10" uuid="5ec77feb-a0e9-4077-af13-19d4c57180fd"/>
-				<textElement verticalAlignment="Top">
-					<font size="7" isBold="true"/>
-					<paragraph lineSpacing="Fixed"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{move_post_number} != null && $F{move_post_number} != ""
-?
-    $F{move_post_number}
-:
-    "(" + $F{move_number} + ")"]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement x="256" y="0" width="216" height="10" uuid="6c5aadd2-49f9-406a-9421-4a3b56e44a03"/>
@@ -292,8 +299,23 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{credit}]]></textFieldExpression>
 			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="54" height="10" uuid="5ec77feb-a0e9-4077-af13-19d4c57180fd"/>
+				<textElement verticalAlignment="Top">
+					<font size="7" isBold="true"/>
+					<paragraph lineSpacing="Fixed"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{move_post_number} != null && $F{move_post_number} != ""
+?
+    $F{move_post_number}
+:
+    "(" + $F{move_number} + ")"]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
+	<columnFooter>
+		<band height="50"/>
+	</columnFooter>
 	<pageFooter>
 		<band height="12">
 			<textField>
