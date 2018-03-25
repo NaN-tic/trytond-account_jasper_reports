@@ -53,6 +53,10 @@ class Account:
         transaction = Transaction()
         cursor = transaction.connection.cursor()
         move_join = 'INNER' if with_moves else 'LEFT'
+        if not accounts:
+            accounts = Account.search([
+                    ('company', '=', transaction.context.get('company')),
+                    ])
         account_ids = [a.id for a in accounts]
         group_by = (table_a.id,)
         columns = (group_by + (Sum(Coalesce(line.debit, 0)).as_('debit'),
