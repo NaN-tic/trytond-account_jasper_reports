@@ -53,7 +53,7 @@ class Unreconciled(Wizard):
         active_model = context['active_model']
         domain = [
             ('move.company', '=', self.start.company),
-            ('reconciliation_date', '>=', self.start.date)
+            ('reconciliation_date', '>', self.start.date)
             ]
         if self.start.maturated:
             domain.append(('maturity_date', '<=', self.start.date))
