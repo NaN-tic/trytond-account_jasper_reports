@@ -34,6 +34,8 @@ class PrintGeneralLedgerStart(ModelView):
             ],
         depends=['fiscalyear', 'start_period'])
     accounts = fields.Many2Many('account.account', None, None, 'Accounts')
+    all_accounts = fields.Boolean('All accounts with and without balance', help='If unchecked only '
+        'print accounts with previous balance different from 0 or with moves')
     parties = fields.Many2Many('party.party', None, None, 'Parties')
     output_format = fields.Selection([
             ('pdf', 'PDF'),
@@ -46,6 +48,10 @@ class PrintGeneralLedgerStart(ModelView):
         FiscalYear = Pool().get('account.fiscalyear')
         return FiscalYear.find(
             Transaction().context.get('company'), exception=False)
+
+    @staticmethod
+    def default_all_accounts():
+        return True
 
     @staticmethod
     def default_company():
@@ -84,6 +90,7 @@ class PrintGeneralLedger(Wizard):
             'start_period': start_period,
             'end_period': end_period,
             'accounts': [x.id for x in self.start.accounts],
+            'all_accounts': self.start.all_accounts,
             'parties': [x.id for x in self.start.parties],
             'output_format': self.start.output_format,
             }
@@ -221,7 +228,10 @@ class GeneralLedgerReport(JasperReport):
         records = []
         lastKey = None
         sequence = 0
+        accounts_w_moves = []
         for line in Line.browse(line_ids):
+            if line.account not in accounts_w_moves:
+                accounts_w_moves.append(line.account.id)
             if line.account.kind in ('receivable', 'payable'):
                 currentKey = (line.account, line.party and line.party
                     or None)
@@ -259,6 +269,30 @@ class GeneralLedgerReport(JasperReport):
                     'party_name': line.party.name if line.party else '',
                     'credit': line.credit,
                     'debit': line.debit,
+                    'balance': balance,
+                    })
+
+        init_values_account_wo_moves = {
+            k: init_values[k] for k in init_values if k not in accounts_w_moves}
+        for account_id, values in init_values_account_wo_moves.iteritems():
+            account = Account(account_id)
+            balance = values.get('balance', Decimal(0))
+            credit = values.get('credit', Decimal(0))
+            debit = values.get('debit', Decimal(0))
+            if not data.get('all_accounts', True) and balance == 0:
+                continue
+            records.append({
+                    'sequence': 1,
+                    'key': str(account),
+                    'account_code': account.code or '',
+                    'account_name': account.name or '',
+                    'account_type': account.kind,
+                    'move_line_name': '###PREVIOUSBALANCE###',
+                    'ref': '-',
+                    'move_number': '-',
+                    'move_post_number': '-',
+                    'credit': credit,
+                    'debit': debit,
                     'balance': balance,
                     })
         return records, parameters
