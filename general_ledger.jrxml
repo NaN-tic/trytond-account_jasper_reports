@@ -104,7 +104,7 @@
 				</textField>
 				<textField pattern="#,##0.00" isBlankWhenNull="true">
 					<reportElement x="495" y="2" width="60" height="10" uuid="74f5fe69-435c-457e-b685-8273fe37cd55">
-						<printWhenExpression><![CDATA[$F{order} != 'number']]></printWhenExpression>
+						<printWhenExpression><![CDATA[$F{order} != 'number' && ($F{ref} != '-' || $F{move_number} != '-' || $F{move_post_number} != '-')]]></printWhenExpression>
 					</reportElement>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font size="7"/>
@@ -115,7 +115,7 @@
 				</textField>
 				<textField pattern="" isBlankWhenNull="true">
 					<reportElement x="391" y="2" width="104" height="10" uuid="7a558506-1727-4e3f-8e17-9b39c1485f8f">
-						<printWhenExpression><![CDATA[$F{order} != 'number']]></printWhenExpression>
+						<printWhenExpression><![CDATA[$F{order} != 'number' && ($F{ref} != '-' || $F{move_number} != '-' || $F{move_post_number} != '-')]]></printWhenExpression>
 					</reportElement>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font size="7"/>
@@ -349,7 +349,11 @@
 				<textElement verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{move_line_name}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{move_line_name} != '###PREVIOUSBALANCE###'
+?
+    $F{move_line_name}
+:
+    tr($V{L},"PREVIOUS BALANCE")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="241" y="2" width="62" height="10" uuid="75e5d0bb-4341-4439-8bc8-b4793b12d26a"/>

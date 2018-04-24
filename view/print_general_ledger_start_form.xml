@@ -14,6 +14,8 @@ copyright notices and license terms. -->
     <field name="parties" colspan="4"/>
     <label id="select_accounts" string="Left empty to select all accounts"/>
     <field name="accounts" colspan="4"/>
+    <label name="all_accounts"/>
+    <field name="all_accounts"/>
     <label name="output_format"/>
     <field name="output_format"/>
 </form>
