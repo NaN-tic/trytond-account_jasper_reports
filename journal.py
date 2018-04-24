@@ -196,7 +196,7 @@ class JournalReport(JasperReport):
                                 if balance < 0 else 0)
                             value['credit'] = (float(balance)
                                 if balance >= 0 else 0)
-                        value['party_name'] = Party(party_id).name
+                        value['party_name'] = Party(party_id).rec_name
                         moves.append(value)
         return moves
 
