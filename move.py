@@ -26,7 +26,8 @@ class Reconciliation:
             return [('lines.date', operator, value)]
         reconciliation_ids = []
         reconciliations = cls.search([('lines.date', operator, value)])
-        value = datetime.strptime(value, '%Y-%m-%d').date()
+        if not isinstance(value,  datetime.date):
+            value = datetime.strptime(value, '%Y-%m-%d').date()
         for reconciliation in reconciliations:
             if reconciliation.date:
                 if (operator == '=' and reconciliation.date == value or
