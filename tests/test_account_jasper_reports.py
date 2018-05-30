@@ -1291,6 +1291,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             print_general_ledger.start.parties = []
             print_general_ledger.start.accounts = []
             print_general_ledger.start.output_format = 'pdf'
+            print_general_ledger.start.all_accounts = True
             _, data = print_general_ledger.do_print_(None)
             records, parameters = self.general_ledger_report.prepare(data)
             self.assertEqual(len(records), 12)
