@@ -242,26 +242,28 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             print_journal.start.end_period = last_period
             print_journal.start.journals = []
             print_journal.start.output_format = 'pdf'
+            print_journal.start.open_close_account_moves = False
+            print_journal.start.open_move_description = None
+            print_journal.start.close_move_description = None
             _, data = print_journal.do_print_(None)
-            #Full Journall
+            #Full Journal
             self.assertEqual(data['company'], company.id)
             self.assertEqual(data['fiscalyear'], fiscalyear.id)
             self.assertEqual(data['start_period'], period.id)
             self.assertEqual(data['end_period'], last_period.id)
             self.assertEqual(len(data['journals']), 0)
             self.assertEqual(data['output_format'], 'pdf')
-            ids, parameters = self.journal_report.prepare(data)
-            records = self.line.browse(ids)
+            records, parameters = self.journal_report.prepare(data)
             self.assertEqual(len(records), 12)
             self.assertEqual(parameters['start_period'], period.name)
             self.assertEqual(parameters['end_period'], last_period.name)
             self.assertEqual(parameters['fiscal_year'], fiscalyear.name)
             self.assertEqual(parameters['journals'], '')
-            credit = sum([m.credit for m in records])
-            debit = sum([m.debit for m in records])
+            credit = sum([x['credit'] for x in records])
+            debit = sum([x['debit'] for x in records])
             self.assertEqual(credit, debit)
             self.assertEqual(credit, Decimal('730.0'))
-            with_party = [m for m in records if m.party]
+            with_party = [x for x in records if x['party_name']]
             self.assertEqual(len(with_party), 6)
             #Filtering periods
             session_id, _, _ = self.print_journal.create()
@@ -272,12 +274,14 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             print_journal.start.end_period = period
             print_journal.start.journals = []
             print_journal.start.output_format = 'pdf'
+            print_journal.start.open_close_account_moves = False
+            print_journal.start.open_move_description = None
+            print_journal.start.close_move_description = None
             _, data = print_journal.do_print_(None)
-            ids, parameters = self.journal_report.prepare(data)
-            records = self.line.browse(ids)
+            records, parameters = self.journal_report.prepare(data)
             self.assertEqual(len(records), 8)
-            credit = sum([m.credit for m in records])
-            debit = sum([m.debit for m in records])
+            credit = sum([x['credit'] for x in records])
+            debit = sum([x['debit'] for x in records])
             self.assertEqual(credit, debit)
             self.assertEqual(credit, Decimal('380.0'))
             #Filtering journals
@@ -295,13 +299,15 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             print_journal.start.end_period = period
             print_journal.start.journals = [journal_revenue, journal_expense]
             print_journal.start.output_format = 'pdf'
+            print_journal.start.open_close_account_moves = False
+            print_journal.start.open_move_description = None
+            print_journal.start.close_move_description = None
             _, data = print_journal.do_print_(None)
-            ids, parameters = self.journal_report.prepare(data)
-            records = self.line.browse(ids)
+            records, parameters = self.journal_report.prepare(data)
             self.assertNotEqual(parameters['journals'], '')
             self.assertEqual(len(records), 8)
-            credit = sum([m.credit for m in records])
-            debit = sum([m.debit for m in records])
+            credit = sum([x['credit'] for x in records])
+            debit = sum([x['debit'] for x in records])
             self.assertEqual(credit, debit)
             self.assertEqual(credit, Decimal('380.0'))
 
