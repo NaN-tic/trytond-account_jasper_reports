@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d6f9a712-83ca-4bb9-a7ca-fa195ab39a4f">
 	<property name="TRYTON_RELATIONS" value="[&apos;invoice&apos;,&apos;invoice/move&apos;,&apos;invoice/move/period&apos;,&apos;tax&apos;,&apos;account&apos;]"/>
-	<property name="ireport.zoom" value="1.1000000000000023"/>
+	<property name="ireport.zoom" value="1.4641000000000035"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false"/>
@@ -20,52 +20,52 @@
 		<![CDATA[/data/record]]>
 	</queryString>
 	<field name="tax_name" class="java.lang.String">
-		<fieldDescription><![CDATA[tax-tax/name-name]]></fieldDescription>
+		<fieldDescription><![CDATA[tax/name]]></fieldDescription>
 	</field>
 	<field name="tax_amount" class="java.lang.Number">
-		<fieldDescription><![CDATA[amount-amount]]></fieldDescription>
+		<fieldDescription><![CDATA[company_amount]]></fieldDescription>
 	</field>
 	<field name="base_amount" class="java.lang.Number">
-		<fieldDescription><![CDATA[base-base]]></fieldDescription>
-	</field>
-	<field name="partner_name" class="java.lang.String">
-		<fieldDescription><![CDATA[invoice-invoice/party-party/rec_name-rec_name]]></fieldDescription>
-	</field>
-	<field name="partner_vat" class="java.lang.String">
-        <fieldDescription><![CDATA[invoice-invoice/party-party/tax_idenfier/code]]></fieldDescription>
-	</field>
-	<field name="date_invoice" class="java.sql.Timestamp">
-		<fieldDescription><![CDATA[invoice-invoice/invoice_date-invoice_date]]></fieldDescription>
-	</field>
-	<field name="type" class="java.lang.String">
-		<fieldDescription><![CDATA[invoice-invoice/type-type]]></fieldDescription>
-	</field>
-	<field name="number" class="java.lang.String">
-		<fieldDescription><![CDATA[invoice-invoice/number-number]]></fieldDescription>
-	</field>
-	<field name="account_code" class="java.lang.String">
-		<fieldDescription><![CDATA[account-account/code-code]]></fieldDescription>
-	</field>
-	<field name="account_name" class="java.lang.String">
-		<fieldDescription><![CDATA[account-account/name-name]]></fieldDescription>
-	</field>
-	<field name="base_code_name" class="java.lang.String">
-		<fieldDescription><![CDATA[base_code-base_code/name-name]]></fieldDescription>
-	</field>
-	<field name="account_move_date" class="java.sql.Timestamp">
-		<fieldDescription><![CDATA[invoice-invoice/move-move/date-date]]></fieldDescription>
-	</field>
-	<field name="period" class="java.lang.String">
-		<fieldDescription><![CDATA[invoice-invoice/move-move/period-period/rec_name-rec_name]]></fieldDescription>
-	</field>
-	<field name="invoice_total_amount" class="java.lang.Number">
-		<fieldDescription><![CDATA[invoice-invoice/total_amount-total_amount]]></fieldDescription>
+		<fieldDescription><![CDATA[company_base]]></fieldDescription>
 	</field>
 	<field name="tax_sign" class="java.lang.Number">
 		<fieldDescription><![CDATA[tax_sign]]></fieldDescription>
 	</field>
 	<field name="base_sign" class="java.lang.Number">
 		<fieldDescription><![CDATA[base_sign]]></fieldDescription>
+	</field>
+	<field name="partner_name" class="java.lang.String">
+		<fieldDescription><![CDATA[invoice/party/rec_name]]></fieldDescription>
+	</field>
+	<field name="partner_vat" class="java.lang.String">
+		<fieldDescription><![CDATA[invoice/party/vat_code]]></fieldDescription>
+	</field>
+	<field name="date_invoice" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[invoice/invoice_date]]></fieldDescription>
+	</field>
+	<field name="type" class="java.lang.String">
+		<fieldDescription><![CDATA[invoice/type]]></fieldDescription>
+	</field>
+	<field name="number" class="java.lang.String">
+		<fieldDescription><![CDATA[invoice/number]]></fieldDescription>
+	</field>
+	<field name="account_code" class="java.lang.String">
+		<fieldDescription><![CDATA[account/code]]></fieldDescription>
+	</field>
+	<field name="account_name" class="java.lang.String">
+		<fieldDescription><![CDATA[account/name]]></fieldDescription>
+	</field>
+	<field name="base_code_name" class="java.lang.String">
+		<fieldDescription><![CDATA[base_code/name]]></fieldDescription>
+	</field>
+	<field name="account_move_date" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[invoice/move/date]]></fieldDescription>
+	</field>
+	<field name="period" class="java.lang.String">
+		<fieldDescription><![CDATA[invoice/move/period/rec_name]]></fieldDescription>
+	</field>
+	<field name="invoice_total_amount" class="java.lang.Number">
+		<fieldDescription><![CDATA[invoice/company_total_amount]]></fieldDescription>
 	</field>
 	<sortField name="base_code_name"/>
 	<sortField name="period"/>
@@ -80,10 +80,10 @@
 	<variable name="base_tax_total" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
 		<variableExpression><![CDATA[$V{base_tax_line}]]></variableExpression>
 	</variable>
-	<variable name="tax_amount_1" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
+	<variable name="tax_amount" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
 		<variableExpression><![CDATA[$F{tax_amount} * $F{tax_sign}]]></variableExpression>
 	</variable>
-	<variable name="base_amount_1" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
+	<variable name="base_amount" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
 		<variableExpression><![CDATA[$F{base_amount} * $F{base_sign}]]></variableExpression>
 	</variable>
 	<group name="tax" isReprintHeaderOnEachPage="true">
@@ -117,21 +117,33 @@
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font size="8" isBold="true" pdfFontName="Helvetica"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$V{tax_amount_1} != null ? $V{tax_amount_1} : 0.0]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$V{tax_amount} != null
+?
+    $V{tax_amount}
+:
+    0.0]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
 					<reportElement x="493" y="0" width="78" height="16" uuid="a256c7c5-7ee3-4932-9c77-26c324ef9538"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font size="8" isBold="true" pdfFontName="Helvetica"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$V{base_amount_1} != null ? $V{base_amount_1} : 0.0]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$V{base_amount} != null
+?
+    $V{base_amount}
+:
+    0.0]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00" isBlankWhenNull="false">
 					<reportElement x="669" y="0" width="69" height="16" uuid="b516390b-db04-443d-b2fe-4f0d322019b2"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font size="8" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$V{base_tax_total} != null ? $V{base_tax_total} : 0.0]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$V{base_tax_total} != null
+?
+    $V{base_tax_total}
+:
+    0.0]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupFooter>
@@ -319,9 +331,17 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{type}.equalsIgnoreCase("out_credit_note") || $F{type}.equalsIgnoreCase("in_credit_note")
 ?
-   $F{invoice_total_amount} != null ? -$F{invoice_total_amount} : 0.0
+    $f{invoice_total_amount} != null && $f{invoice_total_amount} != ""
+    ?
+        -$f{invoice_total_amount}
+    :
+        0.0
 :
-   $F{invoice_total_amount} != null ? $F{invoice_total_amount} : 0.0]]></textFieldExpression>
+    $f{invoice_total_amount} != null && $f{invoice_total_amount} != ""
+    ?
+        $f{invoice_total_amount}
+    :
+        0.0]]></textfieldexpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="572" y="0" width="42" height="12" uuid="3c9e00e1-a5d7-4efe-8fbc-837af50c088f"/>
@@ -349,7 +369,12 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{tax_amount} * $F{tax_sign}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(
+    $F{tax_amount} != null && $F{tax_amount} != "" && $F{tax_sign} != null && $F{tax_sign} != ""
+    ?
+        $F{tax_amount} * $F{tax_sign}
+    :
+        0.0)]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00" isBlankWhenNull="false">
 				<reportElement x="669" y="0" width="69" height="12" uuid="efcf3be5-1af7-4cc8-ae70-6c4902cb26f8"/>
@@ -363,7 +388,12 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{base_amount} * $F{base_sign}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(
+    $F{base_amount} != null && $F{base_amount} != "" && $F{base_sign} != null && $F{base_sign} != ""
+    ?
+        $F{base_amount} * $F{base_sign}
+    :
+        0.0)]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="328" y="0" width="65" height="12" uuid="5551245c-dd89-4fd6-9a32-f6638482b163"/>
