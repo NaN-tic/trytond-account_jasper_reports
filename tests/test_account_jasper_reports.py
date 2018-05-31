@@ -1176,8 +1176,8 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             self.assertEqual(parameters['parties'], '')
             self.assertEqual(parameters['periods'], '')
             self.assertEqual(parameters['TOTALS_ONLY'], False)
-            base = sum([m.base for m in records])
-            tax = sum([m.amount for m in records])
+            base = sum([m.company_base for m in records])
+            tax = sum([m.company_amount for m in records])
             self.assertEqual(base, Decimal('100.0'))
             self.assertEqual(tax, Decimal('7.0'))
             for tax in records:
@@ -1197,8 +1197,8 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             ids, parameters = self.taxes_by_invoice_report.prepare(data)
             records = self.invoice_tax.browse(ids)
             self.assertEqual(len(records), 2)
-            base = sum([m.base for m in records])
-            tax = sum([m.amount for m in records])
+            base = sum([m.company_base for m in records])
+            tax = sum([m.company_amount for m in records])
             self.assertEqual(base, Decimal('40.0'))
             self.assertEqual(tax, Decimal('2.8'))
             for tax in records:
@@ -1294,7 +1294,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             print_general_ledger.start.all_accounts = True
             _, data = print_general_ledger.do_print_(None)
             records, parameters = self.general_ledger_report.prepare(data)
-            self.assertEqual(len(records), 12)
+            self.assertEqual(len(records), 13)
             self.assertEqual(parameters['start_period'], period.name)
             self.assertEqual(parameters['end_period'], last_period.name)
             self.assertEqual(parameters['fiscal_year'], next_fiscalyear.name)
