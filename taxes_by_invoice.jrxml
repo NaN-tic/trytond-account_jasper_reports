@@ -23,16 +23,10 @@
 		<fieldDescription><![CDATA[tax/name]]></fieldDescription>
 	</field>
 	<field name="tax_amount" class="java.lang.Number">
-		<fieldDescription><![CDATA[amount]]></fieldDescription>
+		<fieldDescription><![CDATA[company_amount]]></fieldDescription>
 	</field>
 	<field name="base_amount" class="java.lang.Number">
-		<fieldDescription><![CDATA[base]]></fieldDescription>
-	</field>
-	<field name="company_base_amount" class="java.lang.Number">
 		<fieldDescription><![CDATA[company_base]]></fieldDescription>
-	</field>
-	<field name="company_tax_amount" class="java.lang.Number">
-		<fieldDescription><![CDATA[company_amount]]></fieldDescription>
 	</field>
 	<field name="tax_sign" class="java.lang.Number">
 		<fieldDescription><![CDATA[tax_sign]]></fieldDescription>
@@ -71,9 +65,6 @@
 		<fieldDescription><![CDATA[invoice/move/period/rec_name]]></fieldDescription>
 	</field>
 	<field name="invoice_total_amount" class="java.lang.Number">
-		<fieldDescription><![CDATA[invoice/total_amount]]></fieldDescription>
-	</field>
-	<field name="company_invoice_total_amount" class="java.lang.Number">
 		<fieldDescription><![CDATA[invoice/company_total_amount]]></fieldDescription>
 	</field>
 	<sortField name="base_code_name"/>
@@ -83,45 +74,17 @@
 		<variableExpression><![CDATA[$P{REPORT_LOCALE}]]></variableExpression>
 		<initialValueExpression><![CDATA[$P{REPORT_LOCALE}]]></initialValueExpression>
 	</variable>
-	<variable name="base_amount" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
-		<variableExpression><![CDATA[(
-    $F{company_base_amount} != null && $F{company_base_amount} != ""
-    ?
-        $F{company_base_amount}
-    :
-        $F{base_amount}
-) * $F{base_sign}]]></variableExpression>
-	</variable>
-	<variable name="tax_amount" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
-		<variableExpression><![CDATA[(
-    $F{company_tax_amount} != null && $F{company_tax_amount} != ""
-    ?
-        $F{company_tax_amount}
-    :
-        $F{tax_amount}
-) * $F{tax_sign}]]></variableExpression>
-	</variable>
 	<variable name="base_tax_line" class="java.lang.Number">
-		<variableExpression><![CDATA[(
-    (
-        $F{company_base_amount} != null && $F{company_base_amount} != ""
-        ?
-            $F{company_base_amount}
-        :
-            $F{base_amount}
-    ) * $F{base_sign}
-) + (
-    (
-        $F{company_tax_amount} != null && $F{company_tax_amount} != ""
-        ?
-            $F{company_tax_amount}
-        :
-            $F{tax_amount}
-    ) * $F{tax_sign}
-)]]></variableExpression>
+		<variableExpression><![CDATA[($F{base_amount} * $F{base_sign}) + $F{tax_amount} * $F{tax_sign}]]></variableExpression>
 	</variable>
 	<variable name="base_tax_total" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
 		<variableExpression><![CDATA[$V{base_tax_line}]]></variableExpression>
+	</variable>
+	<variable name="tax_amount" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
+		<variableExpression><![CDATA[$F{tax_amount} * $F{tax_sign}]]></variableExpression>
+	</variable>
+	<variable name="base_amount" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
+		<variableExpression><![CDATA[$F{base_amount} * $F{base_sign}]]></variableExpression>
 	</variable>
 	<group name="tax" isReprintHeaderOnEachPage="true">
 		<groupExpression><![CDATA[$F{base_code_name}]]></groupExpression>
@@ -368,25 +331,17 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{type}.equalsIgnoreCase("out_credit_note") || $F{type}.equalsIgnoreCase("in_credit_note")
 ?
-    $F{company_invoice_total_amount} != null && $F{company_invoice_total_amount} != ""
+    $f{invoice_total_amount} != null && $f{invoice_total_amount} != ""
     ?
-        -$F{company_invoice_total_amount}
+        -$f{invoice_total_amount}
     :
-        $F{invoice_total_amount} != null
-        ?
-            -$F{invoice_total_amount}
-        :
-            0.0
+        0.0
 :
-    $F{company_invoice_total_amount} != null && $F{company_invoice_total_amount} != ""
+    $f{invoice_total_amount} != null && $f{invoice_total_amount} != ""
     ?
-        $F{company_invoice_total_amount}
+        $f{invoice_total_amount}
     :
-        $F{invoice_total_amount} != null
-        ?
-            $F{invoice_total_amount}
-        :
-            0.0]]></textFieldExpression>
+        0.0]]></textfieldexpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="572" y="0" width="42" height="12" uuid="3c9e00e1-a5d7-4efe-8fbc-837af50c088f"/>
@@ -415,12 +370,11 @@
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[(
-    $F{company_tax_amount} != null && $F{company_tax_amount} != ""
+    $F{tax_amount} != null && $F{tax_amount} != "" && $F{tax_sign} != null && $F{tax_sign} != ""
     ?
-        $F{company_tax_amount}
+        $F{tax_amount} * $F{tax_sign}
     :
-        $F{tax_amount}
-) * $F{tax_sign}]]></textFieldExpression>
+        0.0)]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00" isBlankWhenNull="false">
 				<reportElement x="669" y="0" width="69" height="12" uuid="efcf3be5-1af7-4cc8-ae70-6c4902cb26f8"/>
@@ -435,12 +389,11 @@
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[(
-    $F{company_base_amount} != null && $F{company_base_amount} != ""
+    $F{base_amount} != null && $F{base_amount} != "" && $F{base_sign} != null && $F{base_sign} != ""
     ?
-        $F{company_base_amount}
+        $F{base_amount} * $F{base_sign}
     :
-        $F{base_amount}
-) * $F{base_sign}]]></textFieldExpression>
+        0.0)]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="328" y="0" width="65" height="12" uuid="5551245c-dd89-4fd6-9a32-f6638482b163"/>
