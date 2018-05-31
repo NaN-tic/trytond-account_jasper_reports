@@ -1238,8 +1238,8 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         self.assertEqual(parameters['parties'], '')
         self.assertEqual(parameters['periods'], '')
         self.assertEqual(parameters['TOTALS_ONLY'], False)
-        base = sum([m.base for m in records])
-        tax = sum([m.amount for m in records])
+        base = sum([m.company_base for m in records])
+        tax = sum([m.company_amount for m in records])
         self.assertEqual(base, Decimal('100.0'))
         self.assertEqual(tax, Decimal('7.0'))
         for tax in records:
@@ -1259,8 +1259,8 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         ids, parameters = TaxesByInvoiceReport.prepare(data)
         records = InvoiceTax.browse(ids)
         self.assertEqual(len(records), 2)
-        base = sum([m.base for m in records])
-        tax = sum([m.amount for m in records])
+        base = sum([m.company_base for m in records])
+        tax = sum([m.company_amount for m in records])
         self.assertEqual(base, Decimal('40.0'))
         self.assertEqual(tax, Decimal('2.8'))
         for tax in records:
