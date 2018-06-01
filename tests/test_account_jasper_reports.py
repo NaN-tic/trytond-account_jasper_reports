@@ -400,6 +400,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             print_general_ledger.start.parties = []
             print_general_ledger.start.accounts = []
             print_general_ledger.start.output_format = 'pdf'
+            print_general_ledger.start.all_accounts = True
             _, data = print_general_ledger.do_print_(None)
 
             # Full general_ledger
@@ -438,6 +439,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             print_general_ledger.start.parties = []
             print_general_ledger.start.accounts = []
             print_general_ledger.start.output_format = 'pdf'
+            print_general_ledger.start.all_accounts = True
             _, data = print_general_ledger.do_print_(None)
             records, parameters = self.general_ledger_report.prepare(data)
             self.assertEqual(len(records), 8)
@@ -461,6 +463,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             print_general_ledger.start.parties = []
             print_general_ledger.start.accounts = [expense.id]
             print_general_ledger.start.output_format = 'pdf'
+            print_general_ledger.start.all_accounts = True
             _, data = print_general_ledger.do_print_(None)
             records, parameters = self.general_ledger_report.prepare(data)
             self.assertEqual(parameters['accounts'], expense.code)
@@ -482,6 +485,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             print_general_ledger.start.parties = [customer1.id]
             print_general_ledger.start.accounts = []
             print_general_ledger.start.output_format = 'pdf'
+            print_general_ledger.start.all_accounts = True
             _, data = print_general_ledger.do_print_(None)
             records, parameters = self.general_ledger_report.prepare(data)
             self.assertEqual(parameters['parties'], customer1.rec_name)
@@ -510,6 +514,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             print_general_ledger.start.parties = [customer1.id]
             print_general_ledger.start.accounts = [receivable.id]
             print_general_ledger.start.output_format = 'pdf'
+            print_general_ledger.start.all_accounts = True
             _, data = print_general_ledger.do_print_(None)
             records, parameters = self.general_ledger_report.prepare(data)
             self.assertEqual(parameters['parties'], customer1.rec_name)
@@ -531,6 +536,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             print_general_ledger.start.parties = []
             print_general_ledger.start.accounts = []
             print_general_ledger.start.output_format = 'pdf'
+            print_general_ledger.start.all_accounts = True
             _, data = print_general_ledger.do_print_(None)
             records, parameters = self.general_ledger_report.prepare(data)
             self.assertEqual(len(records), 12)
