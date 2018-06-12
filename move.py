@@ -1,6 +1,6 @@
 #The COPYRIGHT file at the top level of this repository contains the full
 #copyright notices and license terms.
-from datetime import datetime
+from datetime import datetime, date
 from trytond.model import fields
 from trytond.pool import PoolMeta
 
@@ -26,7 +26,7 @@ class Reconciliation:
             return [('lines.date', operator, value)]
         reconciliation_ids = []
         reconciliations = cls.search([('lines.date', operator, value)])
-        if not isinstance(value,  datetime.date):
+        if not isinstance(value, date):
             value = datetime.strptime(value, '%Y-%m-%d').date()
         for reconciliation in reconciliations:
             if reconciliation.date:
