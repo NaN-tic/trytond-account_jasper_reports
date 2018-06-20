@@ -3,7 +3,6 @@
 	<property name="ireport.zoom" value="1.2100000000000042"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
-	<subDataset name="dataset1" uuid="a0e43402-0eae-4f3b-ac6f-f73084888591"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="STANDARD_DIR" class="java.lang.String"/>
 	<parameter name="SUBTITLE" class="java.lang.String"/>
@@ -198,14 +197,14 @@
 	<columnHeader>
 		<band height="50">
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="30" width="60" height="20" uuid="ff2bedbf-db28-41b6-a8fc-a243d8eeaa01"/>
+				<reportElement x="0" y="30" width="62" height="20" uuid="ff2bedbf-db28-41b6-a8fc-a243d8eeaa01"/>
 				<textElement verticalAlignment="Middle">
 					<font isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Account")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="60" y="30" width="224" height="20" uuid="4844b3bb-9297-4b40-bc19-af5251e0502b"/>
+				<reportElement x="62" y="30" width="222" height="20" uuid="4844b3bb-9297-4b40-bc19-af5251e0502b"/>
 				<textElement verticalAlignment="Middle">
 					<font isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
@@ -296,14 +295,14 @@
 	<detail>
 		<band height="18">
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="3" width="60" height="12" uuid="a920a12b-6799-4461-b1aa-b654d826091e"/>
+				<reportElement x="0" y="3" width="62" height="12" uuid="a920a12b-6799-4461-b1aa-b654d826091e"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="60" y="3" width="224" height="12" uuid="a222f4f5-aa21-491a-9ec0-5e0c14c3d300"/>
+				<reportElement x="62" y="3" width="222" height="12" uuid="a222f4f5-aa21-491a-9ec0-5e0c14c3d300"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
