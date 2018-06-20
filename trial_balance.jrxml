@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
-<!-- 2016-12-12T15:23:59 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="901838a5-c3ed-4bbc-94e5-29788bc41da9">
-	<property name="ireport.zoom" value="1.2100000000000042"/>
+	<property name="ireport.zoom" value="2.3579476910000112"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
-	<subDataset name="dataset1" uuid="a0e43402-0eae-4f3b-ac6f-f73084888591"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="STANDARD_DIR" class="java.lang.String"/>
 	<parameter name="SUBTITLE" class="java.lang.String"/>
@@ -200,14 +197,14 @@
 	<columnHeader>
 		<band height="55">
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="30" width="60" height="20" uuid="ff2bedbf-db28-41b6-a8fc-a243d8eeaa01"/>
+				<reportElement x="0" y="30" width="62" height="20" uuid="ff2bedbf-db28-41b6-a8fc-a243d8eeaa01"/>
 				<textElement verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Account")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="60" y="30" width="224" height="20" uuid="4844b3bb-9297-4b40-bc19-af5251e0502b"/>
+				<reportElement x="62" y="30" width="222" height="20" uuid="4844b3bb-9297-4b40-bc19-af5251e0502b"/>
 				<textElement verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
@@ -345,15 +342,15 @@
 	<detail>
 		<band height="18">
 			<printWhenExpression><![CDATA[!$P{comparison_fiscalyear}.equalsIgnoreCase("")]]></printWhenExpression>
-			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="3" width="60" height="12" uuid="a920a12b-6799-4461-b1aa-b654d826091e"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="3" width="62" height="12" uuid="a920a12b-6799-4461-b1aa-b654d826091e"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="60" y="3" width="224" height="12" uuid="a222f4f5-aa21-491a-9ec0-5e0c14c3d300"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="62" y="3" width="222" height="12" uuid="a222f4f5-aa21-491a-9ec0-5e0c14c3d300"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
@@ -427,15 +424,15 @@
 		<band height="18">
 			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 			<printWhenExpression><![CDATA[$P{comparison_fiscalyear}.equalsIgnoreCase("")]]></printWhenExpression>
-			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="3" width="60" height="12" uuid="3dd73f7d-2aee-4f99-844d-95ab2c2e21af"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="0" y="3" width="62" height="12" uuid="3dd73f7d-2aee-4f99-844d-95ab2c2e21af"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="60" y="3" width="339" height="12" uuid="4f09236b-2b1e-4fee-ad76-cd05fedeb3a4"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="62" y="3" width="337" height="12" uuid="4f09236b-2b1e-4fee-ad76-cd05fedeb3a4"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
