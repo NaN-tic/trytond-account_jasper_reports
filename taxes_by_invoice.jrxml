@@ -331,17 +331,17 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{type}.equalsIgnoreCase("out_credit_note") || $F{type}.equalsIgnoreCase("in_credit_note")
 ?
-    $f{invoice_total_amount} != null && $f{invoice_total_amount} != ""
+    $F{invoice_total_amount} != null && $F{invoice_total_amount} != ""
     ?
-        -$f{invoice_total_amount}
+        -$F{invoice_total_amount}
     :
         0.0
 :
-    $f{invoice_total_amount} != null && $f{invoice_total_amount} != ""
+    $F{invoice_total_amount} != null && $F{invoice_total_amount} != ""
     ?
-        $f{invoice_total_amount}
+        $F{invoice_total_amount}
     :
-        0.0]]></textfieldexpression>
+        0.0]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="572" y="0" width="42" height="12" uuid="3c9e00e1-a5d7-4efe-8fbc-837af50c088f"/>

@@ -32,9 +32,26 @@ class FiscalYear:
         return periods
 
 
+class AccountTemplate:
+    __metaclass__ = PoolMeta
+    __name__ = 'account.account.template'
+
+    @classmethod
+    def __setup__(cls):
+        super(AccountTemplate, cls).__setup__()
+        # hide because used in odt report
+        cls.general_ledger_balance.states['invisible'] = True
+
+
 class Account:
     __metaclass__ = PoolMeta
     __name__ = 'account.account'
+
+    @classmethod
+    def __setup__(cls):
+        super(Account, cls).__setup__()
+        # hide because used in odt report
+        cls.general_ledger_balance.states['invisible'] = True
 
     @classmethod
     def read_account_vals(cls, accounts, with_moves=False,
