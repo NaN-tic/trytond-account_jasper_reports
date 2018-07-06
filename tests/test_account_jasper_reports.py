@@ -290,6 +290,10 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_journal.start.end_period = last_period
         print_journal.start.journals = []
         print_journal.start.output_format = 'pdf'
+        print_journal.start.open_close_account_moves = False
+        print_journal.start.open_move_description = 'Open'
+        print_journal.start.close_move_description = 'Close'
+
         _, data = print_journal.do_print_(None)
         # Full Journall
         self.assertEqual(data['company'], company.id)
@@ -298,18 +302,17 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         self.assertEqual(data['end_period'], last_period.id)
         self.assertEqual(len(data['journals']), 0)
         self.assertEqual(data['output_format'], 'pdf')
-        ids, parameters = JournalReport.prepare(data)
-        records = Line.browse(ids)
+        records, parameters = JournalReport.prepare(data)
         self.assertEqual(len(records), 12)
         self.assertEqual(parameters['start_period'], period.name)
         self.assertEqual(parameters['end_period'], last_period.name)
         self.assertEqual(parameters['fiscal_year'], fiscalyear.name)
         self.assertEqual(parameters['journals'], '')
-        credit = sum([m.credit for m in records])
-        debit = sum([m.debit for m in records])
+        credit = sum([m['credit'] for m in records])
+        debit = sum([m['debit'] for m in records])
         self.assertEqual(credit, debit)
         self.assertEqual(credit, Decimal('730.0'))
-        with_party = [m for m in records if m.party]
+        with_party = [m for m in records if m['party_name']]
         self.assertEqual(len(with_party), 6)
         # Filtering periods
         session_id, _, _ = PrintJournal.create()
@@ -320,12 +323,15 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_journal.start.end_period = period
         print_journal.start.journals = []
         print_journal.start.output_format = 'pdf'
+        print_journal.start.open_close_account_moves = False
+        print_journal.start.open_move_description = 'Open'
+        print_journal.start.close_move_description = 'Close'
+
         _, data = print_journal.do_print_(None)
-        ids, parameters = JournalReport.prepare(data)
-        records = Line.browse(ids)
+        records, parameters = JournalReport.prepare(data)
         self.assertEqual(len(records), 8)
-        credit = sum([m.credit for m in records])
-        debit = sum([m.debit for m in records])
+        credit = sum([m['credit'] for m in records])
+        debit = sum([m['debit'] for m in records])
         self.assertEqual(credit, debit)
         self.assertEqual(credit, Decimal('380.0'))
         # Filtering journals
@@ -340,13 +346,15 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_journal.start.end_period = period
         print_journal.start.journals = [journal_revenue, journal_expense]
         print_journal.start.output_format = 'pdf'
+        print_journal.start.open_close_account_moves = False
+        print_journal.start.open_move_description = 'Open'
+        print_journal.start.close_move_description = 'Close'
         _, data = print_journal.do_print_(None)
-        ids, parameters = JournalReport.prepare(data)
-        records = Line.browse(ids)
+        records, parameters = JournalReport.prepare(data)
         self.assertNotEqual(parameters['journals'], '')
         self.assertEqual(len(records), 8)
-        credit = sum([m.credit for m in records])
-        debit = sum([m.debit for m in records])
+        credit = sum([m['credit'] for m in records])
+        debit = sum([m['debit'] for m in records])
         self.assertEqual(credit, debit)
         self.assertEqual(credit, Decimal('380.0'))
 
@@ -446,6 +454,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_general_ledger.start.parties = []
         print_general_ledger.start.accounts = []
         print_general_ledger.start.output_format = 'pdf'
+        print_general_ledger.start.all_accounts = False
         _, data = print_general_ledger.do_print_(None)
 
         # Full general_ledger
@@ -483,6 +492,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_general_ledger.start.end_period = period
         print_general_ledger.start.parties = []
         print_general_ledger.start.accounts = []
+        print_general_ledger.start.all_accounts = False
         print_general_ledger.start.output_format = 'pdf'
         _, data = print_general_ledger.do_print_(None)
         records, parameters = GeneralLedgerReport.prepare(data)
@@ -506,6 +516,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_general_ledger.start.end_period = last_period
         print_general_ledger.start.parties = []
         print_general_ledger.start.accounts = [expense.id]
+        print_general_ledger.start.all_accounts = False
         print_general_ledger.start.output_format = 'pdf'
         _, data = print_general_ledger.do_print_(None)
         records, parameters = GeneralLedgerReport.prepare(data)
@@ -525,6 +536,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_general_ledger.start.end_period = last_period
         print_general_ledger.start.parties = [customer1.id]
         print_general_ledger.start.accounts = []
+        print_general_ledger.start.all_accounts = False
         print_general_ledger.start.output_format = 'pdf'
         _, data = print_general_ledger.do_print_(None)
         records, parameters = GeneralLedgerReport.prepare(data)
@@ -554,6 +566,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_general_ledger.start.parties = [customer1.id]
         print_general_ledger.start.accounts = [receivable.id]
         print_general_ledger.start.output_format = 'pdf'
+        print_general_ledger.start.all_accounts = False
         _, data = print_general_ledger.do_print_(None)
         records, parameters = GeneralLedgerReport.prepare(data)
         self.assertEqual(parameters['parties'], customer1.rec_name)
@@ -575,6 +588,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_general_ledger.start.parties = []
         print_general_ledger.start.accounts = []
         print_general_ledger.start.output_format = 'pdf'
+        print_general_ledger.start.all_accounts = False
         _, data = print_general_ledger.do_print_(None)
         records, parameters = GeneralLedgerReport.prepare(data)
         self.assertEqual(len(records), 12)
@@ -1140,10 +1154,6 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                         'rate': Decimal('.10'),
                         'invoice_account': account_tax.id,
                         'credit_note_account': account_tax.id,
-                        'invoice_base_code': invoice_base.id,
-                        'invoice_tax_code': invoice_tax.id,
-                        'credit_note_base_code': credit_note_base.id,
-                        'credit_note_tax_code': credit_note_tax.id,
                         },
                     {
                         'name': 'Tax 2',
@@ -1152,10 +1162,6 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                         'rate': Decimal('.04'),
                         'invoice_account': account_tax.id,
                         'credit_note_account': account_tax.id,
-                        'invoice_base_code': invoice_base.id,
-                        'invoice_tax_code': invoice_tax.id,
-                        'credit_note_base_code': credit_note_base.id,
-                        'credit_note_tax_code': credit_note_tax.id,
                         }])
             customer, _, supplier, supplier2 = self.get_parties()
             customer_address, = customer.addresses
@@ -1312,8 +1318,11 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         TrialBalanceReport = pool.get(
             'account_jasper_reports.trial_balance', type='report')
         company = create_company()
+
         fiscalyear = self.create_moves(company)
-        next_fiscalyear = set_invoice_sequences(get_fiscalyear(company,
+        fiscalyear.save()
+        with set_company(company):
+            next_fiscalyear = set_invoice_sequences(get_fiscalyear(company,
                 today=fiscalyear.end_date + relativedelta(days=1)))
         next_fiscalyear.save()
         FiscalYear.create_period([next_fiscalyear])
@@ -1330,6 +1339,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_general_ledger.start.end_period = last_period
         print_general_ledger.start.parties = []
         print_general_ledger.start.accounts = []
+        print_general_ledger.start.all_accounts = True
         print_general_ledger.start.output_format = 'pdf'
         _, data = print_general_ledger.do_print_(None)
         records, parameters = GeneralLedgerReport.prepare(data)
@@ -1350,18 +1360,18 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                     last_period.end_date]):
             self.assertEqual(date, expected_value.strftime('%d/%m/%Y'))
         balances = [
-            Decimal('160'),            # Expense
-            Decimal('210'),            # Expense
-            Decimal('260'),            # Expense
+            Decimal('30'),            # Expense
+            Decimal('80'),            # Expense
+            Decimal('130'),            # Expense
             Decimal('-60'),            # Payable Party 1
             Decimal('-150'),           # Payable Party 2
             Decimal('-200'),           # Payable Party 2
             Decimal('200'),            # Receivable Party 1
             Decimal('700'),            # Receivable Party 2
             Decimal('1000'),           # Receivable Party 2
-            Decimal('-700'),           # Revenue
-            Decimal('-900'),           # Revenue
-            Decimal('-1200'),          # Revenue
+            Decimal('-100'),           # Revenue
+            Decimal('-300'),           # Revenue
+            Decimal('-600'),          # Revenue
             ]
         for record, balance in zip(records, balances):
             self.assertEqual(record['balance'], balance)
@@ -1406,9 +1416,10 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                 balances[record['name']])
 
         # Create another fiscalyear and test it cumulates correctly
-        future_fiscalyear = set_invoice_sequences(get_fiscalyear(company,
+        with set_company(company):
+            future_fiscalyear = set_invoice_sequences(get_fiscalyear(company,
                 today=fiscalyear.end_date + relativedelta(days=1, years=1)))
-        future_fiscalyear.save()
+            future_fiscalyear.save()
         FiscalYear.create_period([future_fiscalyear])
         self.create_moves(company, future_fiscalyear, False)
 
