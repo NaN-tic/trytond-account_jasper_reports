@@ -10,6 +10,7 @@ from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateReport, Button
 from trytond.pyson import Eval
 from trytond.modules.jasper_reports.jasper import JasperReport
+from trytond.tools import grouped_slice
 
 __all__ = ['PrintGeneralLedgerStart', 'PrintGeneralLedger',
     'GeneralLedgerReport']
@@ -229,48 +230,49 @@ class GeneralLedgerReport(JasperReport):
         lastKey = None
         sequence = 0
         accounts_w_moves = []
-        for line in Line.browse(line_ids):
-            if line.account not in accounts_w_moves:
-                accounts_w_moves.append(line.account.id)
-            if line.account.kind in ('receivable', 'payable'):
-                currentKey = (line.account, line.party and line.party
-                    or None)
-            else:
-                currentKey = line.account
-            if lastKey != currentKey:
-                lastKey = currentKey
-                if isinstance(currentKey, tuple):
-                    account_id = currentKey[0].id
-                    party_id = currentKey[1].id if currentKey[1] else None
+        for group_lines in grouped_slice(line_ids):
+            for line in Line.browse(group_lines):
+                if line.account not in accounts_w_moves:
+                    accounts_w_moves.append(line.account.id)
+                if line.account.kind in ('receivable', 'payable'):
+                    currentKey = (line.account, line.party and line.party
+                        or None)
                 else:
-                    account_id = currentKey.id
-                    party_id = None
-                if party_id:
-                    balance = init_party_values.get(account_id,
-                        {}).get(party_id, {}).get('balance', Decimal(0))
-                else:
-                    balance = init_values.get(account_id, {}).get('balance',
-                        Decimal(0))
-            balance += line.debit - line.credit
-            sequence += 1
-            records.append({
-                    'sequence': sequence,
-                    'key': str(currentKey),
-                    'account_code': line.account.code or '',
-                    'account_name': line.account.name or '',
-                    'account_type': line.account.kind,
-                    'date': line.date.strftime('%d/%m/%Y'),
-                    'move_line_name': line.description or '',
-                    'ref': (line.origin.rec_name if line.origin and
-                        hasattr(line.origin, 'rec_name') else ''),
-                    'move_number': line.move.number,
-                    'move_post_number': (line.move.post_number
-                        if line.move.post_number else ''),
-                    'party_name': line.party.name if line.party else '',
-                    'credit': line.credit,
-                    'debit': line.debit,
-                    'balance': balance,
-                    })
+                    currentKey = line.account
+                if lastKey != currentKey:
+                    lastKey = currentKey
+                    if isinstance(currentKey, tuple):
+                        account_id = currentKey[0].id
+                        party_id = currentKey[1].id if currentKey[1] else None
+                    else:
+                        account_id = currentKey.id
+                        party_id = None
+                    if party_id:
+                        balance = init_party_values.get(account_id,
+                            {}).get(party_id, {}).get('balance', Decimal(0))
+                    else:
+                        balance = init_values.get(account_id, {}).get('balance',
+                            Decimal(0))
+                balance += line.debit - line.credit
+                sequence += 1
+                records.append({
+                        'sequence': sequence,
+                        'key': str(currentKey),
+                        'account_code': line.account.code or '',
+                        'account_name': line.account.name or '',
+                        'account_type': line.account.kind,
+                        'date': line.date.strftime('%d/%m/%Y'),
+                        'move_line_name': line.description or '',
+                        'ref': (line.origin.rec_name if line.origin and
+                            hasattr(line.origin, 'rec_name') else ''),
+                        'move_number': line.move.number,
+                        'move_post_number': (line.move.post_number
+                            if line.move.post_number else ''),
+                        'party_name': line.party.name if line.party else '',
+                        'credit': line.credit,
+                        'debit': line.debit,
+                        'balance': balance,
+                        })
 
         init_values_account_wo_moves = {
             k: init_values[k] for k in init_values if k not in accounts_w_moves}
