@@ -194,9 +194,7 @@ class GeneralLedgerReport(JasperReport):
             ",".join([str(a.id) for a in filter_periods]))
 
         if parties:
-            where += """ and ((aa.kind in ('receivable', 'payable') and
-                aml.party in (%s)) or
-                    (aa.kind not in ('receivable', 'payable'))) """ % (
+            where += " and aml.party in (%s)" % (
                 ",".join([str(a.id) for a in parties]))
 
         cursor = Transaction().connection.cursor()
@@ -228,10 +226,13 @@ class GeneralLedgerReport(JasperReport):
             start_date = start_period.start_date
         initial_balance_date = start_date - timedelta(days=1)
         with Transaction().set_context(date=initial_balance_date):
-            init_values = Account.read_account_vals(accounts, with_moves=False,
-                exclude_party_moves=True)
+            init_values = []
+            if not parties:
+                init_values = Account.read_account_vals(accounts, with_moves=False,
+                    exclude_party_moves=True)
             init_party_values = Party.get_account_values_by_party(
                 parties, accounts, fiscalyear.company)
+
 
         records = []
         lastKey = None
