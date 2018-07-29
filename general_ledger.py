@@ -217,7 +217,7 @@ class GeneralLedgerReport(JasperReport):
 
         initial_balance_date = start_period.start_date - timedelta(days=1)
         with Transaction().set_context(date=initial_balance_date):
-            init_values = []
+            init_values = {}
             if not parties:
                 init_values = Account.read_account_vals(accounts, with_moves=False,
                     exclude_party_moves=True)
