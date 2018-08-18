@@ -13,8 +13,7 @@ from trytond.transaction import Transaction
 __all__ = ['FiscalYear', 'Account', 'Party']
 
 
-class FiscalYear:
-    __metaclass__ = PoolMeta
+class FiscalYear(metaclass=PoolMeta):
     __name__ = 'account.fiscalyear'
 
     def get_periods(self, start_period, end_period):
@@ -32,8 +31,7 @@ class FiscalYear:
         return periods
 
 
-class AccountTemplate:
-    __metaclass__ = PoolMeta
+class AccountTemplate(metaclass=PoolMeta):
     __name__ = 'account.account.template'
 
     @classmethod
@@ -43,8 +41,7 @@ class AccountTemplate:
         cls.general_ledger_balance.states['invisible'] = True
 
 
-class Account:
-    __metaclass__ = PoolMeta
+class Account(metaclass=PoolMeta):
     __name__ = 'account.account'
 
     @classmethod
@@ -124,8 +121,7 @@ class Account:
         return values
 
 
-class Party:
-    __metaclass__ = PoolMeta
+class Party(metaclass=PoolMeta):
     __name__ = 'party.party'
 
     @classmethod

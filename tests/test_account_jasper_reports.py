@@ -274,7 +274,6 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             type='wizard')
         JournalReport = pool.get('account_jasper_reports.journal',
             type='report')
-        Line = pool.get('account.move.line')
         company = create_company()
         fiscalyear = self.create_moves(company)
         period = fiscalyear.periods[0]
