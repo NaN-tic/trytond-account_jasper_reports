@@ -181,7 +181,7 @@ class JournalReport(JasperReport):
 
             parties = init_party_values.get(account.id, None)
             if parties:
-                for party_id, values in parties.iteritems():
+                for party_id, values in parties.items():
                     balance = values.get('balance', 0)
                     if balance:
                         value = {}

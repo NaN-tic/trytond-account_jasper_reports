@@ -283,7 +283,7 @@ class GeneralLedgerReport(JasperReport):
 
         init_values_account_wo_moves = {
             k: init_values[k] for k in init_values if k not in accounts_w_moves}
-        for account_id, values in init_values_account_wo_moves.iteritems():
+        for account_id, values in init_values_account_wo_moves.items():
             account = Account(account_id)
             balance = values.get('balance', Decimal(0))
             credit = values.get('credit', Decimal(0))
