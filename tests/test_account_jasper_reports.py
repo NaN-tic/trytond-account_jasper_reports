@@ -541,17 +541,17 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         _, data = print_general_ledger.do_print_(None)
         records, parameters = GeneralLedgerReport.prepare(data)
         self.assertEqual(parameters['parties'], customer1.rec_name)
-        self.assertEqual(len(records), 7)
+        self.assertEqual(len(records), 1)
         credit = sum([m['credit'] for m in records])
         debit = sum([m['debit'] for m in records])
-        self.assertEqual(credit, Decimal('600.0'))
-        self.assertEqual(debit, Decimal('230.0'))
-        credit = sum([m['credit'] for m in records
-                if m['party_name'] != ''])
-        debit = sum([m['debit'] for m in records
-                if m['party_name'] != ''])
         self.assertEqual(credit, Decimal('0.0'))
         self.assertEqual(debit, Decimal('100.0'))
+        credit = sum([m['credit'] for m in records
+                if m['party_name'] == ''])
+        debit = sum([m['debit'] for m in records
+                if m['party_name'] == ''])
+        self.assertEqual(credit, Decimal('0.0'))
+        self.assertEqual(debit, Decimal('0.0'))
 
         # Filter by parties and accounts
         receivable, = Account.search([
