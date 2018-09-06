@@ -152,7 +152,7 @@ class Party(metaclass=PoolMeta):
             # Cumulate data from previous fiscalyears
             line_query = line.move.in_(move.select(move.id,
                         where=move.date <= context.get('date')))
-        where = (line_query & account.active &
+        where = (line_query &
             (account.company == company.id))
         if accounts:
             where = where & line.account.in_([a.id for a in accounts])
