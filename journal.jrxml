@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="diary" pageWidth="595" pageHeight="842" columnWidth="575" leftMargin="10" rightMargin="10" topMargin="20" bottomMargin="20" uuid="a2e6542d-192c-4c06-aba2-26e19b94d2f3">
-	<property name="ireport.zoom" value="2.3579476910000063"/>
+	<property name="ireport.zoom" value="2.1435888100000056"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="144"/>
+	<property name="ireport.y" value="0"/>
 	<property name="ireport.layers" value="##Tue Jun 25 17:11:49 CEST 2013\nlayer.0.name=Background\nlayer.0.visible=true\nlayer.0.id=0"/>
 	<style name="table">
 		<box>
@@ -129,7 +129,7 @@
 			<band height="3"/>
 		</groupHeader>
 		<groupFooter>
-			<band height="4">
+			<band height="3">
 				<line>
 					<reportElement x="10" y="0" width="555" height="1" uuid="5b7b489a-d758-4e17-ae93-e4f269ca9d1d"/>
 					<graphicElement>
@@ -254,9 +254,9 @@
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="14">
+		<band height="12">
 			<textField isStretchWithOverflow="true" evaluationTime="Auto" pattern="dd-MM-yy" isBlankWhenNull="true">
-				<reportElement x="58" y="0" width="31" height="10" uuid="1c9db27b-6139-4f15-9e41-eedce506576f"/>
+				<reportElement stretchType="RelativeToTallestObject" x="58" y="0" width="31" height="10" uuid="1c9db27b-6139-4f15-9e41-eedce506576f"/>
 				<textElement textAlignment="Justified" verticalAlignment="Top">
 					<font size="7" isBold="true"/>
 					<paragraph lineSpacing="Fixed"/>
@@ -264,7 +264,7 @@
 				<textFieldExpression><![CDATA[new SimpleDateFormat("yyyy-MM-dd").parse($F{date})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="89" y="0" width="165" height="10" uuid="1a9998f1-c0b1-4767-8433-9154d70083a3"/>
+				<reportElement stretchType="RelativeToTallestObject" x="89" y="0" width="165" height="10" uuid="1a9998f1-c0b1-4767-8433-9154d70083a3"/>
 				<textElement verticalAlignment="Top">
 					<font size="7"/>
 					<paragraph lineSpacing="Fixed"/>
@@ -276,15 +276,15 @@
     $F{account_name}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="256" y="0" width="216" height="10" uuid="6c5aadd2-49f9-406a-9421-4a3b56e44a03"/>
+				<reportElement stretchType="RelativeToTallestObject" x="256" y="0" width="216" height="10" uuid="6c5aadd2-49f9-406a-9421-4a3b56e44a03"/>
 				<textElement verticalAlignment="Top">
 					<font size="7"/>
-					<paragraph lineSpacing="Fixed"/>
+					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{move_line_description}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
-				<reportElement x="473" y="0" width="40" height="10" uuid="5ce3a187-b5f2-425f-bf69-aa1eaf7f93cb"/>
+				<reportElement stretchType="RelativeToTallestObject" x="473" y="0" width="40" height="10" uuid="5ce3a187-b5f2-425f-bf69-aa1eaf7f93cb"/>
 				<textElement textAlignment="Right" verticalAlignment="Top">
 					<font size="7"/>
 					<paragraph lineSpacing="Fixed"/>
@@ -292,7 +292,7 @@
 				<textFieldExpression><![CDATA[$F{debit}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
-				<reportElement x="513" y="0" width="60" height="10" uuid="693288c6-e063-46fc-bcd0-a8d045687e77"/>
+				<reportElement stretchType="RelativeToTallestObject" x="513" y="0" width="60" height="10" uuid="693288c6-e063-46fc-bcd0-a8d045687e77"/>
 				<textElement textAlignment="Right" verticalAlignment="Top">
 					<font size="7"/>
 					<paragraph lineSpacing="Fixed"/>
@@ -300,7 +300,7 @@
 				<textFieldExpression><![CDATA[$F{credit}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="58" height="10" uuid="5ec77feb-a0e9-4077-af13-19d4c57180fd"/>
+				<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="58" height="10" uuid="5ec77feb-a0e9-4077-af13-19d4c57180fd"/>
 				<textElement verticalAlignment="Top">
 					<font size="7" isBold="true"/>
 					<paragraph lineSpacing="Fixed"/>
