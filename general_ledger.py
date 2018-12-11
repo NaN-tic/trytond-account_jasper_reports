@@ -221,9 +221,7 @@ class GeneralLedgerReport(JasperReport):
             """ % where)
         line_ids = [x[0] for x in cursor.fetchall()]
 
-        start_date = fiscalyear.start_date
-        if start_period:
-            start_date = start_period.start_date
+        start_date = start_period.start_date if start_period else fiscalyear.start_date
         initial_balance_date = start_date - timedelta(days=1)
         with Transaction().set_context(date=initial_balance_date):
             init_values = {}
@@ -235,6 +233,7 @@ class GeneralLedgerReport(JasperReport):
 
 
         records = []
+        parties_general_ledger = set()
         lastKey = None
         sequence = 0
         accounts_w_moves = []
@@ -255,6 +254,7 @@ class GeneralLedgerReport(JasperReport):
                     account_id = currentKey.id
                     party_id = None
                 if party_id:
+                    parties_general_ledger.add(party_id)
                     balance = init_party_values.get(account_id,
                         {}).get(party_id, {}).get('balance', Decimal(0))
                 else:
@@ -281,29 +281,63 @@ class GeneralLedgerReport(JasperReport):
                     'balance': balance,
                     })
 
-        init_values_account_wo_moves = {
-            k: init_values[k] for k in init_values if k not in accounts_w_moves}
-        for account_id, values in init_values_account_wo_moves.items():
-            account = Account(account_id)
-            balance = values.get('balance', Decimal(0))
-            credit = values.get('credit', Decimal(0))
-            debit = values.get('debit', Decimal(0))
-            if not data.get('all_accounts', True) and balance == 0:
-                continue
-            records.append({
-                    'sequence': 1,
-                    'key': str(account),
-                    'account_code': account.code or '',
-                    'account_name': account.name or '',
-                    'account_type': account.kind,
-                    'move_line_name': '###PREVIOUSBALANCE###',
-                    'ref': '-',
-                    'move_number': '-',
-                    'move_post_number': '-',
-                    'credit': credit,
-                    'debit': debit,
-                    'balance': balance,
-                    })
+        if data.get('all_accounts', True):
+            init_values_account_wo_moves = {
+                k: init_values[k] for k in init_values if k not in accounts_w_moves}
+            for account_id, values in init_values_account_wo_moves.items():
+                account = Account(account_id)
+                balance = values.get('balance', Decimal(0))
+                credit = values.get('credit', Decimal(0))
+                debit = values.get('debit', Decimal(0))
+                if balance == 0:
+                    continue
+                records.append({
+                        'sequence': 1,
+                        'key': str(account),
+                        'account_code': account.code or '',
+                        'account_name': account.name or '',
+                        'account_type': account.kind,
+                        'move_line_name': '###PREVIOUSBALANCE###',
+                        'ref': '-',
+                        'move_number': '-',
+                        'move_post_number': '-',
+                        'credit': credit,
+                        'debit': debit,
+                        'balance': balance,
+                        })
+
+            if parties:
+                account_ids = [k for k, _ in init_party_values.items()]
+                accounts = dict((a.id, a) for a in Account.browse(account_ids))
+                parties = dict((p.id, p) for p in parties)
+
+                for k, v in init_party_values.items():
+                    account = accounts[k]
+                    for p, z in v.items():
+                        # check if party is in current general ledger
+                        if p in parties_general_ledger:
+                            continue
+                        party = parties[p]
+                        if account.kind in ('receivable', 'payable'):
+                            currentKey = (account, party)
+                        else:
+                            currentKey = account
+                        sequence += 1
+                        records.append({
+                                'sequence': sequence,
+                                'key': str(currentKey),
+                                'account_code': account.code or '',
+                                'account_name': account.name or '',
+                                'account_type': account.kind,
+                                'move_line_name': '###PREVIOUSBALANCE###',
+                                'ref': '-',
+                                'move_number': '-',
+                                'move_post_number': '-',
+                                'party_name': party.name,
+                                'credit': z.get('credit', Decimal(0)),
+                                'debit': z.get('debit', Decimal(0)),
+                                'balance': z.get('balance', Decimal(0)),
+                                })
         return records, parameters
 
     @classmethod
