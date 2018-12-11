@@ -78,7 +78,7 @@
 	<variable name="total_credit" class="java.math.BigDecimal" resetType="Group" resetGroup="Key" calculation="Sum">
 		<variableExpression><![CDATA[$F{credit}]]></variableExpression>
 	</variable>
-	<variable name="balance" class="java.math.BigDecimal">
+	<variable name="total_balance" class="java.math.BigDecimal">
 		<variableExpression><![CDATA[$V{total_debit} - $V{total_credit}]]></variableExpression>
 	</variable>
 	<group name="Key">
@@ -161,7 +161,7 @@
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font size="7" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{balance} == null ? 0.0 : $F{balance}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$V{total_balance} == null ? 0.0 : $V{total_balance}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
 					<reportElement x="445" y="2" width="50" height="10" uuid="c586509c-e6a7-431f-9420-557866652e15"/>
