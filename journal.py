@@ -145,13 +145,13 @@ class JournalReport(JasperReport):
         for account in accounts:
             main_value = {}
             if _type == 'open':
-                main_value['date'] = fiscalyear.start_date.strftime("%d-%m-%Y")
+                main_value['date'] = fiscalyear.start_date.strftime("%Y-%m-%d")
                 main_value['month'] = fiscalyear.start_date.month
                 main_value['move_post_number'] =move_post_number
                 main_value['move_number'] = move_post_number
                 main_value['move_line_description'] = description
             else:
-                main_value['date'] = fiscalyear.end_date.strftime("%d-%m-%Y")
+                main_value['date'] = fiscalyear.end_date.strftime("%Y-%m-%d")
                 main_value['month'] = fiscalyear.end_date.month
                 main_value['move_post_number'] = move_post_number
                 main_value['move_number'] = move_post_number
