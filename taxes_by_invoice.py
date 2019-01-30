@@ -5,7 +5,7 @@ from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateAction, StateReport, Button
-from trytond.pyson import Eval
+from trytond.pyson import Eval, If, Bool
 from trytond.modules.jasper_reports.jasper import JasperReport
 
 __all__ = ['PrintTaxesByInvoiceAndPeriodStart', 'PrintTaxesByInvoiceAndPeriod',
@@ -19,6 +19,9 @@ class PrintTaxesByInvoiceAndPeriodStart(ModelView):
     fiscalyear = fields.Many2One('account.fiscalyear', 'Fiscal Year',
             required=True)
     periods = fields.Many2Many('account.period', None, None, 'Periods',
+        states={
+            'invisible': Eval('start_date') | Eval('end_date'),
+            },
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
             ], depends=['fiscalyear'])
@@ -37,6 +40,26 @@ class PrintTaxesByInvoiceAndPeriodStart(ModelView):
             ('xls', 'XLS'),
             ], 'Output Format', required=True)
     company = fields.Many2One('company.company', 'Company', required=True)
+    start_date = fields.Date('Initial posting date',
+        domain=[
+            If(Eval('start_date') & Eval('end_date'),
+                ('start_date', '<=', Eval('end_date', None)),
+                ()),
+            ],
+        states={
+            'invisible': Bool(Eval('periods')),
+            },
+        depends=['end_date'])
+    end_date = fields.Date('Final posting date',
+        domain=[
+            If(Eval('start_date') & Eval('end_date'),
+                ('end_date', '>=', Eval('start_date', None)),
+                ()),
+            ],
+        states={
+            'invisible': Bool(Eval('periods')),
+            },
+        depends=['start_date'])
 
     @staticmethod
     def default_partner_type():
@@ -75,10 +98,24 @@ class PrintTaxesByInvoiceAndPeriod(Wizard):
             ])
     print_ = StateReport('account_jasper_reports.taxes_by_invoice')
 
+    @classmethod
+    def __setup__(cls):
+        super(PrintTaxesByInvoiceAndPeriod, cls).__setup__()
+        cls._error_messages.update({
+            'start_date': ('The initial posting date does not match the '
+                'fiscal year "%(fiscalyear)s".'),
+            'end_date': ('The final posting date does not match the '
+                'fiscal year "%(fiscalyear)s".'),
+        })
+
     def do_print_(self, action):
+        FiscalYear = Pool().get('account.fiscalyear')
+
         data = {
             'company': self.start.company.id,
             'fiscalyear': self.start.fiscalyear.id,
+            'start_date': self.start.start_date,
+            'end_date': self.start.end_date,
             'periods': [x.id for x in self.start.periods],
             'parties': [x.id for x in self.start.parties],
             'output_format': self.start.output_format,
@@ -86,6 +123,18 @@ class PrintTaxesByInvoiceAndPeriod(Wizard):
             'totals_only': self.start.totals_only,
             'grouping': self.start.grouping,
             }
+
+        fiscalyear = FiscalYear(data['fiscalyear'])
+        if data['start_date']:
+            if (data['start_date'] < fiscalyear.start_date
+                    or data['start_date'] > fiscalyear.end_date):
+                 self.raise_user_error('start_date', {
+                    'fiscalyear': fiscalyear.name})
+        if data['end_date']:
+            if (data['end_date'] < fiscalyear.start_date
+                    or data['end_date'] > fiscalyear.end_date):
+                 self.raise_user_error('end_date', {
+                    'fiscalyear': fiscalyear.name})
         if data['grouping'] == 'invoice':
             state_action = StateAction('account_jasper_reports.'
                 'report_taxes_by_invoice_and_period')
@@ -119,6 +168,9 @@ class TaxesByInvoiceReport(JasperReport):
         AccountInvoiceTax = pool.get('account.invoice.tax')
 
         fiscalyear = FiscalYear(data['fiscalyear'])
+        start_date = data['start_date']
+        end_date = data['end_date']
+
         periods = []
         if data.get('periods'):
             periods = Period.browse(data.get('periods', []))
@@ -150,6 +202,10 @@ class TaxesByInvoiceReport(JasperReport):
         parameters = {}
         parameters['company'] = fiscalyear.company.rec_name
         parameters['fiscal_year'] = fiscalyear.rec_name
+        parameters['start_date'] = (start_date.strftime('%d/%m/%Y')
+            if start_date else '')
+        parameters['end_date'] = (end_date.strftime('%d/%m/%Y')
+            if end_date else '')
         parameters['parties'] = parties_subtitle
         parameters['periods'] = periods_subtitle
         parameters['TOTALS_ONLY'] = data['totals_only'] and True or False
@@ -165,8 +221,18 @@ class TaxesByInvoiceReport(JasperReport):
         else:
             domain += [('invoice.type', '=', 'in')]
 
-        if periods:
-            domain += [('invoice.move.period', 'in', periods)]
+        if start_date:
+             domain += [
+                 ('invoice.move.date', '>=', start_date),
+                 ]
+        if end_date:
+             domain += [
+                 ('invoice.move.date', '<=', end_date),
+                 ]
+
+        if not start_date and not end_date:
+            if periods:
+                domain += [('invoice.move.period', 'in', periods)]
 
         if parties:
             domain += [('invoice.party', 'in', parties)],
