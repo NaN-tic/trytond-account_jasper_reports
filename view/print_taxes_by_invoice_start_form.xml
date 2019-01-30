@@ -11,10 +11,17 @@ copyright notices and license terms. -->
     <field name="grouping"/>
     <label name="fiscalyear"/>
     <field name="fiscalyear"/>
+    <newline/>
+    <label name="start_date"/>
+    <field name="start_date"/>
+    <label name="end_date"/>
+    <field name="end_date"/>
     <label name="totals_only"/>
     <field name="totals_only"/>
-    <label id="select_periods" string="Left empty to select all periods"/>
-    <field name="periods" colspan="4"/>
+    <group name="periods" string="" colspan="4" yexpand="1" yfill="1">
+        <label id="select_periods" string="Left empty to select all periods" xalign="0"/>
+        <field name="periods" colspan="4" yexpand="1" yfill="1"/>
+    </group>
     <label id="select_parties" string="Left empty to select all parties"/>
     <field name="parties" colspan="4"/>
     <label name="output_format"/>
