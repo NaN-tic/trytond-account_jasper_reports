@@ -1226,6 +1226,8 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_taxes_by_invoice.start.partner_type = 'customers'
         print_taxes_by_invoice.start.grouping = 'invoice'
         print_taxes_by_invoice.start.totals_only = False
+        print_taxes_by_invoice.start.start_date = None
+        print_taxes_by_invoice.start.end_date = None
         print_taxes_by_invoice.start.output_format = 'pdf'
         _, data = print_taxes_by_invoice.do_print_(None)
         # Customer data
@@ -1259,6 +1261,8 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_taxes_by_invoice.start.partner_type = 'suppliers'
         print_taxes_by_invoice.start.grouping = 'invoice'
         print_taxes_by_invoice.start.totals_only = False
+        print_taxes_by_invoice.start.start_date = None
+        print_taxes_by_invoice.start.end_date = None
         print_taxes_by_invoice.start.output_format = 'pdf'
         _, data = print_taxes_by_invoice.do_print_(None)
         # Supplier data
@@ -1281,6 +1285,8 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_taxes_by_invoice.start.grouping = 'invoice'
         print_taxes_by_invoice.start.totals_only = False
         print_taxes_by_invoice.start.output_format = 'pdf'
+        print_taxes_by_invoice.start.start_date = None
+        print_taxes_by_invoice.start.end_date = None
         _, data = print_taxes_by_invoice.do_print_(None)
         # Filter by supplier
         ids, parameters = TaxesByInvoiceReport.prepare(data)
@@ -1297,12 +1303,33 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_taxes_by_invoice.start.grouping = 'invoice'
         print_taxes_by_invoice.start.totals_only = False
         print_taxes_by_invoice.start.output_format = 'pdf'
+        print_taxes_by_invoice.start.start_date = None
+        print_taxes_by_invoice.start.end_date = None
         _, data = print_taxes_by_invoice.do_print_(None)
         # Filter by periods
         ids, parameters = TaxesByInvoiceReport.prepare(data)
         self.assertEqual(parameters['periods'], last_period.rec_name)
         records = InvoiceTax.browse(ids)
         self.assertEqual(len(records), 0)
+        # Filter by start/end date
+        session_id, _, _ = PrintTaxesByInvoice.create()
+        print_taxes_by_invoice = PrintTaxesByInvoice(session_id)
+        print_taxes_by_invoice.start.company = company
+        print_taxes_by_invoice.start.fiscalyear = fiscalyear
+        print_taxes_by_invoice.start.periods = []
+        print_taxes_by_invoice.start.parties = []
+        print_taxes_by_invoice.start.partner_type = 'customers'
+        print_taxes_by_invoice.start.grouping = 'invoice'
+        print_taxes_by_invoice.start.totals_only = False
+        print_taxes_by_invoice.start.start_date = period.start_date
+        print_taxes_by_invoice.start.end_date = period.end_date
+        print_taxes_by_invoice.start.output_format = 'pdf'
+        _, data = print_taxes_by_invoice.do_print_(None)
+        ids, parameters = TaxesByInvoiceReport.prepare(data)
+        self.assertEqual(parameters['start_date'], period.start_date.strftime('%d/%m/%Y'))
+        self.assertEqual(parameters['end_date'], period.end_date.strftime('%d/%m/%Y'))
+        records = InvoiceTax.browse(ids)
+        self.assertEqual(len(records), 2)
 
     @with_transaction()
     def test_fiscalyear_not_closed(self):
