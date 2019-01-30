@@ -2,14 +2,6 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-msgctxt "error:account_jasper_reports.print_taxes_by_invoice:"
-msgid "The initial posting date does not match the fiscal year \"%(fiscalyear)s\"."
-msgstr "La data de comptabilització inicial no concorda amb l'any fiscal \"%(fiscalyear)s\"."
-
-msgctxt "error:account_jasper_reports.print_taxes_by_invoice:"
-msgid "The final posting date does not match the fiscal year \"%(fiscalyear)s\"."
-msgstr "La data de comptabilització final no concorda amb l'any fiscal \"%(fiscalyear)s\"."
-
 msgctxt "field:account_jasper_reports.print_abreviated_journal.start,company:"
 msgid "Company"
 msgstr "Empresa"
@@ -761,6 +753,14 @@ msgstr "Imprimeix impostos per factura i període"
 msgctxt "model:ir.action.wizard,name:wizard_print_trial_balance"
 msgid "Print Trial Balance"
 msgstr "Imprimeix balanç de sumes i saldos"
+
+msgctxt "error:account_jasper_reports.fiscalyear_end_date:"
+msgid "The final posting date does not match the fiscal year \"%(fiscalyear)s\"."
+msgstr "La data de comptabilització final no concorda amb l'any fiscal \"%(fiscalyear)s\"."
+
+msgctxt "model:ir.message,text:fiscalyear_start_date"
+msgid "The initial posting date does not match the fiscal year \"%(fiscalyear)s\"."
+msgstr "La data de comptabilització inicial no concorda amb l'any fiscal \"%(fiscalyear)s\"."
 
 msgctxt "model:ir.ui.menu,name:menu_print_general_ledger"
 msgid "Print General Ledger"

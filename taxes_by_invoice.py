@@ -7,6 +7,8 @@ from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateAction, StateReport, Button
 from trytond.pyson import Eval, If, Bool
 from trytond.modules.jasper_reports.jasper import JasperReport
+from trytond.i18n import gettext
+from trytond.exceptions import UserError
 
 __all__ = ['PrintTaxesByInvoiceAndPeriodStart', 'PrintTaxesByInvoiceAndPeriod',
     'TaxesByInvoiceReport', 'TaxesByInvoiceAndPeriodReport']
@@ -98,16 +100,6 @@ class PrintTaxesByInvoiceAndPeriod(Wizard):
             ])
     print_ = StateReport('account_jasper_reports.taxes_by_invoice')
 
-    @classmethod
-    def __setup__(cls):
-        super(PrintTaxesByInvoiceAndPeriod, cls).__setup__()
-        cls._error_messages.update({
-            'start_date': ('The initial posting date does not match the '
-                'fiscal year "%(fiscalyear)s".'),
-            'end_date': ('The final posting date does not match the '
-                'fiscal year "%(fiscalyear)s".'),
-        })
-
     def do_print_(self, action):
         FiscalYear = Pool().get('account.fiscalyear')
 
@@ -128,13 +120,15 @@ class PrintTaxesByInvoiceAndPeriod(Wizard):
         if data['start_date']:
             if (data['start_date'] < fiscalyear.start_date
                     or data['start_date'] > fiscalyear.end_date):
-                 self.raise_user_error('start_date', {
-                    'fiscalyear': fiscalyear.name})
+                raise UserError(gettext(
+                    'account_jasper_reports.fiscalyear_start_date',
+                    fiscalyear=fiscalyear.name))
         if data['end_date']:
             if (data['end_date'] < fiscalyear.start_date
                     or data['end_date'] > fiscalyear.end_date):
-                 self.raise_user_error('end_date', {
-                    'fiscalyear': fiscalyear.name})
+                raise UserError(gettext(
+                    'account_jasper_reports.fiscalyear_end_date',
+                    fiscalyear=fiscalyear.name))
         if data['grouping'] == 'invoice':
             state_action = StateAction('account_jasper_reports.'
                 'report_taxes_by_invoice_and_period')
