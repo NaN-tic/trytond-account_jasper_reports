@@ -386,12 +386,11 @@ class TrialBalanceReport(JasperReport):
 
         # Calc Initial Balance for first period
         init_values = {}
-        if add_initial_balance:
-            logger.info('Calc Initial Balance')
-            initial_balance_date = start_period.start_date - timedelta(days=1)
-            with transaction.set_context(date=initial_balance_date):
-                init_values = Account.read_account_vals(accounts,
-                    with_moves=with_moves)
+        logger.info('Calc Initial Balance')
+        initial_balance_date = start_period.start_date - timedelta(days=1)
+        with transaction.set_context(date=initial_balance_date):
+            init_values = Account.read_account_vals(accounts,
+                with_moves=with_moves)
 
         # Calc comparison period values.
         comparison_initial_values = {}.fromkeys(accounts, Decimal('0.00'))
