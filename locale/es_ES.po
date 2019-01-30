@@ -2,6 +2,14 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
+msgctxt "error:account_jasper_reports.print_taxes_by_invoice:"
+msgid "The initial posting date does not match the fiscal year \"%(fiscalyear)s\"."
+msgstr "La fecha de contabilización inicial no coincide con el año fiscal \"%(fiscalyear)s\"."
+
+msgctxt "error:account_jasper_reports.print_taxes_by_invoice:"
+msgid "The final posting date does not match the fiscal year \"%(fiscalyear)s\"."
+msgstr "La fecha de contabilización final no coincide con el año fiscal \"%(fiscalyear)s\"."
+
 msgctxt "field:account.move.line,reconciliation_date:"
 msgid "Reconciliation Date"
 msgstr "Fecha de conciliación"
@@ -38,6 +46,10 @@ msgctxt ""
 "field:account_jasper_reports.print_abreviated_journal.start,display_account:"
 msgid "Display Accounts"
 msgstr "Mostrar cuentas"
+
+msgctxt "field:account_jasper_reports.print_taxes_by_invoice.start,end_date:"
+msgid "Final posting date"
+msgstr "Fecha de contabilización final"
 
 msgctxt ""
 "field:account_jasper_reports.print_abreviated_journal.start,fiscalyear:"
@@ -147,6 +159,11 @@ msgctxt ""
 "field:account_jasper_reports.print_taxes_by_invoice.start,fiscalyear:"
 msgid "Fiscal Year"
 msgstr "Ejercicio fiscal"
+
+msgctxt ""
+"field:account_jasper_reports.print_taxes_by_invoice.start,start_date:"
+msgid "Initial posting date"
+msgstr "Fecha de contabilización inicial"
 
 msgctxt "field:account_jasper_reports.print_taxes_by_invoice.start,grouping:"
 msgid "Grouping"
@@ -477,8 +494,16 @@ msgid "Base+Tax"
 msgstr "Base+Imp."
 
 msgctxt "jasper:account_jasper_reports.taxes_by_invoice:"
+msgid "Final posting date"
+msgstr "Fecha de contab. final"
+
+msgctxt "jasper:account_jasper_reports.taxes_by_invoice:"
 msgid "Fiscal Year: "
 msgstr "Ejercicio fiscal:"
+
+msgctxt "jasper:account_jasper_reports.taxes_by_invoice:"
+msgid "Initial posting date"
+msgstr "Fecha de contab. inicial"
 
 msgctxt "jasper:account_jasper_reports.taxes_by_invoice:"
 msgid "Invoice"
