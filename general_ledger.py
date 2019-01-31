@@ -213,6 +213,7 @@ class GeneralLedgerReport(JasperReport):
                 CASE WHEN aa.kind in ('receivable', 'payable') THEN
                        aml.party ELSE 0 END,
                 am.date,
+                am.id,
                 am.description,
                 aml.id
             """ % where)
