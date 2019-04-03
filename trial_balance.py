@@ -249,10 +249,15 @@ class TrialBalanceReport(JasperReport):
             if add_initial_balance:
                 balance += init
                 balance_comp += init_comp
+            account_type = 'other'
+            if account.type and account.type.receivable:
+                account_type = 'receivable'
+            elif account.type and account.type.payable:
+                account_type = 'payable'
             return {
                 'code': account.code or '',
                 'name': party and party.name or account.name,
-                'type': account.kind,
+                'type': account_type,
                 'period_initial_balance': init,
                 'period_credit': credit,
                 'period_debit': debit,
@@ -362,7 +367,7 @@ class TrialBalanceReport(JasperReport):
                     if not digits:
                         accounts.append(account)
                 elif not digits or len(account.code) == digits or \
-                    account.kind != 'view' and len(account.childs) == 0 and \
+                    account.type != None and len(account.childs) == 0 and \
                         len(account.code) < (digits or 9999):
                     accounts.append(account)
 
@@ -453,7 +458,7 @@ class TrialBalanceReport(JasperReport):
                     if len(account.code.strip()) < digits:
                         continue
                     elif (len(account.code) == digits and
-                            account.kind == 'view'):
+                            account.type == None):
                         account.kind = 'other'
 
                 vals = _amounts(account, init_values, values)

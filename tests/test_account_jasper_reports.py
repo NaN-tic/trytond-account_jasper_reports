@@ -45,12 +45,18 @@ class AccountJasperReportsTestCase(ModuleTestCase):
     def get_accounts(self, company):
         pool = Pool()
         Account = pool.get('account.account')
-        accounts = Account.search([
-                ('kind', 'in',
-                    ['receivable', 'payable', 'revenue', 'expense']),
+        accounts_search = Account.search(['OR',
+                ('type.receivable', '=', True),
+                ('type.payable', '=', True),
+                ('type.revenue', '=', True),
+                ('type.expense', '=', True),
                 ('company', '=', company.id),
                 ])
-        accounts = {a.kind: a for a in accounts}
+
+        accounts = {}
+        for kind in ('receivable', 'payable', 'revenue', 'expense' ):
+            accounts.update({kind:a for a in accounts_search if a.type and getattr(a.type, kind)})
+
         root, = Account.search([
                 ('parent', '=', None),
                 ('company', '=', company.id),
@@ -72,14 +78,16 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             accounts['payable'].parent = root
             accounts['payable'].code = '41'
             accounts['payable'].save()
+
+        # TODO
         cash, = Account.search([
-                ('kind', '=', 'other'),
+        #        ('kind', '=', 'other'),
                 ('name', '=', 'Main Cash'),
                 ('company', '=', company.id),
                 ])
         accounts['cash'] = cash
         tax, = Account.search([
-                ('kind', '=', 'other'),
+        #        ('kind', '=', 'other'),
                 ('name', '=', 'Main Tax'),
                 ('company', '=', company.id),
                 ])
@@ -95,7 +103,6 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                 view, = Account.create([{
                             'name': 'View',
                             'code': '1',
-                            'kind': 'view',
                             'parent': root.id,
                             }])
         accounts['view'] = view
@@ -505,7 +512,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             self.assertEqual(date, period.start_date.strftime('%d/%m/%Y'))
         # Filtered by accounts
         expense, = Account.search([
-                ('kind', '=', 'expense'),
+                ('type.expense', '=', True),
                 ])
         session_id, _, _ = PrintGeneralLedger.create()
         print_general_ledger = PrintGeneralLedger(session_id)
@@ -554,7 +561,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
 
         # Filter by parties and accounts
         receivable, = Account.search([
-                ('kind', '=', 'receivable'),
+                ('type.receivable', '=', True),
                 ])
         session_id, _, _ = PrintGeneralLedger.create()
         print_general_ledger = PrintGeneralLedger(session_id)

@@ -7,6 +7,7 @@ from trytond.wizard import Wizard, StateView, StateReport, Button
 from trytond.pyson import Eval, If, Bool
 from trytond.modules.jasper_reports.jasper import JasperReport
 from datetime import timedelta
+from sql import Null
 
 __all__ = ['PrintJournalStart', 'PrintJournal', 'JournalReport']
 
@@ -143,6 +144,12 @@ class JournalReport(JasperReport):
 
         moves = []
         for account in accounts:
+            account_type = 'other'
+            if account.type.receivable:
+                account_type = 'receivable'
+            elif account.type.payable:
+                account_type = 'payable'
+
             main_value = {}
             if _type == 'open':
                 main_value['date'] = fiscalyear.start_date.strftime("%Y-%m-%d")
@@ -157,7 +164,7 @@ class JournalReport(JasperReport):
                 main_value['move_number'] = move_post_number
                 main_value['move_line_description'] = description
             main_value['account_name'] = account.rec_name
-            main_value['account_kind'] = account.kind
+            main_value['account_kind'] = account_type
 
             value = {}
             value.update(main_value)
@@ -290,7 +297,7 @@ class JournalReport(JasperReport):
             with Transaction().set_context(active_test=False):
                 accounts = Account.search([
                         ('parent', '!=', None),
-                        ('kind', '!=', 'view'),
+                        ('type', '!=', Null),
                         ('active', 'in', [True, False]),
                         ])
                 parties = Party.search([
@@ -333,6 +340,12 @@ class JournalReport(JasperReport):
         records = []
         records.extend(open_moves)
         for line in Line.browse(ids):
+            account_type = 'other'
+            if line.account.type.receivable:
+                account_type = 'receivable'
+            elif line.account.type.payable:
+                account_type = 'payable'
+
             records.append({
                     'date': line.date,
                     'month': line.date.month,
@@ -343,7 +356,7 @@ class JournalReport(JasperReport):
                     'debit': line.debit,
                     'credit': line.credit,
                     'party_name': line.party and line.party.name or '',
-                    'account_kind': line.account.kind,
+                    'account_kind': account_type,
                     })
         records.extend(close_moves)
         return records, parameters

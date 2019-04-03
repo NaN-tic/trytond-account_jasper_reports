@@ -126,7 +126,7 @@ class AbreviatedJournalReport(JasperReport):
                 if not account.code or not account.parent:
                     continue
                 if len(account.code) == level or \
-                    account.kind != 'view' and len(account.childs) == 0 and \
+                    account.type != None and len(account.childs) == 0 and \
                         len(account.code) < level:
                     account_ids.append(account.id)
             accounts = Account.browse(account_ids)
