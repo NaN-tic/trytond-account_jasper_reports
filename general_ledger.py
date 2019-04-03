@@ -205,16 +205,18 @@ class GeneralLedgerReport(JasperReport):
             FROM
                 account_move_line aml,
                 account_move am,
-                account_account aa
+                account_account aa,
+                account_account_type aat
             WHERE
                 am.id = aml.move AND
                 aa.id = aml.account AND
+                aa.type = aat.id AND
                 %s
             ORDER BY
                 aml.account,
                 -- Sort by party only when account is of
                 -- type 'receivable' or 'payable'
-                CASE WHEN aa.kind in ('receivable', 'payable') THEN
+                CASE WHEN aat.receivable or aat.payable THEN
                        aml.party ELSE 0 END,
                 am.date,
                 am.id,
@@ -243,7 +245,8 @@ class GeneralLedgerReport(JasperReport):
             for line in Line.browse(group_lines):
                 if line.account not in accounts_w_moves:
                     accounts_w_moves.append(line.account.id)
-                if line.account.kind in ('receivable', 'payable'):
+                if (line.account.type.receivable == True or
+                        line.account.type.payable == True) :
                     currentKey = (line.account, line.party and line.party
                         or None)
                 else:
@@ -265,12 +268,17 @@ class GeneralLedgerReport(JasperReport):
                             Decimal(0))
                 balance += line.debit - line.credit
                 sequence += 1
+                account_type = 'other'
+                if line.account.type and line.account.type.receivable:
+                    account_type = 'receivable'
+                elif line.account.type and line.account.type.payable:
+                    account_type = 'payable'
                 records.append({
                         'sequence': sequence,
                         'key': str(currentKey),
                         'account_code': line.account.code or '',
                         'account_name': line.account.name or '',
-                        'account_type': line.account.kind,
+                        'account_type': account_type,
                         'date': line.date.strftime('%d/%m/%Y'),
                         'move_line_name': line.description or '',
                         'ref': (line.origin.rec_name if line.origin and
@@ -294,12 +302,17 @@ class GeneralLedgerReport(JasperReport):
                 debit = values.get('debit', Decimal(0))
                 if balance == 0:
                     continue
+                account_type = 'other'
+                if line.account.type and line.account.type.receivable:
+                    account_type = 'receivable'
+                elif line.account.type and line.account.type.payable:
+                    account_type = 'payable'
                 records.append({
                         'sequence': 1,
                         'key': str(account),
                         'account_code': account.code or '',
                         'account_name': account.name or '',
-                        'account_type': account.kind,
+                        'account_type': account_type,
                         'move_line_name': '###PREVIOUSBALANCE###',
                         'ref': '-',
                         'move_number': '-',
@@ -321,17 +334,22 @@ class GeneralLedgerReport(JasperReport):
                         if p in parties_general_ledger:
                             continue
                         party = parties[p]
-                        if account.kind in ('receivable', 'payable'):
+                        if account.type.receivable or account.type.payable:
                             currentKey = (account, party)
                         else:
                             currentKey = account
                         sequence += 1
+                        account_type = 'other'
+                        if line.account.type and line.account.type.receivable:
+                            account_type = 'receivable'
+                        elif line.account.type and line.account.type.payable:
+                            account_type = 'payable'
                         records.append({
                                 'sequence': sequence,
                                 'key': str(currentKey),
                                 'account_code': account.code or '',
                                 'account_name': account.name or '',
-                                'account_type': account.kind,
+                                'account_type': account_type,
                                 'move_line_name': '###PREVIOUSBALANCE###',
                                 'ref': '-',
                                 'move_number': '-',
