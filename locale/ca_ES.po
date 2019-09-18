@@ -267,7 +267,7 @@ msgstr "Deure"
 
 msgctxt "jasper:account_jasper_reports.abreviated_journal:"
 msgid "Fiscal Year: "
-msgstr "Exercici fiscal:"
+msgstr "Exercici fiscal: "
 
 msgctxt "jasper:account_jasper_reports.abreviated_journal:"
 msgid "Total Period: "
@@ -306,8 +306,8 @@ msgid "Description"
 msgstr "Descripció"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
-msgid "Fiscal Year: "
-msgstr "Exercici fiscal:"
+msgid "Fiscal Year"
+msgstr "Exercici fiscal"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "General Ledger"
@@ -340,6 +340,10 @@ msgstr "Referència"
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "To"
 msgstr "A"
+
+msgctxt "jasper:account_jasper_reports.general_ledger:"
+msgid "Total Fiscal Year"
+msgstr "Total Exercici fiscal"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "Total"
@@ -431,7 +435,7 @@ msgstr "Base+Imp."
 
 msgctxt "jasper:account_jasper_reports.taxes_by_invoice:"
 msgid "Fiscal Year: "
-msgstr "Exercici fiscal:"
+msgstr "Exercici fiscal: "
 
 msgctxt "jasper:account_jasper_reports.taxes_by_invoice:"
 msgid "Invoice"
@@ -499,7 +503,7 @@ msgstr "Base+Imp."
 
 msgctxt "jasper:account_jasper_reports.taxes_by_invoice_and_period:"
 msgid "Fiscal Year: "
-msgstr "Exercici fiscal:"
+msgstr "Exercici fiscal: "
 
 msgctxt "jasper:account_jasper_reports.taxes_by_invoice_and_period:"
 msgid "Invoice"
@@ -567,7 +571,7 @@ msgstr "Saldo"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Comparison Fiscal Year: "
-msgstr "Exercici fiscal de comparació:"
+msgstr "Exercici fiscal de comparació: "
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Credit"
@@ -583,7 +587,7 @@ msgstr "Primer balanç"
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "Fiscal Year: "
-msgstr "Exercici fiscal:"
+msgstr "Exercici fiscal: "
 
 msgctxt "jasper:account_jasper_reports.trial_balance:"
 msgid "From"
