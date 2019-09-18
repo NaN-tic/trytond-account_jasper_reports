@@ -311,7 +311,7 @@ msgstr "Debe"
 
 msgctxt "jasper:account_jasper_reports.abreviated_journal:"
 msgid "Fiscal Year: "
-msgstr "Ejercicio fiscal:"
+msgstr "Ejercicio fiscal: "
 
 msgctxt "jasper:account_jasper_reports.abreviated_journal:"
 msgid "Total Period: "
@@ -358,8 +358,8 @@ msgid "Description"
 msgstr "Descripción"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
-msgid "Fiscal Year: "
-msgstr "Ejercicio fiscal:"
+msgid "Fiscal Year"
+msgstr "Ejercicio fiscal"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "General Ledger"
@@ -392,6 +392,10 @@ msgstr "Referencia"
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "To"
 msgstr "Hasta"
+
+msgctxt "jasper:account_jasper_reports.general_ledger:"
+msgid "Total Fiscal Year"
+msgstr "Total Ejercicio fiscal"
 
 msgctxt "jasper:account_jasper_reports.general_ledger:"
 msgid "Total"
@@ -439,7 +443,7 @@ msgstr "Descripción"
 
 msgctxt "jasper:account_jasper_reports.journal:"
 msgid "Fiscal Year: "
-msgstr "Ejercicio fiscal:"
+msgstr "Ejercicio fiscal: "
 
 msgctxt "jasper:account_jasper_reports.journal:"
 msgid "Journal"
@@ -499,7 +503,7 @@ msgstr "Fecha de contab. final"
 
 msgctxt "jasper:account_jasper_reports.taxes_by_invoice:"
 msgid "Fiscal Year: "
-msgstr "Ejercicio fiscal:"
+msgstr "Ejercicio fiscal: "
 
 msgctxt "jasper:account_jasper_reports.taxes_by_invoice:"
 msgid "Initial posting date"
@@ -571,7 +575,7 @@ msgstr "Base+Imp."
 
 msgctxt "jasper:account_jasper_reports.taxes_by_invoice_and_period:"
 msgid "Fiscal Year: "
-msgstr "Ejercicio fiscal:"
+msgstr "Ejercicio fiscal: "
 
 msgctxt "jasper:account_jasper_reports.taxes_by_invoice_and_period:"
 msgid "Invoice"

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.9.0.final using JasperReports Library version 5.5.0  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="account_movements2.jrxml" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7e6f5ed5-9314-4647-bc83-20dadb015d73">
 	<property name="ireport.zoom" value="2.143588810000005"/>
 	<property name="ireport.x" value="11"/>
@@ -125,22 +126,29 @@
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="20">
+			<band height="25">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<line>
-					<reportElement x="0" y="14" width="555" height="1" uuid="643a20c1-5541-4c73-abcb-103f086f5067"/>
+					<reportElement x="0" y="24" width="555" height="1" uuid="643a20c1-5541-4c73-abcb-103f086f5067">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
 					<graphicElement>
 						<pen lineWidth="0.5"/>
 					</graphicElement>
 				</line>
 				<textField isBlankWhenNull="true">
-					<reportElement x="10" y="2" width="48" height="10" uuid="de9dc99a-6488-4d25-8d74-e91f6ba3f684"/>
+					<reportElement x="10" y="12" width="48" height="10" uuid="de9dc99a-6488-4d25-8d74-e91f6ba3f684">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
 					<textElement verticalAlignment="Middle">
 						<font size="8" isBold="true" pdfFontName="Helvetica"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{account_code}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement x="58" y="2" width="195" height="10" uuid="d911c76f-fac9-48f4-9e29-ea7db54dee5c"/>
+					<reportElement x="58" y="12" width="195" height="10" uuid="d911c76f-fac9-48f4-9e29-ea7db54dee5c">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
 					<textElement verticalAlignment="Middle">
 						<font size="8" isBold="true" pdfFontName="Helvetica"/>
 					</textElement>
@@ -150,11 +158,11 @@
     $F{account_name}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="311" y="2" width="79" height="10" uuid="a00011c0-a800-4a73-83d2-6d658385960c"/>
+					<reportElement x="270" y="2" width="120" height="10" uuid="a00011c0-a800-4a73-83d2-6d658385960c"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font size="8" isBold="true" pdfFontName="Helvetica"/>
+						<font size="7" isBold="true" pdfFontName="Helvetica"/>
 					</textElement>
-					<textFieldExpression><![CDATA[tr($V{L},"Total")]]></textFieldExpression>
+					<textFieldExpression><![CDATA[tr($V{L},"Total Fiscal Year")]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
 					<reportElement x="495" y="2" width="60" height="10" uuid="6b86a895-60a2-4cd0-b3e0-1072300ff516"/>
@@ -176,6 +184,24 @@
 						<font size="7" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{total_debit}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement x="495" y="12" width="60" height="10" uuid="47d56272-a0f7-41c3-a268-600cdfcf4785">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{balance} == null ? 0.0 : $F{balance}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="311" y="12" width="79" height="10" uuid="9801cfd0-f14c-4cd3-b1b4-cf8a4e98e2bc">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="8" isBold="true" pdfFontName="Helvetica"/>
+					</textElement>
+					<textFieldExpression><![CDATA[tr($V{L},"Total")]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupFooter>
@@ -250,7 +276,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year: ") + $P{fiscal_year} +" "+ tr($V{L}," From") +": "+$P{start_period} +"  "+ tr($V{L},"To") +": "+ $P{end_period}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year") + ": " + $P{fiscal_year} +" "+ tr($V{L}," From") +": "+$P{start_period} +"  "+ tr($V{L},"To") +": "+ $P{end_period}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement positionType="Float" x="10" y="55" width="545" height="10" uuid="4928ddc3-3ffa-43fc-ab3a-728ebf0b2893"/>
