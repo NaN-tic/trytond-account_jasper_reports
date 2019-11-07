@@ -457,9 +457,6 @@ class TrialBalanceReport(JasperReport):
                 if digits and account.code:
                     if len(account.code.strip()) < digits:
                         continue
-                    elif (len(account.code) == digits and
-                            account.type == None):
-                        account.kind = 'other'
 
                 vals = _amounts(account, init_values, values)
                 initial, credit, debit, balance = vals
