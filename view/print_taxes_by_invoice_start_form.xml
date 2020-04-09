@@ -9,6 +9,8 @@ copyright notices and license terms. -->
     <field name="partner_type"/>
     <label name="grouping"/>
     <field name="grouping"/>
+    <label name="tax_type"/>
+    <field name="tax_type"/>
     <label name="fiscalyear"/>
     <field name="fiscalyear"/>
     <newline/>

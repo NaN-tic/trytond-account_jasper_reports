@@ -35,6 +35,11 @@ class PrintTaxesByInvoiceAndPeriodStart(ModelView):
             ('base_tax_code', 'Base Tax Code'),
             ('invoice', 'Invoice'),
             ], 'Grouping', required=True)
+    tax_type = fields.Selection([
+            ('all', 'All'),
+            ('invoiced', 'Invoiced'),
+            ('refunded', 'Refunded'),
+            ], 'Tax Type', required=True)
     totals_only = fields.Boolean('Totals Only')
     parties = fields.Many2Many('party.party', None, None, 'Parties')
     output_format = fields.Selection([
@@ -70,6 +75,10 @@ class PrintTaxesByInvoiceAndPeriodStart(ModelView):
     @staticmethod
     def default_grouping():
         return 'base_tax_code'
+
+    @staticmethod
+    def default_tax_type():
+        return 'all'
 
     @staticmethod
     def default_fiscalyear():
@@ -114,6 +123,7 @@ class PrintTaxesByInvoiceAndPeriod(Wizard):
             'partner_type': self.start.partner_type,
             'totals_only': self.start.totals_only,
             'grouping': self.start.grouping,
+            'tax_type': self.start.tax_type,
             }
 
         fiscalyear = FiscalYear(data['fiscalyear'])
@@ -230,6 +240,11 @@ class TaxesByInvoiceReport(JasperReport):
 
         if parties:
             domain += [('invoice.party', 'in', parties)],
+
+        if data['tax_type'] == 'invoiced':
+            domain += [('base', '>=', 0)]
+        elif data['tax_type'] == 'refunded':
+            domain += [('base', '<', 0)]
 
         report_ids = [x.id for x in AccountInvoiceTax.search(domain,
             order=[('account', 'ASC')])]
