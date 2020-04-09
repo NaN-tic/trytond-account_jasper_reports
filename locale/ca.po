@@ -146,6 +146,11 @@ msgctxt ""
 msgid "Party Type"
 msgstr "Tipus de tercer"
 
+msgctxt ""
+"field:account_jasper_reports.print_taxes_by_invoice.start,tax_type:"
+msgid "Tax Type"
+msgstr "Tipus d'impostos"
+
 msgctxt "field:account_jasper_reports.print_taxes_by_invoice.start,periods:"
 msgid "Periods"
 msgstr "Períodes"
@@ -858,6 +863,21 @@ msgctxt ""
 "selection:account_jasper_reports.print_taxes_by_invoice.start,partner_type:"
 msgid "Suppliers"
 msgstr "Proveïdors"
+
+msgctxt ""
+"selection:account_jasper_reports.print_taxes_by_invoice.start,tax_type:"
+msgid "All"
+msgstr "Tots"
+
+msgctxt ""
+"selection:account_jasper_reports.print_taxes_by_invoice.start,tax_type:"
+msgid "Invoiced"
+msgstr "Facturats"
+
+msgctxt ""
+"selection:account_jasper_reports.print_taxes_by_invoice.start,tax_type:"
+msgid "Refunded"
+msgstr "Rectificats"
 
 msgctxt ""
 "selection:account_jasper_reports.print_trial_balance.start,output_format:"
