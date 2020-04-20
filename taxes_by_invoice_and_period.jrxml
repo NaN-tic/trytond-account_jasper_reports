@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d6f9a712-83ca-4bb9-a7ca-fa195ab39a4f">
 	<property name="TRYTON_RELATIONS" value="[&apos;invoice&apos;,&apos;invoice/move&apos;,&apos;invoice/move/period&apos;,&apos;tax&apos;,&apos;account&apos;]"/>
-	<property name="ireport.zoom" value="2.143588810000006"/>
+	<property name="ireport.zoom" value="1.3310000000000035"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false"/>
@@ -99,6 +99,9 @@
 	</variable>
 	<variable name="total_tax" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{tax_amount}]]></variableExpression>
+	</variable>
+	<variable name="total_base" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{base_amount}]]></variableExpression>
 	</variable>
 	<group name="quarter" isStartNewPage="true">
 		<groupExpression><![CDATA[$F{period}]]></groupExpression>
@@ -420,14 +423,14 @@
 				<textFieldExpression><![CDATA[$V{total_base_tax}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="458" y="0" width="157" height="16" uuid="464566cb-7374-45bf-9533-05fe7a2f8315"/>
+				<reportElement x="380" y="0" width="157" height="16" uuid="464566cb-7374-45bf-9533-05fe7a2f8315"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Total")]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
-				<reportElement x="615" y="0" width="55" height="16" uuid="eb5cc36a-e313-49af-9798-0d44b54e94d9"/>
+				<reportElement x="573" y="0" width="97" height="16" uuid="eb5cc36a-e313-49af-9798-0d44b54e94d9"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
@@ -441,6 +444,13 @@
 					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{total}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="513" y="0" width="59" height="16" uuid="017ab724-2bdd-45c5-95f2-48e42d1e3265"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_base}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>
