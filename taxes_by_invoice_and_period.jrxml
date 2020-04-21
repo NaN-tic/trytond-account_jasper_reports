@@ -16,6 +16,8 @@
 	<parameter name="parties" class="java.lang.String"/>
 	<parameter name="company_rec_name" class="java.lang.String"/>
 	<parameter name="company_vat" class="java.lang.String"/>
+	<parameter name="end_date" class="java.lang.String"/>
+	<parameter name="start_date" class="java.lang.String"/>
 	<queryString language="xPath">
 		<![CDATA[/data/record]]>
 	</queryString>
@@ -240,7 +242,9 @@
 				<textFieldExpression><![CDATA[tr($V{L},"Taxes By Invoice and Period")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="10" y="39" width="791" height="10" uuid="eb59ec7b-461a-41b5-8120-893f3b715c40"/>
+				<reportElement positionType="Float" x="10" y="39" width="640" height="10" uuid="eb59ec7b-461a-41b5-8120-893f3b715c40">
+					<printWhenExpression><![CDATA[$P{fiscal_year} != ""]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
@@ -249,11 +253,11 @@
     ?
         tr($V{L},"All Periods")
     :
-        tr($V{L},"Periods: ") + $P{periods}
+        tr($V{L},"Periods:") + " " + $P{periods}
     )]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="10" y="50" width="791" height="10" uuid="ef2818fa-0de0-4299-98ba-7ad53b498ce6"/>
+				<reportElement positionType="Float" x="10" y="50" width="640" height="10" uuid="ef2818fa-0de0-4299-98ba-7ad53b498ce6"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
@@ -301,6 +305,24 @@
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}+" /"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="650" y="50" width="152" height="10" uuid="e8f3f044-de02-4ead-b572-d8d2bbe493ab">
+					<printWhenExpression><![CDATA[$P{end_date} != ""]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L},"Final posting date")+": "+$P{end_date}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="650" y="39" width="152" height="10" uuid="79393839-2749-4dc8-8a69-ea9267e7b646">
+					<printWhenExpression><![CDATA[$P{start_date} != ""]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[tr($V{L},"Initial posting date")+": "+$P{start_date}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>

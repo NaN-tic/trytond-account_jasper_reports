@@ -245,7 +245,7 @@
 			</textField>
 			<textField>
 				<reportElement positionType="Float" x="10" y="40" width="640" height="10" uuid="77d8243f-2b04-402a-941b-c73f12d90afe">
-					<printWhenExpression><![CDATA[$P{start_date} == ""]]></printWhenExpression>
+					<printWhenExpression><![CDATA[$P{fiscal_year} != ""]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="8"/>
@@ -255,7 +255,7 @@
     ?
         tr($V{L},"All Periods")
     :
-        tr($V{L},"Periods: ") +" "+ $P{periods}
+        tr($V{L},"Periods:") + " " + $P{periods}
     )]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
@@ -300,7 +300,7 @@
 				<textFieldExpression><![CDATA[tr($V{L},"Initial posting date")+": "+$P{start_date}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement positionType="Float" x="650" y="52" width="152" height="10" uuid="b487e094-1023-4cfa-a1c9-e69ef71348e4">
+				<reportElement positionType="Float" x="650" y="51" width="152" height="10" uuid="b487e094-1023-4cfa-a1c9-e69ef71348e4">
 					<printWhenExpression><![CDATA[$P{end_date} != ""]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right">
