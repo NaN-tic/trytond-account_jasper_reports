@@ -19,7 +19,10 @@ class PrintTaxesByInvoiceAndPeriodStart(ModelView):
     __name__ = 'account_jasper_reports.print_taxes_by_invoice.start'
 
     fiscalyear = fields.Many2One('account.fiscalyear', 'Fiscal Year',
-            required=True)
+        states={
+            'invisible': Eval('start_date') | Eval('end_date'),
+            'required': ~Eval('start_date') & ~Eval('end_date'),
+            })
     periods = fields.Many2Many('account.period', None, None, 'Periods',
         states={
             'invisible': Eval('start_date') | Eval('end_date'),
@@ -55,6 +58,8 @@ class PrintTaxesByInvoiceAndPeriodStart(ModelView):
             ],
         states={
             'invisible': Bool(Eval('periods')),
+            'required': ((Eval('start_date') | Eval('end_date')) &
+                ~Bool(Eval('periods'))),
             },
         depends=['end_date'])
     end_date = fields.Date('Final posting date',
@@ -65,6 +70,8 @@ class PrintTaxesByInvoiceAndPeriodStart(ModelView):
             ],
         states={
             'invisible': Bool(Eval('periods')),
+            'required': ((Eval('end_date') | Eval('start_date')) &
+                ~Bool(Eval('periods'))),
             },
         depends=['start_date'])
 
@@ -110,11 +117,14 @@ class PrintTaxesByInvoiceAndPeriod(Wizard):
     print_ = StateReport('account_jasper_reports.taxes_by_invoice')
 
     def do_print_(self, action):
-        FiscalYear = Pool().get('account.fiscalyear')
+        fiscalyear = (self.start.fiscalyear.id if self.start.fiscalyear
+            else None)
+        if self.start.start_date:
+            fiscalyear = None
 
         data = {
             'company': self.start.company.id,
-            'fiscalyear': self.start.fiscalyear.id,
+            'fiscalyear': fiscalyear,
             'start_date': self.start.start_date,
             'end_date': self.start.end_date,
             'periods': [x.id for x in self.start.periods],
@@ -126,19 +136,6 @@ class PrintTaxesByInvoiceAndPeriod(Wizard):
             'tax_type': self.start.tax_type,
             }
 
-        fiscalyear = FiscalYear(data['fiscalyear'])
-        if data['start_date']:
-            if (data['start_date'] < fiscalyear.start_date
-                    or data['start_date'] > fiscalyear.end_date):
-                raise UserError(gettext(
-                    'account_jasper_reports.fiscalyear_start_date',
-                    fiscalyear=fiscalyear.name))
-        if data['end_date']:
-            if (data['end_date'] < fiscalyear.start_date
-                    or data['end_date'] > fiscalyear.end_date):
-                raise UserError(gettext(
-                    'account_jasper_reports.fiscalyear_end_date',
-                    fiscalyear=fiscalyear.name))
         if data['grouping'] == 'invoice':
             state_action = StateAction('account_jasper_reports.'
                 'report_taxes_by_invoice_and_period')
@@ -171,20 +168,21 @@ class TaxesByInvoiceReport(JasperReport):
         Party = pool.get('party.party')
         AccountInvoiceTax = pool.get('account.invoice.tax')
 
-        fiscalyear = FiscalYear(data['fiscalyear'])
+        fiscalyear = (FiscalYear(data['fiscalyear']) if data.get('fiscalyear')
+            else None)
         start_date = data['start_date']
         end_date = data['end_date']
 
         periods = []
+        periods_subtitle = ''
         if data.get('periods'):
             periods = Period.browse(data.get('periods', []))
             periods_subtitle = []
             for x in periods:
                 periods_subtitle.append(x.rec_name)
             periods_subtitle = '; '.join(periods_subtitle)
-        else:
+        elif not start_date and not end_date:
             periods = Period.search([('fiscalyear', '=', fiscalyear.id)])
-            periods_subtitle = ''
 
         with Transaction().set_context(active_test=False):
             parties = Party.browse(data.get('parties', []))
@@ -204,8 +202,7 @@ class TaxesByInvoiceReport(JasperReport):
             company = Company(data['company'])
 
         parameters = {}
-        parameters['company'] = fiscalyear.company.rec_name
-        parameters['fiscal_year'] = fiscalyear.rec_name
+        parameters['fiscal_year'] = fiscalyear.rec_name if fiscalyear else ''
         parameters['start_date'] = (start_date.strftime('%d/%m/%Y')
             if start_date else '')
         parameters['end_date'] = (end_date.strftime('%d/%m/%Y')
@@ -213,7 +210,7 @@ class TaxesByInvoiceReport(JasperReport):
         parameters['parties'] = parties_subtitle
         parameters['periods'] = periods_subtitle
         parameters['TOTALS_ONLY'] = data['totals_only'] and True or False
-        parameters['company_rec_name'] = company and company.rec_name or ''
+        parameters['company_rec_name'] = company.rec_name if company else ''
         parameters['company_vat'] = (company
             and company.party.tax_identifier and
             company.party.tax_identifier.code) or ''
