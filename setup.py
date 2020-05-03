@@ -2,10 +2,6 @@
 # encoding: utf-8
 
 from setuptools import setup
-import re#!/usr/bin/env python
-# encoding: utf-8
-
-from setuptools import setup
 import re
 import os
 import io
@@ -13,8 +9,11 @@ from configparser import ConfigParser
 
 MODULE = 'account_jasper_reports'
 PREFIX = 'trytonspain'
-MODULE2PREFIX = {'jasper_reports': 'trytonspain',
-    'account_invoice_company_currency': 'trytonspain'}
+MODULE2PREFIX = {'jasper_reports': 'trytonspain', 'account_invoice_company_currency': 'trytonspain'}
+OWNER = {
+    'nantic':'NaN-tic',
+    'trytonzz':'nanticzz',
+}
 
 
 def read(fname):
@@ -32,6 +31,27 @@ def get_require_version(name):
         major_version, minor_version + 1)
     return require
 
+def get_requires(depends='depends'):
+  requires = []
+  for dep in info.get(depends, []):
+      if not re.match(r'(ir|res)(\W|$)', dep):
+          prefix = MODULE2PREFIX.get(dep, 'trytond')
+          owner = OWNER.get(prefix, prefix)
+          if prefix == 'trytond':
+              requires.append(get_require_version('%s_%s' % (prefix, dep)))
+          else:
+              requires.append(
+                  '%(prefix)s-%(dep)s@git+https://github.com/%(owner)s/'
+                  'trytond-%(dep)s.git@%(branch)s'
+                  '#egg=%(prefix)s-%(dep)s-%(series)s'%{
+                          'prefix': prefix,
+                          'owner': owner,
+                          'dep':dep,
+                          'branch': branch,
+                          'series': series,})
+
+  return requires
+
 config = ConfigParser()
 config.readfp(open('tryton.cfg'))
 info = dict(config.items('tryton'))
@@ -46,37 +66,22 @@ minor_version = int(minor_version)
 
 requires = []
 
-for dep in info.get('depends', []):
-    if not re.match(r'(ir|res)(\W|$)', dep):
-        prefix = MODULE2PREFIX.get(dep, 'trytond')
-        requires.append(get_require_version('%s_%s' % (prefix, dep)))
-requires.append(get_require_version('trytond'))
-requires += []
-
-tests_require = [
-    get_require_version('proteus'),
-    get_require_version('trytond_account_invoice'),
-    ]
-
 series = '%s.%s' % (major_version, minor_version)
 if minor_version % 2:
     branch = 'master'
 else:
     branch = series
 
-dependency_links = [
-   ('git+https://github.com/trytonspain/'
-       'trytond-jasper_reports@%(branch)s'
-       '#egg=trytonspain-jasper_reports-%(series)s'%{
-               'branch': branch,
-               'series': series,}),
+requires += get_requires('depends')
 
-   ('git+https://github.com/trytonspain/'
-       'trytond-account_invoice_company_currency@%(branch)s'
-       '#egg=trytonspain-account_invoice_company_currency-%(series)s'%{
-               'branch': branch,
-               'series': series,}),
-]
+tests_require = [
+    get_require_version('proteus'),
+    
+    ]
+tests_require += get_requires('extras_depend')
+requires += [get_require_version('trytond_account_invoice')]
+
+dependency_links = []
 
 if minor_version % 2:
     # Add development index for testing with proteus
@@ -96,8 +101,12 @@ setup(name='%s_%s' % (PREFIX, MODULE),
         ],
     package_data={
         'trytond.modules.%s' % MODULE: (info.get('xml', [])
-            + ['tryton.cfg', 'locale/*.po', 'tests/*.rst', 'view/*.xml']),
+            + ['tryton.cfg', 'locale/*.po', 'tests/*.rst', 'view/*.xml',
+            'icons/*.svg', '*.jrxml']),
         },
+    project_urls = {
+       "Source Code": 'https://github.com:trytonspain/trytond-account_jasper_reports'
+    },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Plugins',
