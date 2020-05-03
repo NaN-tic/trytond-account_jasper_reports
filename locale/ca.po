@@ -641,7 +641,7 @@ msgid "Parties: "
 msgstr "Tercers:"
 
 msgctxt "report:account_jasper_reports.taxes_by_invoice:"
-msgid "Periods: "
+msgid "Periods:"
 msgstr "Períodes:"
 
 msgctxt "report:account_jasper_reports.taxes_by_invoice:"
@@ -709,7 +709,7 @@ msgid "Parties: "
 msgstr "Tercers:"
 
 msgctxt "report:account_jasper_reports.taxes_by_invoice_and_period:"
-msgid "Periods: "
+msgid "Periods:"
 msgstr "Períodes:"
 
 msgctxt "report:account_jasper_reports.taxes_by_invoice_and_period:"
