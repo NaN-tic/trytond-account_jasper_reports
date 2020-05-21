@@ -404,7 +404,8 @@ class TrialBalanceReport(JasperReport):
         if comparison_fiscalyear:
             # second_dict = {}.fromkeys(accounts, Decimal('0.00'))
             logger.info('Calc initial vals for comparison period')
-            with transaction.set_context(periods=comparison_periods):
+            with transaction.set_context(fiscalyear=comparison_fiscalyear.id,
+                    periods=comparison_periods):
                 comparison_values = Account.read_account_vals(accounts,
                     with_moves=with_moves)
 
@@ -439,11 +440,11 @@ class TrialBalanceReport(JasperReport):
                             fiscalyear.company)
 
                 logger.info('Calc values for comparsion for parties')
-                with transaction.set_context(fiscalyear=fiscalyear.id,
+                with transaction.set_context(fiscalyear=comparision_fiscalyear.id,
                         periods=comparison_periods):
                     comparison_party_values = \
                         Party.get_account_values_by_party(parties, accounts,
-                            fiscalyear.company)
+                            comparision_fiscalyear.company)
 
         records = []
         virt_records = {}
