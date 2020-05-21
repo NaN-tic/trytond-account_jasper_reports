@@ -440,11 +440,11 @@ class TrialBalanceReport(JasperReport):
                             fiscalyear.company)
 
                 logger.info('Calc values for comparsion for parties')
-                with transaction.set_context(fiscalyear=comparision_fiscalyear.id,
+                with transaction.set_context(fiscalyear=comparison_fiscalyear.id,
                         periods=comparison_periods):
                     comparison_party_values = \
                         Party.get_account_values_by_party(parties, accounts,
-                            comparision_fiscalyear.company)
+                            comparison_fiscalyear.company)
 
         records = []
         virt_records = {}
