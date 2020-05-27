@@ -303,9 +303,9 @@ class GeneralLedgerReport(JasperReport):
                 if balance == 0:
                     continue
                 account_type = 'other'
-                if line.account.type and line.account.type.receivable:
+                if account.type and account.type.receivable:
                     account_type = 'receivable'
-                elif line.account.type and line.account.type.payable:
+                elif account.type and account.type.payable:
                     account_type = 'payable'
                 records.append({
                         'sequence': 1,
@@ -340,9 +340,9 @@ class GeneralLedgerReport(JasperReport):
                             currentKey = account
                         sequence += 1
                         account_type = 'other'
-                        if line.account.type and line.account.type.receivable:
+                        if account.type and account.type.receivable:
                             account_type = 'receivable'
-                        elif line.account.type and line.account.type.payable:
+                        elif account.type and account.type.payable:
                             account_type = 'payable'
                         records.append({
                                 'sequence': sequence,
