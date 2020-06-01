@@ -461,16 +461,23 @@ class TrialBalanceReport(JasperReport):
                 vals = _amounts(account, init_values, values)
                 initial, credit, debit, balance = vals
 
-                if with_moves_or_initial:
-                    if credit == 0 and debit == 0 and initial == 0:
-                        continue
-                elif with_moves and credit == 0 and debit == 0:
-                    continue
-
                 comp_vals = _amounts(account,
                     comparison_initial_values, comparison_values)
                 comp_initial, comp_credit, comp_debit, comp_balance = \
                     comp_vals
+
+                empty = False
+                comp_empty = False
+                if with_moves_or_initial:
+                    empty = (credit == 0 and debit == 0 and initial == 0)
+                    comp_empty = (comp_credit == 0 and comp_debit == 0
+                        and comp_initial == 0)
+                elif with_moves:
+                    empty = (credit == 0 and debit == 0 and initial == 0)
+                    comp_empty = (comp_credit == 0 and comp_debit == 0)
+
+                if empty and (not comparison_fiscalyear or comp_empty):
+                    continue
 
                 if split_parties and account.party_required:
                     account_parties = parties
