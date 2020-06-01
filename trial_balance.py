@@ -385,8 +385,7 @@ class TrialBalanceReport(JasperReport):
 
         logger.info('Calc amounts')
         # Calc first period values
-        with transaction.set_context(fiscalyear=fiscalyear.id,
-                periods=periods):
+        with transaction.set_context(periods=periods):
             values = Account.read_account_vals(accounts, with_moves=with_moves)
 
         # Calc Initial Balance for first period
@@ -404,8 +403,7 @@ class TrialBalanceReport(JasperReport):
         if comparison_fiscalyear:
             # second_dict = {}.fromkeys(accounts, Decimal('0.00'))
             logger.info('Calc initial vals for comparison period')
-            with transaction.set_context(fiscalyear=comparison_fiscalyear.id,
-                    periods=comparison_periods):
+            with transaction.set_context(periods=comparison_periods):
                 comparison_values = Account.read_account_vals(accounts,
                     with_moves=with_moves)
 
