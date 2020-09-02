@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.9.0.final using JasperReports Library version 5.5.0  -->
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 5.5.2  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="account_movements2.jrxml" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7e6f5ed5-9314-4647-bc83-20dadb015d73">
 	<property name="ireport.zoom" value="2.143588810000005"/>
 	<property name="ireport.x" value="11"/>
@@ -87,7 +87,7 @@
 		<groupHeader>
 			<band height="14">
 				<textField isBlankWhenNull="true">
-					<reportElement x="58" y="2" width="280" height="10" uuid="a71b825d-5e5f-4017-a0d7-c42800b955ba"/>
+					<reportElement x="68" y="2" width="280" height="10" uuid="a71b825d-5e5f-4017-a0d7-c42800b955ba"/>
 					<textElement verticalAlignment="Middle">
 						<font size="8" isBold="true" pdfFontName="Helvetica"/>
 					</textElement>
@@ -97,7 +97,7 @@
     $F{account_name}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement x="10" y="2" width="48" height="10" uuid="8331776a-e2c7-4553-9c34-3cc43d22d97d"/>
+					<reportElement x="10" y="2" width="56" height="10" uuid="8331776a-e2c7-4553-9c34-3cc43d22d97d"/>
 					<textElement verticalAlignment="Middle">
 						<font size="8" isBold="true" pdfFontName="Helvetica"/>
 					</textElement>
@@ -137,7 +137,7 @@
 					</graphicElement>
 				</line>
 				<textField isBlankWhenNull="true">
-					<reportElement x="10" y="12" width="48" height="10" uuid="de9dc99a-6488-4d25-8d74-e91f6ba3f684">
+					<reportElement x="10" y="12" width="56" height="10" uuid="de9dc99a-6488-4d25-8d74-e91f6ba3f684">
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					</reportElement>
 					<textElement verticalAlignment="Middle">
@@ -146,7 +146,7 @@
 					<textFieldExpression><![CDATA[$F{account_code}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement x="58" y="12" width="195" height="10" uuid="d911c76f-fac9-48f4-9e29-ea7db54dee5c">
+					<reportElement x="68" y="12" width="255" height="10" uuid="d911c76f-fac9-48f4-9e29-ea7db54dee5c">
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					</reportElement>
 					<textElement verticalAlignment="Middle">
@@ -195,7 +195,7 @@
 					<textFieldExpression><![CDATA[$F{balance} == null ? 0.0 : $F{balance}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="311" y="12" width="79" height="10" uuid="9801cfd0-f14c-4cd3-b1b4-cf8a4e98e2bc">
+					<reportElement x="326" y="12" width="64" height="10" uuid="9801cfd0-f14c-4cd3-b1b4-cf8a4e98e2bc">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
