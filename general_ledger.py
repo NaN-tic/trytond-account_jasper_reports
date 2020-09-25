@@ -281,8 +281,12 @@ class GeneralLedgerReport(JasperReport):
                         'account_type': account_type,
                         'date': line.date.strftime('%d/%m/%Y'),
                         'move_line_name': line.description or '',
-                        'ref': (line.origin.rec_name if line.origin and
-                            hasattr(line.origin, 'rec_name') else ''),
+                        'ref': (line.move_origin.rec_name
+                            if line.move_origin and
+                            hasattr(line.move_origin, 'rec_name') else ''),
+                        'party_origin': (line.move_origin.party.rec_name
+                            if line.move_origin
+                            and hasattr(line.move_origin, 'party') else ''),
                         'move_number': line.move.number,
                         'move_post_number': (line.move.post_number
                             if line.move.post_number else ''),

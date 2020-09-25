@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 5.5.2  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="account_movements2.jrxml" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7e6f5ed5-9314-4647-bc83-20dadb015d73">
 	<property name="ireport.zoom" value="2.143588810000005"/>
 	<property name="ireport.x" value="11"/>
@@ -42,6 +41,9 @@
 	</field>
 	<field name="ref" class="java.lang.String">
 		<fieldDescription><![CDATA[ref]]></fieldDescription>
+	</field>
+	<field name="party_origin" class="java.lang.String">
+		<fieldDescription><![CDATA[party_origin]]></fieldDescription>
 	</field>
 	<field name="party_name" class="java.lang.String">
 		<fieldDescription><![CDATA[party_name]]></fieldDescription>
@@ -364,6 +366,13 @@
 				<textFieldExpression><![CDATA[$F{move_line_name} != '###PREVIOUSBALANCE###'
 ?
     $F{ref} +
+    (
+        $F{party_origin} != ""
+        ?
+            " " + $F{party_origin}
+        :
+            ""
+    ) +
     (
         $F{ref} != "" && $F{move_line_name} != ""
         ?
