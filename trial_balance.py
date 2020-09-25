@@ -472,7 +472,7 @@ class TrialBalanceReport(JasperReport):
                     comp_empty = (comp_credit == 0 and comp_debit == 0
                         and comp_initial == 0)
                 elif with_moves:
-                    empty = (credit == 0 and debit == 0 and initial == 0)
+                    empty = (credit == 0 and debit == 0)
                     comp_empty = (comp_credit == 0 and comp_debit == 0)
 
                 if empty and (not comparison_fiscalyear or comp_empty):
