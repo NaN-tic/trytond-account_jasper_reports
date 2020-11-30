@@ -215,7 +215,9 @@ class TaxesByInvoiceReport(JasperReport):
             and company.party.tax_identifier and
             company.party.tax_identifier.code) or ''
 
-        domain = [('invoice.state', 'in', ['posted', 'paid'])]
+        domain = [
+            ('invoice.move', '!=', None),
+            ]
 
         if data['partner_type'] == 'customers':
             domain += [('invoice.type', '=', 'out')]
