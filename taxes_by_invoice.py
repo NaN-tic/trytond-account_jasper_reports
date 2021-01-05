@@ -74,6 +74,13 @@ class PrintTaxesByInvoiceAndPeriodStart(ModelView):
                 ~Bool(Eval('periods'))),
             },
         depends=['start_date'])
+    taxes = fields.Many2Many('account.tax', None, None, 'Taxes',
+        domain=[
+            If(Eval('partner_type') == 'customers',
+                ('group.kind', 'in', ('both', 'sale')),
+                ('group.kind', 'in', ('both', 'purchase'))
+                ),
+            ], depends=['partner_type'])
 
     @staticmethod
     def default_partner_type():
@@ -134,6 +141,7 @@ class PrintTaxesByInvoiceAndPeriod(Wizard):
             'totals_only': self.start.totals_only,
             'grouping': self.start.grouping,
             'tax_type': self.start.tax_type,
+            'taxes': [x.id for x in self.start.taxes],
             }
 
         if data['grouping'] == 'invoice':
@@ -166,6 +174,7 @@ class TaxesByInvoiceReport(JasperReport):
         FiscalYear = pool.get('account.fiscalyear')
         Period = pool.get('account.period')
         Party = pool.get('party.party')
+        Tax = pool.get('account.tax')
         AccountInvoiceTax = pool.get('account.invoice.tax')
 
         fiscalyear = (FiscalYear(data['fiscalyear']) if data.get('fiscalyear')
@@ -233,9 +242,8 @@ class TaxesByInvoiceReport(JasperReport):
                  ('invoice.move.date', '<=', end_date),
                  ]
 
-        if not start_date and not end_date:
-            if periods:
-                domain += [('invoice.move.period', 'in', periods)]
+        if not start_date and not end_date and periods:
+            domain += [('invoice.move.period', 'in', periods)]
 
         if parties:
             domain += [('invoice.party', 'in', parties)],
@@ -244,6 +252,9 @@ class TaxesByInvoiceReport(JasperReport):
             domain += [('base', '>=', 0)]
         elif data['tax_type'] == 'refunded':
             domain += [('base', '<', 0)]
+
+        if data['taxes']:
+            domain += [('tax', 'in', data.get('taxes', []))]
 
         report_ids = [x.id for x in AccountInvoiceTax.search(domain,
             order=[('account', 'ASC')])]

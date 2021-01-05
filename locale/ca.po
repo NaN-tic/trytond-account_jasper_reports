@@ -141,6 +141,10 @@ msgctxt "field:account_jasper_reports.print_taxes_by_invoice.start,parties:"
 msgid "Parties"
 msgstr "Tercers"
 
+msgctxt "field:account_jasper_reports.print_taxes_by_invoice.start,taxes:"
+msgid "Taxes"
+msgstr "Impostos"
+
 msgctxt ""
 "field:account_jasper_reports.print_taxes_by_invoice.start,partner_type:"
 msgid "Party Type"
@@ -912,6 +916,10 @@ msgstr "Deixeu-ho en blanc per seleccionar tots els tercers"
 msgctxt "view:account_jasper_reports.print_taxes_by_invoice.start:"
 msgid "Left empty to select all periods"
 msgstr "Deixeu-ho en blanc per seleccionar tots els perídoes"
+
+msgctxt "view:account_jasper_reports.print_taxes_by_invoice.start:"
+msgid "Left empty to select all taxes"
+msgstr "Deixeu-ho en blanc per seleccionar tots els impostos"
 
 msgctxt "view:account_jasper_reports.print_trial_balance.start:"
 msgid "All accounts if Empty"
