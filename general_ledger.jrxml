@@ -365,23 +365,19 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{move_line_name} != '###PREVIOUSBALANCE###'
 ?
-    $F{ref} +
-    (
-        $F{party_origin} != ""
-        ?
-            " " + $F{party_origin}
-        :
-            ""
-    ) +
-    (
-        $F{ref} != "" && $F{move_line_name} != ""
-        ?
-            " // "
-        :
-            ""
-    ) + $F{move_line_name}
+		($F{move_line_name} && $F{move_line_name} != "") ?
+			$F{move_line_name}
+		:
+		$F{ref} +
+		(
+			$F{party_origin} != ""
+			?
+				" " + $F{party_origin}
+			:
+				""
+		)
 :
-    tr($V{L},"PREVIOUS BALANCE")]]></textFieldExpression>
+	tr($V{L},"PREVIOUS BALANCE")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="58" y="2" width="70" height="10" uuid="73416a75-6242-4b71-a0a9-17e53d87855e"/>
