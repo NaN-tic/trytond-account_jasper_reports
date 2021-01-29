@@ -1101,6 +1101,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
     def test_taxes_by_invoice(self):
         'Test taxes by invoice'
         pool = Pool()
+        Date = pool.get('ir.date')
         PaymentTerm = pool.get('account.invoice.payment_term')
         TaxCode = pool.get('account.tax.code')
         Tax = pool.get('account.tax')
@@ -1110,6 +1111,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             'account_jasper_reports.print_taxes_by_invoice', type='wizard')
         TaxesByInvoiceReport = pool.get(
             'account_jasper_reports.taxes_by_invoice', type='report')
+
         company = create_company()
         fiscalyear = self.create_moves(company)
         period = fiscalyear.periods[0]
@@ -1183,6 +1185,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                         'journal': journal_revenue.id,
                         'account': receivable.id,
                         'payment_term': term.id,
+                        'payment_term_date': Date.today(),
                         'lines': [
                             ('create', [{
                                         'invoice_type': 'out',
@@ -1207,6 +1210,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                         'journal': journal_expense.id,
                         'account': payable.id,
                         'payment_term': term.id,
+                        'payment_term_date': Date.today(),
                         'lines': [
                             ('create', [{
                                         'invoice_type': 'in',
