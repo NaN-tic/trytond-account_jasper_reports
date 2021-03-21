@@ -22,9 +22,6 @@ copyright notices and license terms. -->
         </record>
 
         <!-- Create a new menu so translations are rendered correctly -->
-        <record model="ir.ui.menu" id="account.menu_print_general_journal">
-            <field name="active" eval="False"/>
-        </record>
         <menuitem id="menu_print_general_journal" action="wizard_print_journal"
             parent="account.menu_reporting" icon="tryton-print" sequence="110"
             name="Print Journal"/>
