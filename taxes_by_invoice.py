@@ -7,11 +7,6 @@ from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateAction, StateReport, Button
 from trytond.pyson import Eval, If, Bool
 from trytond.modules.jasper_reports.jasper import JasperReport
-from trytond.i18n import gettext
-from trytond.exceptions import UserError
-
-__all__ = ['PrintTaxesByInvoiceAndPeriodStart', 'PrintTaxesByInvoiceAndPeriod',
-    'TaxesByInvoiceReport', 'TaxesByInvoiceAndPeriodReport']
 
 
 class PrintTaxesByInvoiceAndPeriodStart(ModelView):
@@ -174,7 +169,6 @@ class TaxesByInvoiceReport(JasperReport):
         FiscalYear = pool.get('account.fiscalyear')
         Period = pool.get('account.period')
         Party = pool.get('party.party')
-        Tax = pool.get('account.tax')
         AccountInvoiceTax = pool.get('account.invoice.tax')
 
         fiscalyear = (FiscalYear(data['fiscalyear']) if data.get('fiscalyear')

@@ -12,9 +12,6 @@ from trytond.wizard import Wizard, StateView, StateReport, Button
 from trytond.tools import reduce_ids, grouped_slice
 from trytond.modules.jasper_reports.jasper import JasperReport
 
-__all__ = ['PrintAbreviatedJournalStart', 'PrintAbreviatedJournal',
-    'AbreviatedJournalReport']
-
 
 class PrintAbreviatedJournalStart(ModelView):
     'Print Abreviated Journal'

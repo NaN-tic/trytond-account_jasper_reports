@@ -12,9 +12,6 @@ from trytond.pyson import Eval, Bool, If
 from trytond.modules.jasper_reports.jasper import JasperReport
 from trytond.tools import grouped_slice
 
-__all__ = ['PrintGeneralLedgerStart', 'PrintGeneralLedger',
-    'GeneralLedgerReport']
-
 
 class PrintGeneralLedgerStart(ModelView):
     'Print General Ledger'
