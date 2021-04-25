@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="901838a5-c3ed-4bbc-94e5-29788bc41da9">
-	<property name="ireport.zoom" value="2.3579476910000112"/>
+	<property name="ireport.zoom" value="1.3310000000000062"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false"/>
@@ -471,9 +471,8 @@
 		</band>
 	</detail>
 	<summary>
-		<band height="16">
+		<band height="36">
 			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-			<printWhenExpression><![CDATA[!$P{comparison_fiscalyear}.equalsIgnoreCase("")]]></printWhenExpression>
 			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
 				<reportElement x="469" y="4" width="60" height="12" uuid="eb6c0538-9694-4cd5-97dc-1fb1df9755f3">
 					<printWhenExpression><![CDATA[!$P{comparison_fiscalyear}.equalsIgnoreCase("")]]></printWhenExpression>
