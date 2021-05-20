@@ -39,8 +39,9 @@ class PrintGeneralLedgerStart(ModelView):
             ],
         depends=['fiscalyear', 'start_period'])
     accounts = fields.Many2Many('account.account', None, None, 'Accounts')
-    all_accounts = fields.Boolean('All accounts with and without balance', help='If unchecked only '
-        'print accounts with previous balance different from 0 or with moves')
+    all_accounts = fields.Boolean('All accounts with and without balance',
+        help='If unchecked only print accounts with previous balance different'
+        ' from 0 or with moves')
     parties = fields.Many2Many('party.party', None, None, 'Parties')
     output_format = fields.Selection([
             ('pdf', 'PDF'),
@@ -225,16 +226,16 @@ class GeneralLedgerReport(JasperReport):
             """ % where)
         line_ids = [x[0] for x in cursor.fetchall()]
 
-        start_date = start_period.start_date if start_period else fiscalyear.start_date
+        start_date = (start_period.start_date if start_period else
+            fiscalyear.start_date)
         initial_balance_date = start_date - timedelta(days=1)
         with Transaction().set_context(date=initial_balance_date):
             init_values = {}
             if not parties:
-                init_values = Account.read_account_vals(accounts, with_moves=False,
-                    exclude_party_moves=True)
+                init_values = Account.read_account_vals(accounts,
+                    with_moves=False, exclude_party_moves=True)
             init_party_values = Party.get_account_values_by_party(
                 parties, accounts, fiscalyear.company)
-
 
         records = []
         parties_general_ledger = set()
@@ -245,8 +246,8 @@ class GeneralLedgerReport(JasperReport):
             for line in Line.browse(group_lines):
                 if line.account not in accounts_w_moves:
                     accounts_w_moves.append(line.account.id)
-                if (line.account.type.receivable == True or
-                        line.account.type.payable == True) :
+                if (line.account.type.receivable is True or
+                        line.account.type.payable is True):
                     currentKey = (line.account, line.party and line.party
                         or None)
                 else:
@@ -264,8 +265,8 @@ class GeneralLedgerReport(JasperReport):
                         balance = init_party_values.get(account_id,
                             {}).get(party_id, {}).get('balance', Decimal(0))
                     else:
-                        balance = init_values.get(account_id, {}).get('balance',
-                            Decimal(0))
+                        balance = init_values.get(account_id, {}).get(
+                            'balance', Decimal(0))
                 balance += line.debit - line.credit
                 sequence += 1
                 account_type = 'other'
@@ -298,7 +299,8 @@ class GeneralLedgerReport(JasperReport):
 
         if data.get('all_accounts', True):
             init_values_account_wo_moves = {
-                k: init_values[k] for k in init_values if k not in accounts_w_moves}
+                k: init_values[k] for k in init_values
+                if k not in accounts_w_moves}
             for account_id, values in init_values_account_wo_moves.items():
                 account = Account(account_id)
                 balance = values.get('balance', Decimal(0))
@@ -326,10 +328,17 @@ class GeneralLedgerReport(JasperReport):
                         'balance': balance,
                         })
 
-            if parties:
+            if parties or parties_general_ledger:
                 account_ids = [k for k, _ in init_party_values.items()]
                 accounts = dict((a.id, a) for a in Account.browse(account_ids))
-                parties = dict((p.id, p) for p in parties)
+                if parties:
+                    parties = dict((p.id, p) for p in parties)
+                elif parties_general_ledger:
+                    pgl = dict((p, Party(p))
+                        for a, av in init_party_values.items()
+                        for p, pv in av.items()
+                        if p not in parties_general_ledger)
+                    parties = pgl
 
                 for k, v in init_party_values.items():
                     account = accounts[k]
@@ -343,26 +352,28 @@ class GeneralLedgerReport(JasperReport):
                         else:
                             currentKey = account
                         sequence += 1
-                        account_type = 'other'
-                        if account.type and account.type.receivable:
-                            account_type = 'receivable'
-                        elif account.type and account.type.payable:
-                            account_type = 'payable'
-                        records.append({
-                                'sequence': sequence,
-                                'key': str(currentKey),
-                                'account_code': account.code or '',
-                                'account_name': account.name or '',
-                                'account_type': account_type,
-                                'move_line_name': '###PREVIOUSBALANCE###',
-                                'ref': '-',
-                                'move_number': '-',
-                                'move_post_number': '-',
-                                'party_name': party.name,
-                                'credit': z.get('credit', Decimal(0)),
-                                'debit': z.get('debit', Decimal(0)),
-                                'balance': z.get('balance', Decimal(0)),
-                                })
+                        balance = z.get('balance', Decimal(0))
+                        if balance:
+                            account_type = 'other'
+                            if account.type and account.type.receivable:
+                                account_type = 'receivable'
+                            elif account.type and account.type.payable:
+                                account_type = 'payable'
+                            records.append({
+                                    'sequence': sequence,
+                                    'key': str(currentKey),
+                                    'account_code': account.code or '',
+                                    'account_name': account.name or '',
+                                    'account_type': account_type,
+                                    'move_line_name': '###PREVIOUSBALANCE###',
+                                    'ref': '-',
+                                    'move_number': '-',
+                                    'move_post_number': '-',
+                                    'party_name': party.name,
+                                    'credit': z.get('credit', Decimal(0)),
+                                    'debit': z.get('debit', Decimal(0)),
+                                    'balance': balance,
+                                    })
         return records, parameters
 
     @classmethod
