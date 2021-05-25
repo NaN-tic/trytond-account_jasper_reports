@@ -603,11 +603,11 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             Decimal('80'),             # Expense
             Decimal('130'),            # Expense
             Decimal('-30'),            # Payable Party 1
-            Decimal('-50'),            # Payable Party 2
-            Decimal('-100'),           # Payable Party 2
+            Decimal('-80'),            # Payable Party 2
+            Decimal('-130'),           # Payable Party 2
             Decimal('100'),            # Receivable Party 1
-            Decimal('200'),            # Receivable Party 2
-            Decimal('500'),            # Receivable Party 2
+            Decimal('300'),            # Receivable Party 2
+            Decimal('600'),            # Receivable Party 2
             Decimal('-100'),           # Revenue
             Decimal('-300'),           # Revenue
             Decimal('-600'),           # Revenue
@@ -1411,12 +1411,12 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             Decimal('30'),            # Expense
             Decimal('80'),            # Expense
             Decimal('130'),            # Expense
-            Decimal('-60'),            # Payable Party 1
-            Decimal('-150'),           # Payable Party 2
-            Decimal('-200'),           # Payable Party 2
-            Decimal('200'),            # Receivable Party 1
-            Decimal('700'),            # Receivable Party 2
-            Decimal('1000'),           # Receivable Party 2
+            Decimal('-30'),            # Payable Party 1
+            Decimal('-80'),           # Payable Party 2
+            Decimal('-130'),           # Payable Party 2
+            Decimal('100'),            # Receivable Party 1
+            Decimal('300'),            # Receivable Party 2
+            Decimal('600'),           # Receivable Party 2
             Decimal('-100'),           # Revenue
             Decimal('-300'),           # Revenue
             Decimal('-600'),          # Revenue
