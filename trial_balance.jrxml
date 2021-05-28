@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="901838a5-c3ed-4bbc-94e5-29788bc41da9">
-	<property name="ireport.zoom" value="1.3310000000000062"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.zoom" value="2.143588810000011"/>
+	<property name="ireport.x" value="545"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="STANDARD_DIR" class="java.lang.String"/>
 	<parameter name="SUBTITLE" class="java.lang.String"/>
 	<parameter name="HEADER_DS" class="java.lang.Object"/>
-	<parameter name="SECOND_BALANCE" class="java.lang.Boolean"/>
+	<parameter name="second_balance" class="java.lang.Boolean"/>
 	<parameter name="start_period" class="java.lang.String"/>
 	<parameter name="end_period" class="java.lang.String"/>
 	<parameter name="comparison_start_period" class="java.lang.String"/>
@@ -16,11 +16,18 @@
 	<parameter name="comparison_fiscalyear" class="java.lang.String"/>
 	<parameter name="with_moves_only" class="java.lang.Boolean"/>
 	<parameter name="split_partners" class="java.lang.Boolean"/>
-	<parameter name="parameter1" class="java.lang.String"/>
 	<parameter name="parties" class="java.lang.String"/>
 	<parameter name="accounts" class="java.lang.String"/>
 	<parameter name="company_rec_name" class="java.lang.String"/>
 	<parameter name="company_vat" class="java.lang.String"/>
+	<parameter name="total_initial_balance" class="java.lang.String"/>
+	<parameter name="total_debit" class="java.lang.String"/>
+	<parameter name="total_credit" class="java.lang.String"/>
+	<parameter name="total_balance" class="java.lang.String"/>
+	<parameter name="total_period_balance" class="java.lang.String"/>
+	<parameter name="total_period_credit" class="java.lang.String"/>
+	<parameter name="total_period_debit" class="java.lang.String"/>
+	<parameter name="total_period_initial_balance" class="java.lang.String"/>
 	<queryString language="xPath">
 		<![CDATA[/data/record]]>
 	</queryString>
@@ -30,28 +37,28 @@
 	<field name="name" class="java.lang.String">
 		<fieldDescription><![CDATA[name]]></fieldDescription>
 	</field>
-	<field name="period_initial_balance" class="java.lang.Number">
+	<field name="period_initial_balance" class="java.lang.String">
 		<fieldDescription><![CDATA[period_initial_balance]]></fieldDescription>
 	</field>
-	<field name="period_credit" class="java.lang.Number">
+	<field name="period_credit" class="java.lang.String">
 		<fieldDescription><![CDATA[period_credit]]></fieldDescription>
 	</field>
-	<field name="period_debit" class="java.lang.Number">
+	<field name="period_debit" class="java.lang.String">
 		<fieldDescription><![CDATA[period_debit]]></fieldDescription>
 	</field>
-	<field name="period_balance" class="java.lang.Number">
+	<field name="period_balance" class="java.lang.String">
 		<fieldDescription><![CDATA[period_balance]]></fieldDescription>
 	</field>
 	<field name="initial_balance" class="java.lang.Number">
 		<fieldDescription><![CDATA[initial_balance]]></fieldDescription>
 	</field>
-	<field name="credit" class="java.lang.Number">
+	<field name="credit" class="java.lang.String">
 		<fieldDescription><![CDATA[credit]]></fieldDescription>
 	</field>
-	<field name="debit" class="java.lang.Number">
+	<field name="debit" class="java.lang.String">
 		<fieldDescription><![CDATA[debit]]></fieldDescription>
 	</field>
-	<field name="balance" class="java.lang.Number">
+	<field name="balance" class="java.lang.String">
 		<fieldDescription><![CDATA[balance]]></fieldDescription>
 	</field>
 	<field name="type" class="java.lang.String">
@@ -67,39 +74,9 @@
 		<fieldDescription><![CDATA[add_initial_balance]]></fieldDescription>
 	</field>
 	<sortField name="code"/>
-	<variable name="total_initial_balance" class="java.lang.Number" calculation="Sum">
-		<variableExpression><![CDATA[$F{type} == "view" || $F{initial_balance} == null ? 0.0 : $F{initial_balance}]]></variableExpression>
-	</variable>
-	<variable name="total_debit" class="java.lang.Number" calculation="Sum">
-		<variableExpression><![CDATA[$F{type} == "view" || $F{debit} == null ? 0.0 : $F{debit}]]></variableExpression>
-	</variable>
-	<variable name="total_credit" class="java.lang.Number" calculation="Sum">
-		<variableExpression><![CDATA[$F{type} == "view" || $F{credit} == null ? 0.0 : $F{credit}]]></variableExpression>
-	</variable>
-	<variable name="total_balance" class="java.lang.Number">
-		<variableExpression><![CDATA[$V{total_initial_balance} + $V{total_debit} - $V{total_credit}]]></variableExpression>
-	</variable>
-	<variable name="total_period_initial_balance" class="java.lang.Number" calculation="Sum">
-		<variableExpression><![CDATA[$F{type} == "view" || $F{period_initial_balance} == null? 0.0 : $F{period_initial_balance}]]></variableExpression>
-	</variable>
-	<variable name="total_period_debit" class="java.lang.Number" calculation="Sum">
-		<variableExpression><![CDATA[$F{type} == "view" || $F{period_debit} == null? 0.0 : $F{period_debit}]]></variableExpression>
-	</variable>
-	<variable name="total_period_credit" class="java.lang.Number" calculation="Sum">
-		<variableExpression><![CDATA[$F{type} == "view" || $F{period_credit} == null ? 0.0 : $F{period_credit}]]></variableExpression>
-	</variable>
-	<variable name="total_period_balance" class="java.lang.Number">
-		<variableExpression><![CDATA[$V{total_period_initial_balance} + $V{total_period_debit} - $V{total_period_credit}]]></variableExpression>
-	</variable>
 	<variable name="L" class="java.util.Locale">
 		<variableExpression><![CDATA[$P{REPORT_LOCALE}]]></variableExpression>
 		<initialValueExpression><![CDATA[$P{REPORT_LOCALE}]]></initialValueExpression>
-	</variable>
-	<variable name="total_period_balance2" class="java.lang.Number">
-		<variableExpression><![CDATA[$V{total_period_debit} - $V{total_period_credit}]]></variableExpression>
-	</variable>
-	<variable name="total_balance2" class="java.lang.Number">
-		<variableExpression><![CDATA[$V{total_debit} - $V{total_credit}]]></variableExpression>
 	</variable>
 	<background>
 		<band/>
@@ -356,64 +333,64 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+			<textField pattern="" isBlankWhenNull="true">
 				<reportElement x="349" y="3" width="60" height="12" uuid="788b0189-7a01-4c89-bdc4-9c025ff0ba14"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{period_debit}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+			<textField pattern="" isBlankWhenNull="true">
 				<reportElement x="409" y="3" width="60" height="12" uuid="b15afd72-b1c9-44f1-8fe6-d349682650af"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{period_credit}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+			<textField pattern="" isBlankWhenNull="true">
 				<reportElement x="469" y="3" width="60" height="12" uuid="dcd6ff6a-aedc-4859-877e-7ca99736f9d1"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{period_balance}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+			<textField pattern="" isBlankWhenNull="true">
 				<reportElement x="622" y="3" width="60" height="12" uuid="62feae50-4505-44f1-8c02-63834f98055d">
-					<printWhenExpression><![CDATA[$P{SECOND_BALANCE}]]></printWhenExpression>
+					<printWhenExpression><![CDATA[$P{second_balance}]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{debit}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+			<textField pattern="" isBlankWhenNull="true">
 				<reportElement x="682" y="3" width="60" height="12" uuid="ba3d3e4f-250f-42ca-ab37-f21aa1139a67">
-					<printWhenExpression><![CDATA[$P{SECOND_BALANCE}]]></printWhenExpression>
+					<printWhenExpression><![CDATA[$P{second_balance}]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{credit}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+			<textField pattern="" isBlankWhenNull="true">
 				<reportElement x="742" y="3" width="60" height="12" uuid="c3316792-bb1d-48ab-a9d8-b9f0d6575400">
-					<printWhenExpression><![CDATA[$P{SECOND_BALANCE}]]></printWhenExpression>
+					<printWhenExpression><![CDATA[$P{second_balance}]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{balance}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+			<textField pattern="" isBlankWhenNull="true">
 				<reportElement x="557" y="3" width="65" height="12" uuid="f4460d78-4558-4ff7-a408-6c90bcacbb73">
-					<printWhenExpression><![CDATA[$P{SECOND_BALANCE}]]></printWhenExpression>
+					<printWhenExpression><![CDATA[$P{second_balance}]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{initial_balance}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+			<textField pattern="" isBlankWhenNull="true">
 				<reportElement x="284" y="3" width="65" height="12" uuid="bbaa86ae-a75a-4ac1-a08c-7e90750d9090"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
@@ -432,14 +409,14 @@
 				<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="62" y="3" width="337" height="12" uuid="4f09236b-2b1e-4fee-ad76-cd05fedeb3a4"/>
+				<reportElement x="62" y="3" width="317" height="12" uuid="4f09236b-2b1e-4fee-ad76-cd05fedeb3a4"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
-				<reportElement x="499" y="3" width="100" height="12" uuid="d804b774-d708-43c9-a411-d11747f94115">
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="481" y="3" width="109" height="12" uuid="d804b774-d708-43c9-a411-d11747f94115">
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
@@ -447,22 +424,22 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{period_debit}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
-				<reportElement x="599" y="3" width="100" height="12" uuid="4e9a5b1a-b831-4f5d-8d11-ee8a1152d261"/>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="590" y="3" width="109" height="12" uuid="4e9a5b1a-b831-4f5d-8d11-ee8a1152d261"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{period_credit}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
-				<reportElement x="699" y="3" width="100" height="12" uuid="f8dd6e7a-a099-43fe-b64f-4fd72f7678d7"/>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="699" y="3" width="103" height="12" uuid="f8dd6e7a-a099-43fe-b64f-4fd72f7678d7"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{period_balance}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
-				<reportElement x="399" y="3" width="100" height="12" uuid="aed8acbc-6f7c-4fb8-b50d-230734b0cb34"/>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="379" y="3" width="102" height="12" uuid="aed8acbc-6f7c-4fb8-b50d-230734b0cb34"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
@@ -473,114 +450,130 @@
 	<summary>
 		<band height="36">
 			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+			<textField pattern="" isBlankWhenNull="true">
 				<reportElement x="469" y="4" width="60" height="12" uuid="eb6c0538-9694-4cd5-97dc-1fb1df9755f3">
 					<printWhenExpression><![CDATA[!$P{comparison_fiscalyear}.equalsIgnoreCase("")]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{total_period_balance} == null ? 0.0 : $V{total_period_balance}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{total_period_balance} == null ? 0.0 : $P{total_period_balance}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+			<textField pattern="" isBlankWhenNull="true">
 				<reportElement x="349" y="4" width="60" height="12" uuid="25e0af8c-234f-402e-80d4-d767fb0472a5">
 					<printWhenExpression><![CDATA[!$P{comparison_fiscalyear}.equalsIgnoreCase("")]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{total_period_debit} == null ? 0.0 : $V{total_period_debit}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{total_period_debit} == null ? 0.0 : $P{total_period_debit}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+			<textField pattern="" isBlankWhenNull="true">
 				<reportElement x="409" y="4" width="60" height="12" uuid="c9b967fc-7f1b-4285-99c5-7cef947f43c4">
 					<printWhenExpression><![CDATA[!$P{comparison_fiscalyear}.equalsIgnoreCase("")]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{total_period_credit} == null ? 0.0 : $V{total_period_credit}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{total_period_credit} == null ? 0.0 : $P{total_period_credit}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+			<textField pattern="" isBlankWhenNull="true">
 				<reportElement x="622" y="4" width="60" height="12" uuid="8540b9e6-ae6d-4ce3-beb6-fc19223eef67">
 					<printWhenExpression><![CDATA[!$P{comparison_fiscalyear}.equalsIgnoreCase("")]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{total_debit} == null ? 0.0 : $V{total_debit}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{total_debit} == null ? 0.0 : $P{total_debit}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+			<textField pattern="" isBlankWhenNull="true">
 				<reportElement x="742" y="4" width="60" height="12" uuid="fdd0e995-0765-46e6-92a7-3d0e37690115">
 					<printWhenExpression><![CDATA[!$P{comparison_fiscalyear}.equalsIgnoreCase("")]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{total_balance} == null ? 0.0 : $V{total_balance}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{total_balance} == null ? 0.0 : $P{total_balance}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+			<textField pattern="" isBlankWhenNull="true">
 				<reportElement x="682" y="4" width="60" height="12" uuid="3e9154b2-fde9-426a-9a20-b8e4200d82db">
 					<printWhenExpression><![CDATA[!$P{comparison_fiscalyear}.equalsIgnoreCase("")]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{total_credit} == null ? 0.0 : $V{total_credit}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{total_credit} == null ? 0.0 : $P{total_credit}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+			<textField pattern="" isBlankWhenNull="true">
 				<reportElement x="557" y="4" width="65" height="12" uuid="557e70db-e781-48f0-bc90-cbdddceb8c62">
 					<printWhenExpression><![CDATA[!$P{comparison_fiscalyear}.equalsIgnoreCase("")]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{total_initial_balance} == null ? 0.0 : $V{total_initial_balance}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{total_initial_balance} == null ? 0.0 : $P{total_initial_balance}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+			<textField pattern="" isBlankWhenNull="true">
 				<reportElement x="284" y="4" width="65" height="12" uuid="21dce043-2cb7-41eb-8ac5-259a9f84dfdb">
 					<printWhenExpression><![CDATA[!$P{comparison_fiscalyear}.equalsIgnoreCase("")]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{total_period_initial_balance} == null ? 0.0 : $V{total_period_initial_balance}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{total_period_initial_balance} == null ? 0.0 : $P{total_period_initial_balance}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
-				<reportElement x="599" y="4" width="100" height="12" uuid="50c8f763-41d6-478c-896c-a1bc6342c6c6">
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="590" y="4" width="109" height="12" uuid="50c8f763-41d6-478c-896c-a1bc6342c6c6">
 					<printWhenExpression><![CDATA[$P{comparison_fiscalyear}.equalsIgnoreCase("")]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{total_period_credit} == null ? 0.0 : $V{total_period_credit}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{total_period_credit} == null
+?
+    "0.00"
+:
+    $P{total_period_credit}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
-				<reportElement x="399" y="4" width="100" height="12" uuid="b418c8d0-5f33-4794-baf5-cd324f18057c">
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="379" y="4" width="102" height="12" uuid="b418c8d0-5f33-4794-baf5-cd324f18057c">
 					<printWhenExpression><![CDATA[$P{comparison_fiscalyear}.equalsIgnoreCase("")]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{total_period_initial_balance} == null ? 0.0 : $V{total_period_initial_balance}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{total_period_initial_balance} == null
+?
+    0.0
+:
+
+    $P{total_period_initial_balance}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
-				<reportElement x="499" y="4" width="100" height="12" uuid="0ddc06c3-8abd-466c-bdc5-b8bbefffd985">
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="481" y="4" width="109" height="12" uuid="0ddc06c3-8abd-466c-bdc5-b8bbefffd985">
 					<printWhenExpression><![CDATA[$P{comparison_fiscalyear}.equalsIgnoreCase("")]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{total_period_debit} == null ? 0.0 : $V{total_period_debit}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{total_period_debit} == null ? 0.0 : $P{total_period_debit}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
-				<reportElement x="699" y="4" width="100" height="12" uuid="e97c94d2-fdda-4fc3-9503-6449b8650781">
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="699" y="4" width="103" height="12" uuid="e97c94d2-fdda-4fc3-9503-6449b8650781">
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					<printWhenExpression><![CDATA[$P{comparison_fiscalyear}.equalsIgnoreCase("")]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{total_period_balance} == null ? 0.0 : $V{total_period_balance}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{total_period_balance} == null
+?
+    "0.00"
+:
+    $P{total_period_balance}
+
+
+]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>

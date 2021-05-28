@@ -77,15 +77,17 @@ class Account(metaclass=PoolMeta):
                 Sum(Coalesce(line.credit, 0)).as_('credit'),
                 (Sum(Coalesce(line.debit, 0)) -
                     Sum(Coalesce(line.credit, 0))).as_('balance')))
+
+        periods = transaction.context.get('periods', False)
+        if periods:
+            periods.append(0)
+        date = transaction.context.get('date')
         for i in range(0, len(account_ids), in_max):
             sub_ids = account_ids[i:i + in_max]
             red_sql = reduce_ids(table_a.id, sub_ids)
             where = red_sql
-            periods = transaction.context.get('periods', False)
             if periods:
-                periods.append(0)
-                where = (where & In(Coalesce(move.period, 0), periods))
-            date = transaction.context.get('date')
+                where &= In(Coalesce(move.period, 0), periods)
             if date:
                 where &= (move.date <= date)
             if exclude_party_moves:
@@ -94,7 +96,7 @@ class Account(metaclass=PoolMeta):
                 # party_required use in a different way that "standard".
                 # For example if you check the prty_required an account with
                 # the kind equal to 'other'
-                where = (where & (line.party == None))
+                where &= (line.party is None)
 
             cursor.execute(*table_a.join(table_c,
                     condition=(table_c.left >= table_a.left)

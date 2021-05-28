@@ -327,8 +327,7 @@ class TrialBalanceReport(JasperReport):
             domain += [('id', 'in', accounts)]
 
         parameters = {}
-        parameters['company'] = fiscalyear.company.rec_name
-        parameters['SECOND_BALANCE'] = comparison_fiscalyear and True or False
+        parameters['second_balance'] = comparison_fiscalyear and True or False
         parameters['fiscalyear'] = fiscalyear.name
         parameters['comparison_fiscalyear'] = comparison_fiscalyear and \
             comparison_fiscalyear.name or ''
@@ -342,7 +341,6 @@ class TrialBalanceReport(JasperReport):
         parameters['company_vat'] = (company
             and company.party.tax_identifier and
             company.party.tax_identifier.code) or ''
-        parameters['digits'] = digits or ''
         parameters['with_moves_only'] = with_moves or ''
         parameters['split_parties'] = split_parties or ''
 
@@ -367,7 +365,7 @@ class TrialBalanceReport(JasperReport):
                     if not digits:
                         accounts.append(account)
                 elif not digits or len(account.code) == digits or \
-                    account.type != None and len(account.childs) == 0 and \
+                    account.type is not None and len(account.childs) == 0 and \
                         len(account.code) < (digits or 9999):
                     accounts.append(account)
 
@@ -438,7 +436,8 @@ class TrialBalanceReport(JasperReport):
                             fiscalyear.company)
 
                 logger.info('Calc values for comparsion for parties')
-                with transaction.set_context(fiscalyear=comparison_fiscalyear.id,
+                with transaction.set_context(
+                        fiscalyear=comparison_fiscalyear.id,
                         periods=comparison_periods):
                     comparison_party_values = \
                         Party.get_account_values_by_party(parties, accounts,
@@ -520,6 +519,77 @@ class TrialBalanceReport(JasperReport):
 
             for record in virt_records:
                 records.append(virt_records[record])
+
+        total_period_initial_balance = 0
+        total_period_debit = 0
+        total_period_credit = 0
+        total_period_balance = 0
+        total_initial_balance = 0
+        total_debit = 0
+        total_credit = 0
+        total_balance = 0
+        digits = company.currency.digits if company else 2
+        decimal_point = transaction.context.get('decimal_point', ',')
+        thousands_sep = transaction.context.get('thousands_sep', '.')
+        for record in records:
+            total_period_initial_balance += record['period_initial_balance']
+            total_period_credit += record['period_credit']
+            total_period_debit += record['period_debit']
+            total_period_balance += record['period_balance']
+            total_initial_balance += record['initial_balance']
+            total_credit += record['credit']
+            total_debit += record['debit']
+            total_balance += record['balance']
+            record['period_initial_balance'] = ("{:,.%sf}" % digits).format(
+                record['period_initial_balance']).replace(",", "X").replace(
+                    ".", decimal_point).replace("X", thousands_sep)
+            record['period_credit'] = ("{:,.%sf}" % digits).format(
+                record['period_credit']).replace(",", "X").replace(
+                    ".", decimal_point).replace("X", thousands_sep)
+            record['period_debit'] = ("{:,.%sf}" % digits).format(
+                record['period_debit']).replace(",", "X").replace(
+                    ".", decimal_point).replace("X", thousands_sep)
+            record['period_balance'] = ("{:,.%sf}" % digits).format(
+                record['period_balance']).replace(",", "X").replace(
+                    ".", decimal_point).replace("X", thousands_sep)
+            record['initial_balance'] = ("{:,.%sf}" % digits).format(
+                record['initial_balance']).replace(",", "X").replace(
+                    ".", decimal_point).replace("X", thousands_sep)
+            record['credit'] = ("{:,.%sf}" % digits).format(
+                record['credit']).replace(",", "X").replace(
+                    ".", decimal_point).replace("X", thousands_sep)
+            record['debit'] = ("{:,.%sf}" % digits).format(
+                record['debit']).replace(",", "X").replace(
+                    ".", decimal_point).replace("X", thousands_sep)
+            record['balance'] = ("{:,.%sf}" % digits).format(
+                record['balance']).replace(",", "X").replace(
+                    ".", decimal_point).replace("X", thousands_sep)
+
+        parameters['total_period_initial_balance'] = (
+            "{:,.%sf}" % digits).format(total_period_initial_balance).replace(
+                ",", "X").replace(".", decimal_point).replace("X",
+                    thousands_sep)
+        parameters['total_period_credit'] = ("{:,.%sf}" % digits).format(
+            total_period_credit).replace(",", "X").replace(
+                ".", decimal_point).replace("X", thousands_sep)
+        parameters['total_period_debit'] = ("{:,.%sf}" % digits).format(
+            total_period_debit).replace(",", "X").replace(
+                ".", decimal_point).replace("X", thousands_sep)
+        parameters['total_period_balance'] = ("{:,.%sf}" % digits).format(
+            total_period_balance).replace(",", "X").replace(
+                ".", decimal_point).replace("X", thousands_sep)
+        parameters['total_initial_balance'] = ("{:,.%sf}" % digits).format(
+            total_initial_balance).replace(",", "X").replace(
+                ".", decimal_point).replace("X", thousands_sep)
+        parameters['total_credit'] = ("{:,.%sf}" % digits).format(
+            total_credit).replace(",", "X").replace(
+                ".", decimal_point).replace("X", thousands_sep)
+        parameters['total_debit'] = ("{:,.%sf}" % digits).format(
+            total_debit).replace(",", "X").replace(
+                ".", decimal_point).replace("X", thousands_sep)
+        parameters['total_balance'] = ("{:,.%sf}" % digits).format(
+            total_balance).replace(",", "X").replace(
+                ".", decimal_point).replace("X", thousands_sep)
 
         logger.info('Records:' + str(len(records)))
         return records, parameters
