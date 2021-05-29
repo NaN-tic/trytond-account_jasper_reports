@@ -54,8 +54,10 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                 ])
 
         accounts = {}
-        for kind in ('receivable', 'payable', 'revenue', 'expense' ):
-            accounts.update({kind:a for a in accounts_search if a.type and getattr(a.type, kind)})
+        for kind in ('receivable', 'payable', 'revenue', 'expense'):
+            accounts.update(
+                {kind: a for a in accounts_search if a.type and getattr(
+                        a.type, kind)})
 
         root, = Account.search([
                 ('parent', '=', None),
@@ -660,26 +662,16 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         self.assertEqual(parameters['fiscalyear'], fiscalyear.name)
         self.assertEqual(parameters['accounts'], '')
         self.assertEqual(parameters['parties'], '')
-        self.assertEqual(parameters['digits'], '')
         self.assertEqual(parameters['with_moves_only'], '')
         self.assertEqual(parameters['split_parties'], '')
-        self.assertEqual(parameters['SECOND_BALANCE'], False)
+        self.assertEqual(parameters['second_balance'], False)
         self.assertEqual(parameters['comparison_fiscalyear'], '')
         self.assertEqual(parameters['comparison_start_period'], '')
         self.assertEqual(parameters['comparison_end_period'], '')
-        credit = sum([Decimal(str(m['period_credit'])) for m in records])
-        debit = sum([Decimal(str(m['period_debit'])) for m in records])
-        balance = sum([Decimal(str(m['period_balance'])) for m in records])
-        self.assertEqual(credit, debit)
-        self.assertEqual(credit, Decimal('730.0'))
-        self.assertEqual(balance, Decimal('0.0'))
-        # Comparision data
-        credit = sum([Decimal(str(m['credit'])) for m in records])
-        debit = sum([Decimal(str(m['debit'])) for m in records])
-        balance = sum([Decimal(str(m['balance'])) for m in records])
-        self.assertEqual(credit, debit)
-        self.assertEqual(credit, balance)
-        self.assertEqual(balance, Decimal('0.0'))
+        self.assertEqual(parameters['total_period_credit'], '730,00')
+        self.assertEqual(parameters['total_period_balance'], '0,00')
+        self.assertEqual(parameters['total_credit'], '0,00')
+        self.assertEqual(parameters['total_balance'], '0,00')
         session_id, _, _ = PrintTrialBalance.create()
         print_trial_balance = PrintTrialBalance(session_id)
         print_trial_balance.start.company = company
@@ -701,13 +693,9 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         # With 1 digit
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 3)
-        self.assertEqual(parameters['digits'], 1)
-        credit = sum([Decimal(str(m['period_credit'])) for m in records])
-        debit = sum([Decimal(str(m['period_debit'])) for m in records])
-        balance = sum([Decimal(str(m['period_balance'])) for m in records])
-        self.assertEqual(credit, Decimal('600.0'))
-        self.assertEqual(debit, Decimal('130.0'))
-        self.assertEqual(balance, Decimal('-470.0'))
+        self.assertEqual(parameters['total_period_credit'], '600,00')
+        self.assertEqual(parameters['total_period_debit'], '130,00')
+        self.assertEqual(parameters['total_period_balance'], '-470,00')
         session_id, _, _ = PrintTrialBalance.create()
         print_trial_balance = PrintTrialBalance(session_id)
         print_trial_balance.start.company = company
@@ -729,12 +717,9 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         # With 2 digits
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 2)
-        credit = sum([Decimal(str(m['period_credit'])) for m in records])
-        debit = sum([Decimal(str(m['period_debit'])) for m in records])
-        balance = sum([Decimal(str(m['period_balance'])) for m in records])
-        self.assertEqual(credit, Decimal('130.0'))
-        self.assertEqual(debit, Decimal('600.0'))
-        self.assertEqual(balance, Decimal('470.0'))
+        self.assertEqual(parameters['total_period_credit'], '130,00')
+        self.assertEqual(parameters['total_period_debit'], '600,00')
+        self.assertEqual(parameters['total_period_balance'], '470,00')
         session_id, _, _ = PrintTrialBalance.create()
         print_trial_balance = PrintTrialBalance(session_id)
         print_trial_balance.start.company = company
@@ -757,12 +742,9 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 2)
         self.assertEqual(parameters['with_moves_only'], True)
-        credit = sum([Decimal(str(m['period_credit'])) for m in records])
-        debit = sum([Decimal(str(m['period_debit'])) for m in records])
-        balance = sum([Decimal(str(m['period_balance'])) for m in records])
-        self.assertEqual(debit, Decimal('130.0'))
-        self.assertEqual(credit, Decimal('600.0'))
-        self.assertEqual(balance, Decimal('-470.0'))
+        self.assertEqual(parameters['total_period_credit'], '600,00')
+        self.assertEqual(parameters['total_period_debit'], '130,00')
+        self.assertEqual(parameters['total_period_balance'], '-470,00')
         session_id, _, _ = PrintTrialBalance.create()
         print_trial_balance = PrintTrialBalance(session_id)
         print_trial_balance.start.company = company
@@ -785,11 +767,8 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 4)
         self.assertEqual(parameters['split_parties'], True)
-        credit = sum([Decimal(str(m['period_credit'])) for m in records])
-        debit = sum([Decimal(str(m['period_debit'])) for m in records])
-        balance = sum([Decimal(str(m['period_balance'])) for m in records])
-        self.assertEqual(credit, Decimal('130.0'))
-        self.assertEqual(debit, Decimal('600.0'))
+        self.assertEqual(parameters['total_period_credit'], '130,00')
+        self.assertEqual(parameters['total_period_debit'], '600,00')
         session_id, _, _ = PrintTrialBalance.create()
         print_trial_balance = PrintTrialBalance(session_id)
         print_trial_balance.start.company = company
@@ -812,11 +791,8 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 9)
         self.assertEqual(parameters['split_parties'], True)
-        credit = sum([Decimal(str(m['period_credit'])) for m in records])
-        debit = sum([Decimal(str(m['period_debit'])) for m in records])
-        balance = sum([Decimal(str(m['period_balance'])) for m in records])
-        self.assertEqual(credit, Decimal('730.0'))
-        self.assertEqual(debit, Decimal('730.0'))
+        self.assertEqual(parameters['total_period_credit'], '730,00')
+        self.assertEqual(parameters['total_period_debit'], '730,00')
         customer1 = self.get_parties()[0]
         session_id, _, _ = PrintTrialBalance.create()
         print_trial_balance = PrintTrialBalance(session_id)
@@ -840,15 +816,9 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 7)
         self.assertEqual(parameters['parties'], customer1.rec_name)
-        credit = sum([Decimal(str(m['period_credit'])) for m in records
-                if m['name'] == customer1.rec_name])
-        debit = sum([Decimal(str(m['period_debit'])) for m in records
-                if m['name'] == customer1.rec_name])
-        balance = sum([Decimal(str(m['period_balance'])) for m in records
-                if m['name'] == customer1.rec_name])
-        self.assertEqual(credit, Decimal('0.0'))
-        self.assertEqual(debit, Decimal('100.0'))
-        self.assertEqual(balance, Decimal('100.0'))
+        self.assertEqual(parameters['total_period_debit'], '230,00')
+        self.assertEqual(parameters['total_period_credit'], '600,00')
+        self.assertEqual(parameters['total_period_balance'], '-370,00')
         revenue = self.get_accounts(company)['revenue']
         session_id, _, _ = PrintTrialBalance.create()
         print_trial_balance = PrintTrialBalance(session_id)
@@ -872,12 +842,9 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 1)
         self.assertEqual(parameters['accounts'], revenue.code)
-        credit = sum([Decimal(str(m['period_credit'])) for m in records])
-        debit = sum([Decimal(str(m['period_debit'])) for m in records])
-        balance = sum([Decimal(str(m['period_balance'])) for m in records])
-        self.assertEqual(credit, Decimal('600.0'))
-        self.assertEqual(debit, Decimal('0.0'))
-        self.assertEqual(balance, Decimal('-600.0'))
+        self.assertEqual(parameters['total_period_credit'], '600,00')
+        self.assertEqual(parameters['total_period_debit'], '0,00')
+        self.assertEqual(parameters['total_period_balance'], '-600,00')
         session_id, _, _ = PrintTrialBalance.create()
         print_trial_balance = PrintTrialBalance(session_id)
         print_trial_balance.start.company = company
@@ -899,18 +866,14 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         # With moves and add initial balance
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 4)
-        initial = sum([Decimal(str(m['period_initial_balance']))
-                for m in records])
-        credit = sum([Decimal(str(m['period_credit'])) for m in records])
-        debit = sum([Decimal(str(m['period_debit'])) for m in records])
-        balance = sum([Decimal(str(m['period_balance'])) for m in records])
-        self.assertEqual(credit, Decimal('350.0'))
-        self.assertEqual(debit, Decimal('350.0'))
+        initial = parameters['total_period_initial_balance']
+        self.assertEqual(parameters['total_period_credit'], '350,00')
+        self.assertEqual(parameters['total_period_debit'], '350,00')
         results = {
-            '41': (Decimal('-80'), Decimal('-130')),
-            '43': (Decimal('300'), Decimal('600')),
-            '6': (Decimal('80'), Decimal('130')),
-            '7': (Decimal('-300'), Decimal('-600')),
+            '41': ('-80,00', '-130,00'),
+            '43': ('300,00', '600,00'),
+            '6': ('80,00', '130,00'),
+            '7': ('-300,00', '-600,00'),
             }
         for r in records:
             initial, balance = results[r['code']]
@@ -920,10 +883,9 @@ class AccountJasperReportsTestCase(ModuleTestCase):
             self.assertEqual(r['balance'], balance)
         for initial, balance in [(m['period_initial_balance'],
                     m['period_balance']) for m in records]:
-            self.assertNotEqual(Decimal(str(initial)), Decimal('0.0'))
-            self.assertNotEqual(Decimal(str(balance)), Decimal('0.0'))
-            self.assertNotEqual(Decimal(str(balance)),
-                Decimal(str(initial)))
+            self.assertNotEqual(initial, '0,00')
+            self.assertNotEqual(balance, '0,00')
+            self.assertNotEqual(balance, initial)
         session_id, _, _ = PrintTrialBalance.create()
         print_trial_balance = PrintTrialBalance(session_id)
         print_trial_balance.start.company = company
@@ -946,10 +908,10 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 4)
         results = {
-            '41': (Decimal('-50'), Decimal('-100')),
-            '43': (Decimal('200'), Decimal('500')),
-            '6': (Decimal('80'), Decimal('130')),
-            '7': (Decimal('-300'), Decimal('-600')),
+            '41': ('-50,00', '-100,00'),
+            '43': ('200,00', '500,00'),
+            '6': ('80,00', '130,00'),
+            '7': ('-300,00', '-600,00'),
             }
         for r in records:
             initial, balance = results[r['code']]
@@ -984,19 +946,19 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         self.assertEqual(parameters['comparison_end_period'],
             period.rec_name)
         self.assertEqual(len(records), 4)
-        credit = sum([Decimal(str(m['period_credit'])) for m in records])
-        debit = sum([Decimal(str(m['period_debit'])) for m in records])
-        balance = sum([Decimal(str(m['period_balance'])) for m in records])
+        credit = parameters['total_period_credit']
+        debit = parameters['total_period_debit']
+        balance = parameters['total_period_balance']
         self.assertEqual(credit, debit)
-        self.assertEqual(debit, Decimal('350.0'))
-        self.assertEqual(balance, Decimal('0.0'))
+        self.assertEqual(debit, '350,00')
+        self.assertEqual(balance, '0,00')
         # Comparision data
-        credit = sum([Decimal(str(m['credit'])) for m in records])
-        debit = sum([Decimal(str(m['debit'])) for m in records])
-        balance = sum([Decimal(str(m['balance'])) for m in records])
+        credit = parameters['total_credit']
+        debit = parameters['total_debit']
+        balance = parameters['total_balance']
         self.assertEqual(credit, debit)
-        self.assertEqual(debit, Decimal('380.0'))
-        self.assertEqual(balance, Decimal('0.0'))
+        self.assertEqual(debit, '380,00')
+        self.assertEqual(balance, '0,00')
         receivable = self.get_accounts(company)['receivable']
         session_id, _, _ = PrintTrialBalance.create()
         print_trial_balance = PrintTrialBalance(session_id)
@@ -1020,12 +982,12 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 1)
         self.assertEqual(parameters['accounts'], receivable.code)
-        credit = sum([Decimal(str(m['period_credit'])) for m in records])
-        debit = sum([Decimal(str(m['period_debit'])) for m in records])
-        balance = sum([Decimal(str(m['period_balance'])) for m in records])
-        self.assertEqual(debit, Decimal('300.0'))
-        self.assertEqual(credit, Decimal('0.0'))
-        self.assertEqual(balance, Decimal('300.0'))
+        credit = parameters['total_credit']
+        debit = parameters['total_debit']
+        balance = parameters['total_balance']
+        self.assertEqual(debit, '0,00')
+        self.assertEqual(credit, '0,00')
+        self.assertEqual(balance, '0,00')
         # Inactive customers should always apear on trial balance
         customer1.active = False
         customer1.save()
@@ -1051,11 +1013,11 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         records, parameters = TrialBalanceReport.prepare(data)
         self.assertEqual(len(records), 9)
         self.assertEqual(parameters['split_parties'], True)
-        credit = sum([Decimal(str(m['period_credit'])) for m in records])
-        debit = sum([Decimal(str(m['period_debit'])) for m in records])
-        balance = sum([Decimal(str(m['period_balance'])) for m in records])
-        self.assertEqual(credit, Decimal('730.0'))
-        self.assertEqual(debit, Decimal('730.0'))
+        credit = parameters['total_period_credit']
+        debit = parameters['total_period_debit']
+        balance = parameters['total_period_balance']
+        self.assertEqual(debit, '730,00')
+        self.assertEqual(credit, '730,00')
         # If we do not indicate periods we get the full definition
         session_id, _, _ = PrintTrialBalance.create()
         print_trial_balance = PrintTrialBalance(session_id)
@@ -1084,18 +1046,18 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         self.assertEqual(parameters['start_period'], period.name)
         self.assertEqual(parameters['end_period'], last_period.name)
         self.assertEqual(parameters['fiscalyear'], fiscalyear.name)
-        credit = sum([Decimal(str(m['period_credit'])) for m in records])
-        debit = sum([Decimal(str(m['period_debit'])) for m in records])
-        balance = sum([Decimal(str(m['period_balance'])) for m in records])
+        credit = parameters['total_period_credit']
+        debit = parameters['total_period_debit']
+        balance = parameters['total_period_balance']
         self.assertEqual(credit, debit)
-        self.assertEqual(credit, Decimal('730.0'))
-        self.assertEqual(balance, Decimal('0.0'))
-        credit = sum([Decimal(str(m['credit'])) for m in records])
-        debit = sum([Decimal(str(m['debit'])) for m in records])
-        balance = sum([Decimal(str(m['balance'])) for m in records])
+        self.assertEqual(debit, '730,00')
+        self.assertEqual(credit, '730,00')
+        credit = parameters['total_credit']
+        debit = parameters['total_debit']
+        balance = parameters['total_balance']
         self.assertEqual(credit, debit)
-        self.assertEqual(credit, Decimal('730.0'))
-        self.assertEqual(balance, Decimal('0.0'))
+        self.assertEqual(debit, '730,00')
+        self.assertEqual(credit, '730,00')
 
     @with_transaction()
     def test_taxes_by_invoice(self):
@@ -1347,8 +1309,10 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_taxes_by_invoice.start.taxes = []
         _, data = print_taxes_by_invoice.do_print_(None)
         ids, parameters = TaxesByInvoiceReport.prepare(data)
-        self.assertEqual(parameters['start_date'], period.start_date.strftime('%d/%m/%Y'))
-        self.assertEqual(parameters['end_date'], period.end_date.strftime('%d/%m/%Y'))
+        self.assertEqual(parameters['start_date'],
+            period.start_date.strftime('%d/%m/%Y'))
+        self.assertEqual(parameters['end_date'],
+            period.end_date.strftime('%d/%m/%Y'))
         records = InvoiceTax.browse(ids)
         self.assertEqual(len(records), 2)
 
@@ -1447,15 +1411,15 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         # Full trial_balance
         records, parameters = TrialBalanceReport.prepare(data)
         balances = {
-            'Main Cash': Decimal('0'),
-            'Main Tax': Decimal('0'),
-            'View': Decimal('0'),
-            'supplier1': Decimal('-30'),
-            'supplier2': Decimal('-100'),
-            'customer1': Decimal('100'),
-            'customer2': Decimal('500'),
-            'Main Expense': Decimal('130'),
-            'Main Revenue': Decimal('-600'),
+            'Main Cash': '0,00',
+            'Main Tax': '0,00',
+            'View': '0,00',
+            'supplier1': '-30,00',
+            'supplier2': '-100,00',
+            'customer1': '100,00',
+            'customer2': '500,00',
+            'Main Expense': '130,00',
+            'Main Revenue': '-600,00',
             }
         for record in records:
             self.assertEqual(record['period_initial_balance'],
@@ -1495,15 +1459,15 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         # Full trial_balance
         records, parameters = TrialBalanceReport.prepare(data)
         balances = {
-            'Main Cash': Decimal('0'),
-            'Main Tax': Decimal('0'),
-            'View': Decimal('0'),
-            'supplier1': Decimal('-60'),
-            'supplier2': Decimal('-200'),
-            'customer1': Decimal('200'),
-            'customer2': Decimal('1000'),
-            'Main Expense': Decimal('260'),
-            'Main Revenue': Decimal('-1200'),
+            'Main Cash': '0,00',
+            'Main Tax': '0,00',
+            'View': '0,00',
+            'supplier1': '-60,00',
+            'supplier2': '-200,00',
+            'customer1': '200,00',
+            'customer2': '1.000,00',
+            'Main Expense': '260,00',
+            'Main Revenue': '-1.200,00',
             }
         for record in records:
             self.assertEqual(record['period_initial_balance'],
