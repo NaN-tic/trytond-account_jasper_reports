@@ -78,7 +78,7 @@ class Account(metaclass=PoolMeta):
         periods = transaction.context.get('periods', False)
         if periods:
             periods.append(0)
-        date = transaction.context.get('date')
+        date = transaction.context.get('date', False)
         for i in range(0, len(account_ids), in_max):
             sub_ids = account_ids[i:i + in_max]
             red_sql = reduce_ids(table_a.id, sub_ids)
@@ -88,12 +88,12 @@ class Account(metaclass=PoolMeta):
             if date:
                 where &= (move.date <= date)
             if exclude_party_moves:
-                # This "where" not use account kind (before a change use it)
+                # This "where" not use account kind (before change use it)
                 # because there are some companies that the accounts kind and
                 # party_required use in a different way that "standard".
-                # For example if you check the prty_required an account with
+                # For example if you check the party_required an account with
                 # the kind equal to 'other'
-                where &= (line.party is None)
+                where &= (line.party == None)
 
             cursor.execute(*table_a.join(table_c,
                     condition=(table_c.left >= table_a.left)
