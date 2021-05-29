@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="account_movements2.jrxml" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7e6f5ed5-9314-4647-bc83-20dadb015d73">
 	<property name="ireport.zoom" value="2.143588810000005"/>
-	<property name="ireport.x" value="11"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="HEADER_DS" class="java.lang.Object"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -18,6 +18,8 @@
 	<parameter name="parties" class="java.lang.String"/>
 	<parameter name="company_rec_name" class="java.lang.String"/>
 	<parameter name="company_vat" class="java.lang.String"/>
+	<parameter name="end_date" class="java.lang.String"/>
+	<parameter name="start_date" class="java.lang.String"/>
 	<queryString language="xPath">
 		<![CDATA[]]>
 	</queryString>
@@ -278,7 +280,16 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[tr($V{L},"Fiscal Year") + ": " + $P{fiscal_year} +" "+ tr($V{L}," From") +": "+$P{start_period} +"  "+ tr($V{L},"To") +": "+ $P{end_period}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{fiscal_year} != "" && $P{fiscal_year} != null
+?
+    tr($V{L},"Fiscal Year") + ": " + $P{fiscal_year} +" "+ tr($V{L}," From") +": "+$P{start_period} +"  "+ tr($V{L},"To") +": "+ $P{end_period}
+:
+    $P{start_date} != "" && $P{start_date} != null
+    ?
+        tr($V{L},"Initial posting date")+": "+ $P{start_date}
+        tr($V{L},"Final posting date")+": "+ $P{end_date}
+    :
+        ""]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement positionType="Float" x="10" y="55" width="545" height="10" uuid="4928ddc3-3ffa-43fc-ab3a-728ebf0b2893"/>

@@ -20,8 +20,14 @@ class PrintGeneralLedgerStart(ModelView):
     'Print General Ledger'
     __name__ = 'account_jasper_reports.print_general_ledger.start'
     fiscalyear = fields.Many2One('account.fiscalyear', 'Fiscal Year',
-            required=True)
+        states={
+            'invisible': Eval('start_date') | Eval('end_date'),
+            'required': ~Eval('start_date') & ~Eval('end_date'),
+            })
     start_period = fields.Many2One('account.period', 'Start Period',
+        states={
+            'invisible': Eval('start_date') | Eval('end_date'),
+            },
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
             If(Bool(Eval('end_period')),
@@ -30,6 +36,9 @@ class PrintGeneralLedgerStart(ModelView):
                 ),
             ], depends=['fiscalyear', 'end_period'])
     end_period = fields.Many2One('account.period', 'End Period',
+        states={
+            'invisible': Eval('start_date') | Eval('end_date'),
+            },
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
             If(Bool(Eval('start_period')),
@@ -38,6 +47,30 @@ class PrintGeneralLedgerStart(ModelView):
                 ),
             ],
         depends=['fiscalyear', 'start_period'])
+    start_date = fields.Date('Initial posting date',
+        domain=[
+            If(Eval('start_date') & Eval('end_date'),
+                ('start_date', '<=', Eval('end_date', None)),
+                ()),
+            ],
+        states={
+            'invisible': Bool(Eval('periods')),
+            'required': ((Eval('start_date') | Eval('end_date')) &
+                ~Bool(Eval('periods'))),
+            },
+        depends=['end_date'])
+    end_date = fields.Date('Final posting date',
+        domain=[
+            If(Eval('start_date') & Eval('end_date'),
+                ('end_date', '>=', Eval('start_date', None)),
+                ()),
+            ],
+        states={
+            'invisible': Bool(Eval('periods')),
+            'required': ((Eval('end_date') | Eval('start_date')) &
+                ~Bool(Eval('periods'))),
+            },
+        depends=['start_date'])
     accounts = fields.Many2Many('account.account', None, None, 'Accounts')
     all_accounts = fields.Boolean('All accounts with and without balance',
         help='If unchecked only print accounts with previous balance different'
@@ -84,17 +117,16 @@ class PrintGeneralLedger(Wizard):
     print_ = StateReport('account_jasper_reports.general_ledger')
 
     def do_print_(self, action):
-        start_period = None
-        if self.start.start_period:
-            start_period = self.start.start_period.id
-        end_period = None
-        if self.start.end_period:
-            end_period = self.start.end_period.id
         data = {
             'company': self.start.company.id,
-            'fiscalyear': self.start.fiscalyear.id,
-            'start_period': start_period,
-            'end_period': end_period,
+            'fiscalyear': (self.start.fiscalyear.id if self.start.fiscalyear
+                else None),
+            'start_period': (self.start.start_period.id if self.start.start_period
+                else None),
+            'end_period': (self.start.end_period.id if self.start.end_period
+                else None),
+            'start_date': self.start.start_date,
+            'end_date': self.start.end_date,
             'accounts': [x.id for x in self.start.accounts],
             'all_accounts': self.start.all_accounts,
             'parties': [x.id for x in self.start.parties],
@@ -135,13 +167,14 @@ class GeneralLedgerReport(JasperReport):
         Party = pool.get('party.party')
         Line = pool.get('account.move.line')
 
-        fiscalyear = FiscalYear(data['fiscalyear'])
-        start_period = None
-        if data['start_period']:
-            start_period = Period(data['start_period'])
-        end_period = None
-        if data['end_period']:
-            end_period = Period(data['end_period'])
+        fiscalyear = (FiscalYear(data['fiscalyear']) if data.get('fiscalyear')
+            else None)
+        start_period = (Period(data['start_period']) if data.get('start_period')
+            else None)
+        end_period = (Period(data['end_period']) if data.get('end_period')
+            else None)
+        start_date = data['start_date'] if data.get('start_date') else None
+        end_date = data['end_date'] if data .get('end_date') else None
         with Transaction().set_context(active_test=False):
             accounts = Account.browse(data.get('accounts', []))
             parties = Party.browse(data.get('parties', []))
@@ -172,10 +205,15 @@ class GeneralLedgerReport(JasperReport):
             company = Company(data['company'])
 
         parameters = {}
-        parameters['company'] = fiscalyear.company.rec_name
+        parameters['company'] = (company.rec_name if company else
+            fiscalyear.company.res_name)
         parameters['start_period'] = start_period and start_period.name or ''
         parameters['end_period'] = end_period and end_period.name or ''
-        parameters['fiscal_year'] = fiscalyear.name
+        parameters['start_date'] = (start_date.strftime('%d/%m/%Y')
+            if start_date else '')
+        parameters['end_date'] = (end_date.strftime('%d/%m/%Y')
+            if end_date else '')
+        parameters['fiscal_year'] = fiscalyear.rec_name if fiscalyear else ''
         parameters['accounts'] = accounts_subtitle
         parameters['parties'] = parties_subtitle
         parameters['company_rec_name'] = company and company.rec_name or ''
@@ -190,10 +228,15 @@ class GeneralLedgerReport(JasperReport):
         else:
             where += "aa.parent is not null "
 
-        filter_periods = fiscalyear.get_periods(start_period, end_period)
-
-        where += "and am.period in (%s) " % (
-            ",".join([str(a.id) for a in filter_periods]))
+        if start_date:
+            if company:
+                where += "and am.company = %s " % company.id
+            where += "and am.date >= '%s' " % start_date
+            where += "and am.date <= '%s' " % end_date
+        else:
+            filter_periods = fiscalyear.get_periods(start_period, end_period)
+            where += "and am.period in (%s) " % (
+                ",".join([str(a.id) for a in filter_periods]))
 
         if parties:
             where += " and aml.party in (%s)" % (
@@ -226,8 +269,9 @@ class GeneralLedgerReport(JasperReport):
             """ % where)
         line_ids = [x[0] for x in cursor.fetchall()]
 
-        start_date = (start_period.start_date if start_period else
-            fiscalyear.start_date)
+        if not start_date:
+            start_date = (start_period.start_date if start_period else
+                fiscalyear.start_date)
         initial_balance_date = start_date - timedelta(days=1)
         with Transaction().set_context(date=initial_balance_date):
             init_values = {}
@@ -235,7 +279,7 @@ class GeneralLedgerReport(JasperReport):
                 init_values = Account.read_account_vals(accounts,
                     with_moves=False, exclude_party_moves=True)
             init_party_values = Party.get_account_values_by_party(
-                parties, accounts, fiscalyear.company)
+                parties, accounts, (company or fiscalyear.company))
 
         records = []
         parties_general_ledger = set()
