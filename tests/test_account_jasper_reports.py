@@ -459,6 +459,8 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_general_ledger.start.fiscalyear = fiscalyear
         print_general_ledger.start.start_period = period
         print_general_ledger.start.end_period = last_period
+        print_general_ledger.start.start_date = None
+        print_general_ledger.start.end_date = None
         print_general_ledger.start.parties = []
         print_general_ledger.start.accounts = []
         print_general_ledger.start.output_format = 'pdf'
@@ -498,6 +500,8 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_general_ledger.start.fiscalyear = fiscalyear
         print_general_ledger.start.start_period = period
         print_general_ledger.start.end_period = period
+        print_general_ledger.start.start_date = None
+        print_general_ledger.start.end_date = None
         print_general_ledger.start.parties = []
         print_general_ledger.start.accounts = []
         print_general_ledger.start.all_accounts = False
@@ -512,6 +516,31 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         dates = [r['date'] for r in records]
         for date in dates:
             self.assertEqual(date, period.start_date.strftime('%d/%m/%Y'))
+
+        # Filtered by dates
+        session_id, _, _ = PrintGeneralLedger.create()
+        print_general_ledger = PrintGeneralLedger(session_id)
+        print_general_ledger.start.company = company
+        print_general_ledger.start.fiscalyear = None
+        print_general_ledger.start.start_period = None
+        print_general_ledger.start.end_period = None
+        print_general_ledger.start.start_date = period.start_date
+        print_general_ledger.start.end_date = period.end_date
+        print_general_ledger.start.parties = []
+        print_general_ledger.start.accounts = []
+        print_general_ledger.start.all_accounts = False
+        print_general_ledger.start.output_format = 'pdf'
+        _, data = print_general_ledger.do_print_(None)
+        records, parameters = GeneralLedgerReport.prepare(data)
+        self.assertEqual(len(records), 8)
+        credit = sum([m['credit'] for m in records])
+        debit = sum([m['debit'] for m in records])
+        self.assertEqual(credit, debit)
+        self.assertEqual(credit, Decimal('380.0'))
+        dates = [r['date'] for r in records]
+        for date in dates:
+            self.assertEqual(date, period.start_date.strftime('%d/%m/%Y'))
+
         # Filtered by accounts
         expense, = Account.search([
                 ('type.expense', '=', True),
@@ -522,6 +551,8 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_general_ledger.start.fiscalyear = fiscalyear
         print_general_ledger.start.start_period = period
         print_general_ledger.start.end_period = last_period
+        print_general_ledger.start.start_date = None
+        print_general_ledger.start.end_date = None
         print_general_ledger.start.parties = []
         print_general_ledger.start.accounts = [expense.id]
         print_general_ledger.start.all_accounts = False
@@ -534,6 +565,7 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         debit = sum([m['debit'] for m in records])
         self.assertEqual(credit, Decimal('0.0'))
         self.assertEqual(debit, Decimal('130.0'))
+
         # Filter by parties
         customer1 = self.get_parties()[0]
         session_id, _, _ = PrintGeneralLedger.create()
@@ -542,6 +574,8 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_general_ledger.start.fiscalyear = fiscalyear
         print_general_ledger.start.start_period = period
         print_general_ledger.start.end_period = last_period
+        print_general_ledger.start.start_date = None
+        print_general_ledger.start.end_date = None
         print_general_ledger.start.parties = [customer1.id]
         print_general_ledger.start.accounts = []
         print_general_ledger.start.all_accounts = False
@@ -571,6 +605,8 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_general_ledger.start.fiscalyear = fiscalyear
         print_general_ledger.start.start_period = period
         print_general_ledger.start.end_period = last_period
+        print_general_ledger.start.start_date = None
+        print_general_ledger.start.end_date = None
         print_general_ledger.start.parties = [customer1.id]
         print_general_ledger.start.accounts = [receivable.id]
         print_general_ledger.start.output_format = 'pdf'
@@ -593,6 +629,8 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_general_ledger.start.fiscalyear = fiscalyear
         print_general_ledger.start.start_period = None
         print_general_ledger.start.end_period = None
+        print_general_ledger.start.start_date = None
+        print_general_ledger.start.end_date = None
         print_general_ledger.start.parties = []
         print_general_ledger.start.accounts = []
         print_general_ledger.start.output_format = 'pdf'
@@ -1349,6 +1387,8 @@ class AccountJasperReportsTestCase(ModuleTestCase):
         print_general_ledger.start.fiscalyear = next_fiscalyear
         print_general_ledger.start.start_period = period
         print_general_ledger.start.end_period = last_period
+        print_general_ledger.start.start_date = None
+        print_general_ledger.start.end_date = None
         print_general_ledger.start.parties = []
         print_general_ledger.start.accounts = []
         print_general_ledger.start.all_accounts = True
