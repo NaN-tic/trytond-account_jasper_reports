@@ -237,7 +237,8 @@ class GeneralLedgerReport(JasperReport):
             for line in Line.browse(group_lines):
                 if line.account not in accounts_w_moves:
                     accounts_w_moves.append(line.account.id)
-                if line.account.kind in ('receivable', 'payable'):
+                if (line.account.kind in ('receivable', 'payable') or
+                        line.account.party_required):
                     currentKey = (line.account, line.party and line.party
                         or None)
                 else:
