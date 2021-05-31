@@ -118,8 +118,8 @@ class PrintGeneralLedger(Wizard):
             'company': self.start.company.id,
             'fiscalyear': (self.start.fiscalyear.id if self.start.fiscalyear
                 else None),
-            'start_period': (self.start.start_period.id if self.start.start_period
-                else None),
+            'start_period': (self.start.start_period.id
+                if self.start.start_period else None),
             'end_period': (self.start.end_period.id if self.start.end_period
                 else None),
             'start_date': self.start.start_date,
@@ -166,8 +166,8 @@ class GeneralLedgerReport(JasperReport):
 
         fiscalyear = (FiscalYear(data['fiscalyear']) if data.get('fiscalyear')
             else None)
-        start_period = (Period(data['start_period']) if data.get('start_period')
-            else None)
+        start_period = (Period(data['start_period']) if data.get(
+                'start_period') else None)
         end_period = (Period(data['end_period']) if data.get('end_period')
             else None)
         start_date = data['start_date'] if data.get('start_date') else None
@@ -288,7 +288,8 @@ class GeneralLedgerReport(JasperReport):
                 if line.account not in accounts_w_moves:
                     accounts_w_moves.append(line.account.id)
                 if (line.account.type.receivable is True or
-                        line.account.type.payable is True):
+                        line.account.type.payable is True or
+                        line.account.party_required):
                     currentKey = (line.account, line.party and line.party
                         or None)
                 else:
