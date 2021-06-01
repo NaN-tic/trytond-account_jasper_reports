@@ -287,11 +287,10 @@ class GeneralLedgerReport(JasperReport):
             for line in Line.browse(group_lines):
                 if line.account not in accounts_w_moves:
                     accounts_w_moves.append(line.account.id)
-                if (line.account.type.receivable is True or
-                        line.account.type.payable is True or
-                        line.account.party_required):
-                    currentKey = (line.account, line.party and line.party
-                        or None)
+                if ((line.account.type.receivable is True or
+                            line.account.type.payable is True or
+                            line.account.party_required) and line.party):
+                    currentKey = (line.account, line.party)
                 else:
                     currentKey = line.account
                 if lastKey != currentKey:
@@ -376,46 +375,47 @@ class GeneralLedgerReport(JasperReport):
                 if parties:
                     parties = dict((p.id, p) for p in parties)
                 elif parties_general_ledger:
-                    pgl = dict((p, Party(p))
+                    parties = dict((p, Party(p))
                         for a, av in init_party_values.items()
                         for p, pv in av.items()
-                        if p not in parties_general_ledger)
-                    parties = pgl
+                        if p and p not in parties_general_ledger)
 
-                for k, v in init_party_values.items():
-                    account = accounts[k]
-                    for p, z in v.items():
-                        # check if party is in current general ledger
-                        if p in parties_general_ledger:
-                            continue
-                        party = parties[p]
-                        if account.type.receivable or account.type.payable:
-                            currentKey = (account, party)
-                        else:
-                            currentKey = account
-                        sequence += 1
-                        balance = z.get('balance', Decimal(0))
-                        if balance:
-                            account_type = 'other'
-                            if account.type and account.type.receivable:
-                                account_type = 'receivable'
-                            elif account.type and account.type.payable:
-                                account_type = 'payable'
-                            records.append({
-                                    'sequence': sequence,
-                                    'key': str(currentKey),
-                                    'account_code': account.code or '',
-                                    'account_name': account.name or '',
-                                    'account_type': account_type,
-                                    'move_line_name': '###PREVIOUSBALANCE###',
-                                    'ref': '-',
-                                    'move_number': '-',
-                                    'move_post_number': '-',
-                                    'party_name': party.name,
-                                    'credit': z.get('credit', Decimal(0)),
-                                    'debit': z.get('debit', Decimal(0)),
-                                    'balance': balance,
-                                    })
+                if parties:
+                    for k, v in init_party_values.items():
+                        account = accounts[k]
+                        for p, z in v.items():
+                            # check if party is in current general ledger
+                            if p in parties_general_ledger:
+                                continue
+                            party = parties[p]
+                            if account.type.receivable or account.type.payable:
+                                currentKey = (account, party)
+                            else:
+                                currentKey = account
+                            sequence += 1
+                            balance = z.get('balance', Decimal(0))
+                            if balance:
+                                account_type = 'other'
+                                if account.type and account.type.receivable:
+                                    account_type = 'receivable'
+                                elif account.type and account.type.payable:
+                                    account_type = 'payable'
+                                records.append({
+                                        'sequence': sequence,
+                                        'key': str(currentKey),
+                                        'account_code': account.code or '',
+                                        'account_name': account.name or '',
+                                        'account_type': account_type,
+                                        'move_line_name': (
+                                            '###PREVIOUSBALANCE###'),
+                                        'ref': '-',
+                                        'move_number': '-',
+                                        'move_post_number': '-',
+                                        'party_name': party.name,
+                                        'credit': z.get('credit', Decimal(0)),
+                                        'debit': z.get('debit', Decimal(0)),
+                                        'balance': balance,
+                                        })
         return records, parameters
 
     @classmethod
