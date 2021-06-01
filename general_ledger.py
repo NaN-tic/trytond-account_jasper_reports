@@ -385,7 +385,7 @@ class GeneralLedgerReport(JasperReport):
                         account = accounts[k]
                         for p, z in v.items():
                             # check if party is in current general ledger
-                            if p in parties_general_ledger:
+                            if not p or p in parties_general_ledger:
                                 continue
                             party = parties[p]
                             if account.type.receivable or account.type.payable:
