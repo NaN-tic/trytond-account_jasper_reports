@@ -282,12 +282,11 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{fiscal_year} != "" && $P{fiscal_year} != null
 ?
-    tr($V{L},"Fiscal Year") + ": " + $P{fiscal_year} +" "+ tr($V{L}," From") +": "+$P{start_period} +"  "+ tr($V{L},"To") +": "+ $P{end_period}
+    tr($V{L},"Fiscal Year") + ": " + $P{fiscal_year} + " " + tr($V{L}," From") + ": " + $P{start_period} + "  " + tr($V{L},"To") + ": " + $P{end_period}
 :
     $P{start_date} != "" && $P{start_date} != null
     ?
-        tr($V{L},"Initial posting date")+": "+ $P{start_date}
-        tr($V{L},"Final posting date")+": "+ $P{end_date}
+        tr($V{L},"Initial posting date") + ": " + $P{start_date} + "  " + tr($V{L},"Final posting date") + ": "+ $P{end_date}
     :
         ""]]></textFieldExpression>
 			</textField>
