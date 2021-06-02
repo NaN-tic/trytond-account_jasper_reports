@@ -321,6 +321,7 @@ class GeneralLedgerReport(JasperReport):
                         'account_code': line.account.code or '',
                         'account_name': line.account.name or '',
                         'account_type': account_type,
+                        'account_party_required': line.account.party_required,
                         'date': line.date.strftime('%d/%m/%Y'),
                         'move_line_name': line.description or '',
                         'ref': (line.move_origin.rec_name
@@ -388,7 +389,8 @@ class GeneralLedgerReport(JasperReport):
                             if not p or p in parties_general_ledger:
                                 continue
                             party = parties[p]
-                            if account.type.receivable or account.type.payable:
+                            if (account.type.receivable or account.type.payable
+                                    or account.party_required):
                                 currentKey = (account, party)
                             else:
                                 currentKey = account
@@ -406,6 +408,8 @@ class GeneralLedgerReport(JasperReport):
                                         'account_code': account.code or '',
                                         'account_name': account.name or '',
                                         'account_type': account_type,
+                                        'account_party_required': (
+                                            account.party_required),
                                         'move_line_name': (
                                             '###PREVIOUSBALANCE###'),
                                         'ref': '-',
