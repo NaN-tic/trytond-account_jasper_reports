@@ -266,6 +266,7 @@ class GeneralLedgerReport(JasperReport):
                         'account_code': line.account.code or '',
                         'account_name': line.account.name or '',
                         'account_type': line.account.kind,
+                        'account_party_required': line.account.party_required,
                         'date': line.date.strftime('%d/%m/%Y'),
                         'move_line_name': line.description or '',
                         'ref': (line.origin.rec_name if line.origin and
@@ -314,38 +315,43 @@ class GeneralLedgerReport(JasperReport):
                     pgl = dict((p, Party(p))
                         for a, av in init_party_values.items()
                         for p, pv in av.items()
-                        if p not in parties_general_ledger)
+                        if p and p not in parties_general_ledger)
                     parties = pgl
 
-                for k, v in init_party_values.items():
-                    account = accounts[k]
-                    for p, z in v.items():
-                        # check if party is in current general ledger
-                        if p in parties_general_ledger:
-                            continue
-                        party = parties[p]
-                        if account.kind in ('receivable', 'payable'):
-                            currentKey = (account, party)
-                        else:
-                            currentKey = account
-                        sequence += 1
-                        balance = z.get('balance', Decimal(0))
-                        if balance:
-                            records.append({
-                                    'sequence': sequence,
-                                    'key': str(currentKey),
-                                    'account_code': account.code or '',
-                                    'account_name': account.name or '',
-                                    'account_type': account.kind,
-                                    'move_line_name': '###PREVIOUSBALANCE###',
-                                    'ref': '-',
-                                    'move_number': '-',
-                                    'move_post_number': '-',
-                                    'party_name': party.name,
-                                    'credit': z.get('credit', Decimal(0)),
-                                    'debit': z.get('debit', Decimal(0)),
-                                    'balance': balance,
-                                    })
+                if parties:
+                    for k, v in init_party_values.items():
+                        account = accounts[k]
+                        for p, z in v.items():
+                            # check if party is in current general ledger
+                            if not p or p in parties_general_ledger:
+                                continue
+                            party = parties[p]
+                            if (account.kind in ('receivable', 'payable') or
+                                    account.party_required):
+                                currentKey = (account, party)
+                            else:
+                                currentKey = account
+                            sequence += 1
+                            balance = z.get('balance', Decimal(0))
+                            if balance:
+                                records.append({
+                                        'sequence': sequence,
+                                        'key': str(currentKey),
+                                        'account_code': account.code or '',
+                                        'account_name': account.name or '',
+                                        'account_type': account.kind,
+                                        'account_party_required': (
+                                            account.party_required),
+                                        'move_line_name': (
+                                            '###PREVIOUSBALANCE###'),
+                                        'ref': '-',
+                                        'move_number': '-',
+                                        'move_post_number': '-',
+                                        'party_name': party.name,
+                                        'credit': z.get('credit', Decimal(0)),
+                                        'debit': z.get('debit', Decimal(0)),
+                                        'balance': balance,
+                                        })
         return records, parameters
 
     @classmethod

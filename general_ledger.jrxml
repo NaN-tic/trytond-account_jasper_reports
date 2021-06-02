@@ -52,6 +52,9 @@
 	<field name="account_type" class="java.lang.String">
 		<fieldDescription><![CDATA[account_type]]></fieldDescription>
 	</field>
+	<field name="account_party_required" class="java.lang.Boolean">
+		<fieldDescription><![CDATA[account_party_required]]></fieldDescription>
+	</field>
 	<field name="key" class="java.lang.String">
 		<fieldDescription><![CDATA[key]]></fieldDescription>
 	</field>
@@ -91,7 +94,7 @@
 					<textElement verticalAlignment="Middle">
 						<font size="8" isBold="true" pdfFontName="Helvetica"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{account_type} == "receivable" || $F{account_type} == "payable" ?
+                    <textFieldExpression><![CDATA[$F{account_type} == "receivable" || $F{account_type} == "payable" || $F{account_party_required} ?
     $F{party_name}
 :
     $F{account_name}]]></textFieldExpression>
@@ -152,7 +155,7 @@
 					<textElement verticalAlignment="Middle">
 						<font size="8" isBold="true" pdfFontName="Helvetica"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{account_type} == "receivable" || $F{account_type} == "payable" ?
+                    <textFieldExpression><![CDATA[$F{account_type} == "receivable" || $F{account_type} == "payable" || $F{account_party_required} ?
     $F{party_name}
 :
     $F{account_name}]]></textFieldExpression>
