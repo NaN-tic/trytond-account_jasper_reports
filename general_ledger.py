@@ -210,8 +210,8 @@ class GeneralLedgerReport(JasperReport):
                 aml.account,
                 -- Sort by party only when account is of
                 -- type 'receivable' or 'payable'
-                CASE WHEN aa.kind in ('receivable', 'payable') THEN
-                       aml.party ELSE 0 END,
+                CASE WHEN aa.kind in ('receivable', 'payable') or
+                    aa.party_required THEN aml.party ELSE 0 END,
                 am.date,
                 am.id,
                 am.description,
@@ -239,8 +239,7 @@ class GeneralLedgerReport(JasperReport):
                     accounts_w_moves.append(line.account.id)
                 if (line.account.kind in ('receivable', 'payable') or
                         line.account.party_required):
-                    currentKey = (line.account, line.party and line.party
-                        or None)
+                    currentKey = (line.account, line.party or None)
                 else:
                     currentKey = line.account
                 if lastKey != currentKey:
