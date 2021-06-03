@@ -260,8 +260,9 @@ class GeneralLedgerReport(JasperReport):
                 aml.account,
                 -- Sort by party only when account is of
                 -- type 'receivable' or 'payable'
-                CASE WHEN aat.receivable or aat.payable THEN
-                       aml.party ELSE 0 END,
+                -- or party_requierd is True
+                CASE WHEN aat.receivable or aat.payable or
+                    aa.party_required THEN aml.party ELSE 0 END,
                 am.date,
                 am.id,
                 am.description,
