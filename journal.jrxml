@@ -276,7 +276,7 @@
     $F{account_name}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="256" y="0" width="216" height="10" uuid="6c5aadd2-49f9-406a-9421-4a3b56e44a03"/>
+				<reportElement stretchType="RelativeToTallestObject" x="256" y="0" width="206" height="10" uuid="6c5aadd2-49f9-406a-9421-4a3b56e44a03"/>
 				<textElement verticalAlignment="Top">
 					<font size="7"/>
 					<paragraph lineSpacing="Single"/>
@@ -284,7 +284,7 @@
 				<textFieldExpression><![CDATA[$F{move_line_description}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="473" y="0" width="40" height="10" uuid="5ce3a187-b5f2-425f-bf69-aa1eaf7f93cb"/>
+				<reportElement stretchType="RelativeToTallestObject" x="463" y="0" width="50" height="10" uuid="5ce3a187-b5f2-425f-bf69-aa1eaf7f93cb"/>
 				<textElement textAlignment="Right" verticalAlignment="Top">
 					<font size="7"/>
 					<paragraph lineSpacing="Fixed"/>
