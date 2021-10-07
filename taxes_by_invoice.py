@@ -7,8 +7,6 @@ from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateAction, StateReport, Button
 from trytond.pyson import Eval, If, Bool
 from trytond.modules.jasper_reports.jasper import JasperReport
-from trytond.i18n import gettext
-from trytond.exceptions import UserError
 
 __all__ = ['PrintTaxesByInvoiceAndPeriodStart', 'PrintTaxesByInvoiceAndPeriod',
     'TaxesByInvoiceReport', 'TaxesByInvoiceAndPeriodReport']
@@ -61,7 +59,7 @@ class PrintTaxesByInvoiceAndPeriodStart(ModelView):
             'required': ((Eval('start_date') | Eval('end_date')) &
                 ~Bool(Eval('periods'))),
             },
-        depends=['end_date'])
+        depends=['end_date', 'periods'])
     end_date = fields.Date('Final posting date',
         domain=[
             If(Eval('start_date') & Eval('end_date'),
@@ -73,13 +71,15 @@ class PrintTaxesByInvoiceAndPeriodStart(ModelView):
             'required': ((Eval('end_date') | Eval('start_date')) &
                 ~Bool(Eval('periods'))),
             },
-        depends=['start_date'])
+        depends=['start_date', 'periods'])
     taxes = fields.Many2Many('account.tax', None, None, 'Taxes',
         domain=[
             If(Eval('partner_type') == 'customers',
                 ('group.kind', 'in', ('both', 'sale')),
-                ('group.kind', 'in', ('both', 'purchase'))
-                ),
+                ('OR',
+                    ('group', '=', None),
+                    ('group.kind', 'in', ('both', 'purchase'))
+                    )),
             ], depends=['partner_type'])
 
     @staticmethod
@@ -174,7 +174,6 @@ class TaxesByInvoiceReport(JasperReport):
         FiscalYear = pool.get('account.fiscalyear')
         Period = pool.get('account.period')
         Party = pool.get('party.party')
-        Tax = pool.get('account.tax')
         AccountInvoiceTax = pool.get('account.invoice.tax')
 
         fiscalyear = (FiscalYear(data['fiscalyear']) if data.get('fiscalyear')
@@ -234,13 +233,13 @@ class TaxesByInvoiceReport(JasperReport):
             domain += [('invoice.type', '=', 'in')]
 
         if start_date:
-             domain += [
-                 ('invoice.move.date', '>=', start_date),
-                 ]
+            domain += [
+                ('invoice.move.date', '>=', start_date),
+                ]
         if end_date:
-             domain += [
-                 ('invoice.move.date', '<=', end_date),
-                 ]
+            domain += [
+                ('invoice.move.date', '<=', end_date),
+                ]
 
         if not start_date and not end_date and periods:
             domain += [('invoice.move.period', 'in', periods)]
