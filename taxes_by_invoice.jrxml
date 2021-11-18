@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d6f9a712-83ca-4bb9-a7ca-fa195ab39a4f">
 	<property name="TRYTON_RELATIONS" value="[&apos;invoice&apos;,&apos;invoice/move&apos;,&apos;invoice/move/period&apos;,&apos;tax&apos;,&apos;account&apos;]"/>
-	<property name="ireport.zoom" value="1.4641000000000035"/>
+	<property name="ireport.zoom" value="1.331000000000003"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false"/>
@@ -59,6 +59,9 @@
 	</field>
 	<field name="invoice_total_amount" class="java.lang.Number">
 		<fieldDescription><![CDATA[invoice/company_total_amount]]></fieldDescription>
+	</field>
+	<field name="state" class="java.lang.String">
+		<fieldDescription><![CDATA[invoice/state]]></fieldDescription>
 	</field>
 	<sortField name="tax_name"/>
 	<sortField name="period"/>
@@ -315,7 +318,7 @@
 	</columnHeader>
 	<detail>
 		<band height="13" splitType="Stretch">
-			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false]]></printWhenExpression>
+			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false && $F{state} != 'cancel']]></printWhenExpression>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
 				<reportElement x="461" y="0" width="56" height="12" uuid="f42d3245-aa77-4c9c-83e6-ae7ca64ceee4"/>
 				<textElement verticalAlignment="Middle">
@@ -410,6 +413,108 @@
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="328" y="0" width="65" height="12" uuid="5551245c-dd89-4fd6-9a32-f6638482b163"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{partner_vat}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="13" splitType="Stretch">
+			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false && $F{state} == 'cancel']]></printWhenExpression>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="461" y="1" width="56" height="12" forecolor="#999999" uuid="09462963-9c4b-45cf-b8f0-003f4e8d104c"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{date_invoice}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="93" y="1" width="57" height="12" forecolor="#999999" uuid="d2b2e4a5-6295-4d79-849b-154d7d58c716"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{account_code}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="393" y="1" width="68" height="12" forecolor="#999999" uuid="18aca2c8-f08d-4e95-8920-b2f51e29f169"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{number}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="false">
+				<reportElement x="738" y="1" width="64" height="12" forecolor="#999999" uuid="3b772469-cfe1-4b6b-a144-f8f018e86441"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{type}.equalsIgnoreCase("out_credit_note") || $F{type}.equalsIgnoreCase("in_credit_note")
+?
+    $F{invoice_total_amount} != null && $F{invoice_total_amount} != ""
+    ?
+        -$F{invoice_total_amount}
+    :
+        0.0
+:
+    $F{invoice_total_amount} != null && $F{invoice_total_amount} != ""
+    ?
+        $F{invoice_total_amount}
+    :
+        0.0]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="572" y="1" width="42" height="12" forecolor="#999999" uuid="a734a14e-2a99-4dd4-b614-392cb513cffe"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tax_name}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="150" y="1" width="178" height="12" forecolor="#999999" uuid="d4529444-3017-454b-9904-9ddeb5e9ae6d"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{partner_name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="0" y="1" width="93" height="12" forecolor="#999999" uuid="4e82fea7-1edc-4c5b-ae3a-1506e9b48023"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{account_move_date}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement x="614" y="1" width="55" height="12" forecolor="#999999" uuid="eb89edd2-cf01-47b3-b2ed-b0107852f019"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[(
+    $F{tax_amount} != null && $F{tax_amount} != ""
+    ?
+        $F{tax_amount}
+    :
+        0.0)]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="false">
+				<reportElement x="669" y="1" width="69" height="12" forecolor="#999999" uuid="bac5952a-72b7-4c96-8e21-963eaaafbca6"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{base_tax_line}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="false">
+				<reportElement x="517" y="1" width="55" height="12" forecolor="#999999" uuid="c63cf790-81fc-42ea-8f3d-e03b55ddd391"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[(
+    $F{base_amount} != null && $F{base_amount} != ""
+    ?
+        $F{base_amount}
+    :
+        0.0)]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="328" y="1" width="65" height="12" forecolor="#999999" uuid="ab299508-e498-4692-9a5f-bd069414b74e"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
