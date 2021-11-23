@@ -74,13 +74,25 @@
 		<variableExpression><![CDATA[$F{base_amount} + $F{tax_amount}]]></variableExpression>
 	</variable>
 	<variable name="base_tax_total" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
-		<variableExpression><![CDATA[$V{base_tax_line}]]></variableExpression>
+		<variableExpression><![CDATA[$F{state} != 'cancel'
+?
+    $V{base_tax_line}
+:
+    0.0]]></variableExpression>
 	</variable>
 	<variable name="tax_amount" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
-		<variableExpression><![CDATA[$F{tax_amount}]]></variableExpression>
+		<variableExpression><![CDATA[$F{state} != 'cancel'
+?
+    $F{tax_amount}
+:
+    0.0]]></variableExpression>
 	</variable>
 	<variable name="base_amount" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
-		<variableExpression><![CDATA[$F{base_amount}]]></variableExpression>
+		<variableExpression><![CDATA[$F{state} != 'cancel'
+?
+    $F{base_amount}
+:
+    0.0]]></variableExpression>
 	</variable>
 	<group name="tax" isReprintHeaderOnEachPage="true">
 		<groupExpression><![CDATA[$F{tax_name}]]></groupExpression>
@@ -441,25 +453,6 @@
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{number}]]></textFieldExpression>
-			</textField>
-			<textField pattern="#,##0.00" isBlankWhenNull="false">
-				<reportElement x="738" y="1" width="64" height="12" forecolor="#999999" uuid="3b772469-cfe1-4b6b-a144-f8f018e86441"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true" pdfFontName="Helvetica"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{type}.equalsIgnoreCase("out_credit_note") || $F{type}.equalsIgnoreCase("in_credit_note")
-?
-    $F{invoice_total_amount} != null && $F{invoice_total_amount} != ""
-    ?
-        -$F{invoice_total_amount}
-    :
-        0.0
-:
-    $F{invoice_total_amount} != null && $F{invoice_total_amount} != ""
-    ?
-        $F{invoice_total_amount}
-    :
-        0.0]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="572" y="1" width="42" height="12" forecolor="#999999" uuid="a734a14e-2a99-4dd4-b614-392cb513cffe"/>
