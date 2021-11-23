@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d6f9a712-83ca-4bb9-a7ca-fa195ab39a4f">
 	<property name="TRYTON_RELATIONS" value="[&apos;invoice&apos;,&apos;invoice/move&apos;,&apos;invoice/move/period&apos;,&apos;tax&apos;,&apos;account&apos;]"/>
-	<property name="ireport.zoom" value="1.6105100000000043"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.zoom" value="1.464100000000004"/>
+	<property name="ireport.x" value="130"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="STANDARD_DIR" class="java.lang.String"/>
@@ -77,33 +77,77 @@
 		<variableExpression><![CDATA[$F{tax_amount}==null?$F{base_amount}:$F{base_amount}+$F{tax_amount}]]></variableExpression>
 	</variable>
 	<variable name="base_tax_total" class="java.lang.Number" resetType="Group" resetGroup="quarter" calculation="Sum">
-		<variableExpression><![CDATA[$F{tax_amount}==null?$F{base_amount}:$F{base_amount}+$F{tax_amount}]]></variableExpression>
+		<variableExpression><![CDATA[$F{state} != 'cancel'
+?
+    $F{tax_amount}==null
+    ?
+        $F{base_amount}
+    :
+        $F{base_amount}+$F{tax_amount}
+:
+    0.0]]></variableExpression>
 	</variable>
 	<variable name="tax_amount_1" class="java.lang.Number" resetType="Group" resetGroup="quarter" calculation="Sum">
-		<variableExpression><![CDATA[$F{tax_amount}]]></variableExpression>
+		<variableExpression><![CDATA[$F{state} != 'cancel'
+?
+    $F{tax_amount}
+:
+    0.0]]></variableExpression>
 	</variable>
 	<variable name="base_amount_1" class="java.lang.Number" resetType="Group" resetGroup="quarter" calculation="Sum">
-		<variableExpression><![CDATA[$F{base_amount}]]></variableExpression>
+		<variableExpression><![CDATA[$F{state} != 'cancel'
+?
+    $F{base_amount}
+:
+    0.0]]></variableExpression>
 	</variable>
 	<variable name="cc_amount_total_1" class="java.lang.Number" resetType="Group" resetGroup="invoice_id" calculation="Sum">
-		<variableExpression><![CDATA[$F{type}.equalsIgnoreCase("out_credit_note") || $F{type}.equalsIgnoreCase("in_credit_note")
+		<variableExpression><![CDATA[$F{state} != 'cancel'
 ?
-    $F{tax_amount}==null?-$F{base_amount}:-($F{base_amount}+$F{tax_amount})
+    $F{type}.equalsIgnoreCase("out_credit_note") || $F{type}.equalsIgnoreCase("in_credit_note")
+    ?
+        $F{tax_amount}==null
+        ?
+            -$F{base_amount}
+        :
+            -($F{base_amount}+$F{tax_amount})
     :
-    $F{tax_amount}==null?$F{base_amount}:$F{base_amount}+$F{tax_amount}]]></variableExpression>
+        $F{tax_amount}==null
+        ?
+            $F{base_amount}
+        :
+            $F{base_amount}+$F{tax_amount}
+:
+    0.0]]></variableExpression>
 	</variable>
 	<variable name="total" class="java.math.BigDecimal" incrementType="Group" incrementGroup="invoice_id" calculation="Sum">
-		<variableExpression><![CDATA[$F{type} == "out_credit_note" || $F{type} == "in_credit_note"
+		<variableExpression><![CDATA[$F{state} != 'cancel'
 ?
-    -$F{invoice_total_amount}
+    $F{type} == "out_credit_note" || $F{type} == "in_credit_note"
+    ?
+        -$F{invoice_total_amount}
     :
-    $F{invoice_total_amount}]]></variableExpression>
+        $F{invoice_total_amount}
+:
+    0.0]]></variableExpression>
 	</variable>
 	<variable name="total_base_tax" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{tax_amount}==null?$F{base_amount}:$F{base_amount}+$F{tax_amount}]]></variableExpression>
+		<variableExpression><![CDATA[$F{state} != 'cancel'
+?
+    $F{tax_amount}==null
+    ?
+        $F{base_amount}
+    :
+        $F{base_amount}+$F{tax_amount}
+:
+    0.0]]></variableExpression>
 	</variable>
 	<variable name="total_tax" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{tax_amount}]]></variableExpression>
+		<variableExpression><![CDATA[$F{state} != 'cancel'
+?
+    $F{tax_amount}
+:
+    0.0]]></variableExpression>
 	</variable>
 	<group name="quarter" isStartNewPage="true">
 		<groupExpression><![CDATA[$F{period}]]></groupExpression>
@@ -433,19 +477,6 @@
 		</band>
 		<band height="13" splitType="Stretch">
 			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false && $F{state} == 'cancel']]></printWhenExpression>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="false">
-				<reportElement x="737" y="0" width="65" height="12" forecolor="#999999" uuid="086bef92-72bf-4773-a40c-d2350c0b9b1e">
-					<printWhenExpression><![CDATA[$V{invoice_id_COUNT}==1]]></printWhenExpression>
-				</reportElement>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{type}.equalsIgnoreCase("out_credit_note") || $F{type}.equalsIgnoreCase("in_credit_note")
-?
-   $F{invoice_total_amount} != null ? -$F{invoice_total_amount} : 0.0
-:
-   $F{invoice_total_amount} != null ? $F{invoice_total_amount} : 0.0]]></textFieldExpression>
-			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="573" y="0" width="42" height="12" forecolor="#999999" uuid="d85f95ac-9efa-4518-914c-f2d251b70f2d"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
