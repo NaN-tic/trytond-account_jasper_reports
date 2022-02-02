@@ -122,33 +122,33 @@
     0.0]]></variableExpression>
 	</variable>
 	<variable name="total" class="java.math.BigDecimal" incrementType="Group" incrementGroup="invoice_id" calculation="Sum">
-		<variableExpression><![CDATA[$F{state} != 'cancel'
+		<variableExpression><![CDATA[$P{partner_type} == 'suppliers' && $F{state} == 'cancel'
 ?
+    0.0
+:
     $F{type} == "out_credit_note" || $F{type} == "in_credit_note"
     ?
         -$F{invoice_total_amount}
     :
-        $F{invoice_total_amount}
-:
-    0.0]]></variableExpression>
+        $F{invoice_total_amount}]]></variableExpression>
 	</variable>
 	<variable name="total_base_tax" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{state} != 'cancel'
+		<variableExpression><![CDATA[$P{partner_type} == 'suppliers' && $F{state} == 'cancel'
 ?
+    0.0
+:
     $F{tax_amount}==null
     ?
         $F{base_amount}
     :
-        $F{base_amount}+$F{tax_amount}
-:
-    0.0]]></variableExpression>
+        $F{base_amount}+$F{tax_amount}]]></variableExpression>
 	</variable>
 	<variable name="total_tax" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{state} != 'cancel'
+		<variableExpression><![CDATA[$P{partner_type} == 'suppliers' && $F{state} == 'cancel'
 ?
-    $F{tax_amount}
+    0.0
 :
-    0.0]]></variableExpression>
+    $F{tax_amount}]]></variableExpression>
 	</variable>
 	<group name="quarter" isStartNewPage="true">
 		<groupExpression><![CDATA[$F{period}]]></groupExpression>

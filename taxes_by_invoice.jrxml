@@ -75,25 +75,25 @@
 		<variableExpression><![CDATA[$F{base_amount} + $F{tax_amount}]]></variableExpression>
 	</variable>
 	<variable name="base_tax_total" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
-		<variableExpression><![CDATA[$F{state} != 'cancel'
+		<variableExpression><![CDATA[$P{partner_type} == 'suppliers' && $F{state} == 'cancel'
 ?
-    $V{base_tax_line}
+    0.0
 :
-    0.0]]></variableExpression>
+    $V{base_tax_line}]]></variableExpression>
 	</variable>
 	<variable name="tax_amount" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
-		<variableExpression><![CDATA[$F{state} != 'cancel'
+		<variableExpression><![CDATA[$P{partner_type} == 'suppliers' && $F{state} == 'cancel'
 ?
-    $F{tax_amount}
+    0.0
 :
-    0.0]]></variableExpression>
+    $F{tax_amount}]]></variableExpression>
 	</variable>
 	<variable name="base_amount" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
-		<variableExpression><![CDATA[$F{state} != 'cancel'
+		<variableExpression><![CDATA[$P{partner_type} == 'suppliers' && $F{state} == 'cancel'
 ?
-    $F{base_amount}
+    0.0
 :
-    0.0]]></variableExpression>
+    $F{base_amount}]]></variableExpression>
 	</variable>
 	<group name="tax" isReprintHeaderOnEachPage="true">
 		<groupExpression><![CDATA[$F{tax_name}]]></groupExpression>
