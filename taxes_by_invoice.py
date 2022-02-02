@@ -219,6 +219,7 @@ class TaxesByInvoiceReport(JasperReport):
         parameters['company_vat'] = (company
             and company.party.tax_identifier and
             company.party.tax_identifier.code) or ''
+        parameters['partner_type'] = data.get('partner_type')
 
         domain = [
             ('invoice.move', '!=', None),
