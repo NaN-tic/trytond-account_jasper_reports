@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d6f9a712-83ca-4bb9-a7ca-fa195ab39a4f">
 	<property name="TRYTON_RELATIONS" value="[&apos;invoice&apos;,&apos;invoice/move&apos;,&apos;invoice/move/period&apos;,&apos;tax&apos;,&apos;account&apos;]"/>
 	<property name="ireport.zoom" value="1.464100000000004"/>
-	<property name="ireport.x" value="130"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="STANDARD_DIR" class="java.lang.String"/>
@@ -18,6 +18,7 @@
 	<parameter name="company_vat" class="java.lang.String"/>
 	<parameter name="end_date" class="java.lang.String"/>
 	<parameter name="start_date" class="java.lang.String"/>
+	<parameter name="partner_type" class="java.lang.String"/>
 	<queryString language="xPath">
 		<![CDATA[/data/record]]>
 	</queryString>
@@ -378,7 +379,7 @@
 	</columnHeader>
 	<detail>
 		<band height="13" splitType="Stretch">
-			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false && $F{state} != 'cancel']]></printWhenExpression>
+			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false && ($P{partner_type} == 'customers' || ($P{partner_type} == 'suppliers' && $F{state} != 'cancel'))]]></printWhenExpression>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="false">
 				<reportElement x="737" y="0" width="65" height="12" uuid="a60563f3-207d-48db-813e-d65c570ba121">
 					<printWhenExpression><![CDATA[$V{invoice_id_COUNT}==1]]></printWhenExpression>
@@ -476,7 +477,7 @@
 			</textField>
 		</band>
 		<band height="13" splitType="Stretch">
-			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false && $F{state} == 'cancel']]></printWhenExpression>
+			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false && $P{partner_type} == 'suppliers' && $F{state} == 'cancel']]></printWhenExpression>
 			<textField isBlankWhenNull="true">
 				<reportElement x="573" y="0" width="42" height="12" forecolor="#999999" uuid="d85f95ac-9efa-4518-914c-f2d251b70f2d"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
