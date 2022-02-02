@@ -18,6 +18,7 @@
 	<parameter name="company_vat" class="java.lang.String"/>
 	<parameter name="start_date" class="java.lang.String"/>
 	<parameter name="end_date" class="java.lang.String"/>
+	<parameter name="partner_type" class="java.lang.String"/>
 	<queryString language="xPath">
 		<![CDATA[/data/record]]>
 	</queryString>
@@ -330,7 +331,7 @@
 	</columnHeader>
 	<detail>
 		<band height="13" splitType="Stretch">
-			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false && $F{state} != 'cancel']]></printWhenExpression>
+			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false && ($P{partner_type} == 'customers' || ($P{partner_type} == 'suppliers' && $F{state} != 'cancel'))]]></printWhenExpression>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
 				<reportElement x="461" y="0" width="56" height="12" uuid="f42d3245-aa77-4c9c-83e6-ae7ca64ceee4"/>
 				<textElement verticalAlignment="Middle">
@@ -432,7 +433,7 @@
 			</textField>
 		</band>
 		<band height="13" splitType="Stretch">
-			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false && $F{state} == 'cancel']]></printWhenExpression>
+			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false && $P{partner_type} == 'suppliers' && $F{state} == 'cancel']]></printWhenExpression>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
 				<reportElement x="461" y="1" width="56" height="12" forecolor="#999999" uuid="09462963-9c4b-45cf-b8f0-003f4e8d104c"/>
 				<textElement verticalAlignment="Middle">
