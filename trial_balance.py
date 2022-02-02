@@ -343,6 +343,7 @@ class TrialBalanceReport(JasperReport):
             company.party.tax_identifier.code) or ''
         parameters['with_moves_only'] = with_moves or ''
         parameters['split_parties'] = split_parties or ''
+        parameters['digits'] = digits or ''
 
         with Transaction().set_context(active_test=False):
             if parties:
