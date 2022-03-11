@@ -16,10 +16,6 @@ msgctxt ""
 msgid "Fiscal Year"
 msgstr "Ejercicio fiscal"
 
-msgctxt "field:account_jasper_reports.print_abreviated_journal.start,id:"
-msgid "ID"
-msgstr "ID"
-
 msgctxt "field:account_jasper_reports.print_abreviated_journal.start,level:"
 msgid "Level"
 msgstr "Nivel"
@@ -42,6 +38,10 @@ msgctxt "field:account_jasper_reports.print_general_ledger.start,company:"
 msgid "Company"
 msgstr "Empresa"
 
+msgctxt "field:account_jasper_reports.print_general_ledger.start,end_date:"
+msgid "Final posting date"
+msgstr "Fecha de contabilización final"
+
 msgctxt "field:account_jasper_reports.print_general_ledger.start,end_period:"
 msgid "End Period"
 msgstr "Período final"
@@ -49,10 +49,6 @@ msgstr "Período final"
 msgctxt "field:account_jasper_reports.print_general_ledger.start,fiscalyear:"
 msgid "Fiscal Year"
 msgstr "Ejercicio fiscal"
-
-msgctxt "field:account_jasper_reports.print_general_ledger.start,id:"
-msgid "ID"
-msgstr "ID"
 
 msgctxt ""
 "field:account_jasper_reports.print_general_ledger.start,output_format:"
@@ -62,6 +58,10 @@ msgstr "Tipo de fichero"
 msgctxt "field:account_jasper_reports.print_general_ledger.start,parties:"
 msgid "Parties"
 msgstr "Terceros"
+
+msgctxt "field:account_jasper_reports.print_general_ledger.start,start_date:"
+msgid "Initial posting date"
+msgstr "Fecha de contabilización inicial"
 
 msgctxt ""
 "field:account_jasper_reports.print_general_ledger.start,start_period:"
@@ -84,10 +84,6 @@ msgstr "Período final"
 msgctxt "field:account_jasper_reports.print_journal.start,fiscalyear:"
 msgid "Fiscal Year"
 msgstr "Ejercicio fiscal"
-
-msgctxt "field:account_jasper_reports.print_journal.start,id:"
-msgid "ID"
-msgstr "ID"
 
 msgctxt "field:account_jasper_reports.print_journal.start,journals:"
 msgid "Journals"
@@ -128,10 +124,6 @@ msgctxt "field:account_jasper_reports.print_taxes_by_invoice.start,grouping:"
 msgid "Grouping"
 msgstr "Agrupación"
 
-msgctxt "field:account_jasper_reports.print_taxes_by_invoice.start,id:"
-msgid "ID"
-msgstr "ID"
-
 msgctxt ""
 "field:account_jasper_reports.print_taxes_by_invoice.start,output_format:"
 msgid "Output Format"
@@ -141,19 +133,10 @@ msgctxt "field:account_jasper_reports.print_taxes_by_invoice.start,parties:"
 msgid "Parties"
 msgstr "Terceros"
 
-msgctxt "field:account_jasper_reports.print_taxes_by_invoice.start,taxes:"
-msgid "Taxes"
-msgstr "Impuestos"
-
 msgctxt ""
 "field:account_jasper_reports.print_taxes_by_invoice.start,partner_type:"
 msgid "Party Type"
 msgstr "Tipo de tercero"
-
-msgctxt ""
-"field:account_jasper_reports.print_taxes_by_invoice.start,tax_type:"
-msgid "Tax Type"
-msgstr "Tipo de impuestos"
 
 msgctxt "field:account_jasper_reports.print_taxes_by_invoice.start,periods:"
 msgid "Periods"
@@ -163,6 +146,14 @@ msgctxt ""
 "field:account_jasper_reports.print_taxes_by_invoice.start,start_date:"
 msgid "Initial posting date"
 msgstr "Fecha de contabilización inicial"
+
+msgctxt "field:account_jasper_reports.print_taxes_by_invoice.start,tax_type:"
+msgid "Tax Type"
+msgstr "Tipo de impuestos"
+
+msgctxt "field:account_jasper_reports.print_taxes_by_invoice.start,taxes:"
+msgid "Taxes"
+msgstr "Impuestos"
 
 msgctxt ""
 "field:account_jasper_reports.print_taxes_by_invoice.start,totals_only:"
@@ -204,10 +195,6 @@ msgstr "Período final"
 msgctxt "field:account_jasper_reports.print_trial_balance.start,fiscalyear:"
 msgid "Fiscal Year"
 msgstr "Ejercicio fiscal"
-
-msgctxt "field:account_jasper_reports.print_trial_balance.start,id:"
-msgid "ID"
-msgstr "ID"
 
 msgctxt ""
 "field:account_jasper_reports.print_trial_balance.start,output_format:"
@@ -472,12 +459,20 @@ msgid "Description"
 msgstr "Descripción"
 
 msgctxt "report:account_jasper_reports.general_ledger:"
+msgid "Final posting date"
+msgstr "Fecha de contabilización final"
+
+msgctxt "report:account_jasper_reports.general_ledger:"
 msgid "Fiscal Year"
 msgstr "Ejercicio fiscal"
 
 msgctxt "report:account_jasper_reports.general_ledger:"
 msgid "General Ledger"
 msgstr "Libro mayor"
+
+msgctxt "report:account_jasper_reports.general_ledger:"
+msgid "Initial posting date"
+msgstr "Fecha de contabilización inicial"
 
 msgctxt "report:account_jasper_reports.general_ledger:"
 msgid "Number"
@@ -492,10 +487,6 @@ msgid "Parties"
 msgstr "Terceros"
 
 msgctxt "report:account_jasper_reports.general_ledger:"
-msgid "Party"
-msgstr "Tercero"
-
-msgctxt "report:account_jasper_reports.general_ledger:"
 msgid "Previous balance..."
 msgstr "Balance anterior..."
 
@@ -508,12 +499,12 @@ msgid "To"
 msgstr "Hasta"
 
 msgctxt "report:account_jasper_reports.general_ledger:"
-msgid "Total Fiscal Year"
-msgstr "Total Ejercicio fiscal"
-
-msgctxt "report:account_jasper_reports.general_ledger:"
 msgid "Total"
 msgstr "Total"
+
+msgctxt "report:account_jasper_reports.general_ledger:"
+msgid "Total Fiscal Year"
+msgstr "Total Ejercicio fiscal"
 
 msgctxt "report:account_jasper_reports.general_ledger:"
 msgid "VAT"
@@ -688,8 +679,16 @@ msgid "Base+Tax"
 msgstr "Base+Imp."
 
 msgctxt "report:account_jasper_reports.taxes_by_invoice_and_period:"
+msgid "Final posting date"
+msgstr "Fecha de contabilización final"
+
+msgctxt "report:account_jasper_reports.taxes_by_invoice_and_period:"
 msgid "Fiscal Year: "
 msgstr "Ejercicio fiscal: "
+
+msgctxt "report:account_jasper_reports.taxes_by_invoice_and_period:"
+msgid "Initial posting date"
+msgstr "Fecha de contabilización inicial"
 
 msgctxt "report:account_jasper_reports.taxes_by_invoice_and_period:"
 msgid "Invoice"
