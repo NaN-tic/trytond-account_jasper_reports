@@ -75,21 +75,21 @@
 		<variableExpression><![CDATA[$F{base_amount} + $F{tax_amount}]]></variableExpression>
 	</variable>
 	<variable name="base_tax_total" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
-		<variableExpression><![CDATA[$P{partner_type} == 'suppliers' && $F{state} == 'cancel'
+		<variableExpression><![CDATA[$P{partner_type} == 'suppliers' && $F{state} == 'cancelled'
 ?
     0.0
 :
     $V{base_tax_line}]]></variableExpression>
 	</variable>
 	<variable name="tax_amount" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
-		<variableExpression><![CDATA[$P{partner_type} == 'suppliers' && $F{state} == 'cancel'
+		<variableExpression><![CDATA[$P{partner_type} == 'suppliers' && $F{state} == 'cancelled'
 ?
     0.0
 :
     $F{tax_amount}]]></variableExpression>
 	</variable>
 	<variable name="base_amount" class="java.lang.Number" resetType="Group" resetGroup="tax" calculation="Sum">
-		<variableExpression><![CDATA[$P{partner_type} == 'suppliers' && $F{state} == 'cancel'
+		<variableExpression><![CDATA[$P{partner_type} == 'suppliers' && $F{state} == 'cancelled'
 ?
     0.0
 :
@@ -331,7 +331,7 @@
 	</columnHeader>
 	<detail>
 		<band height="13" splitType="Stretch">
-			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false && ($P{partner_type} == 'customers' || ($P{partner_type} == 'suppliers' && $F{state} != 'cancel'))]]></printWhenExpression>
+			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false && ($P{partner_type} == 'customers' || ($P{partner_type} == 'suppliers' && $F{state} != 'cancelled'))]]></printWhenExpression>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
 				<reportElement x="461" y="0" width="56" height="12" uuid="f42d3245-aa77-4c9c-83e6-ae7ca64ceee4"/>
 				<textElement verticalAlignment="Middle">
@@ -433,7 +433,7 @@
 			</textField>
 		</band>
 		<band height="13" splitType="Stretch">
-			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false && $P{partner_type} == 'suppliers' && $F{state} == 'cancel']]></printWhenExpression>
+			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false && $P{partner_type} == 'suppliers' && $F{state} == 'cancelled']]></printWhenExpression>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
 				<reportElement x="461" y="1" width="56" height="12" forecolor="#999999" uuid="09462963-9c4b-45cf-b8f0-003f4e8d104c"/>
 				<textElement verticalAlignment="Middle">
