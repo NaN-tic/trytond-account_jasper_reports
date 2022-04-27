@@ -12,7 +12,7 @@ from trytond.modules.account_invoice.tests import set_invoice_sequences
 from trytond.modules.company.tests import CompanyTestMixin
 
 
-class AccountJasperReportsTestCase(ModuleTestCase):
+class AccountJasperReportsTestCase(CompanyTestMixin, ModuleTestCase):
     'Test AccountJasperReports module'
     module = 'account_jasper_reports'
 
