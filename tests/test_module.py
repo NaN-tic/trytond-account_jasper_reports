@@ -3,18 +3,17 @@
 # copyright notices and license terms.
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
-import unittest
 from trytond.pool import Pool
-import trytond.tests.test_tryton
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
 from trytond.transaction import Transaction
 from trytond.modules.company.tests import create_company, set_company
 from trytond.modules.account.tests import create_chart, get_fiscalyear
 from trytond.modules.account_invoice.tests import set_invoice_sequences
+from trytond.modules.company.tests import CompanyTestMixin
 
 
 class AccountJasperReportsTestCase(ModuleTestCase):
-    'Test Account Jasper Reports module'
+    'Test AccountJasperReports module'
     module = 'account_jasper_reports'
 
     def setUp(self):
@@ -1516,8 +1515,5 @@ class AccountJasperReportsTestCase(ModuleTestCase):
                 balances[record['name']])
 
 
-def suite():
-    suite = trytond.tests.test_tryton.suite()
-    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(
-        AccountJasperReportsTestCase))
-    return suite
+
+del ModuleTestCase
