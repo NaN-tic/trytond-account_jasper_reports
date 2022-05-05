@@ -49,7 +49,11 @@ class PrintJournalStart(ModelView):
     journals = fields.Many2Many('account.journal', None, None, 'Journals',
         states={
             'readonly': Bool(Eval('open_close_account_moves')),
-            }, depends=['open_close_account_moves'])
+            },
+        context={
+            'company': Eval('company'),
+            },
+        depends=['open_close_account_moves', 'company'])
     output_format = fields.Selection([
             ('pdf', 'PDF'),
             ('xls', 'XLS'),
