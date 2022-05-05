@@ -72,7 +72,11 @@ class PrintGeneralLedgerStart(ModelView):
     all_accounts = fields.Boolean('All accounts with and without balance',
         help='If unchecked only print accounts with previous balance different'
         ' from 0 or with moves')
-    parties = fields.Many2Many('party.party', None, None, 'Parties')
+    parties = fields.Many2Many('party.party', None, None, 'Parties', 
+        context={
+            'company': Eval('company'),
+            },
+        depends=['company'])
     output_format = fields.Selection([
             ('pdf', 'PDF'),
             ('xls', 'XLS'),

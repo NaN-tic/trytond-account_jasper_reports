@@ -42,7 +42,10 @@ class PrintTrialBalanceStart(ModelView):
         states={
             'invisible': ~Bool(Eval('split_parties', False)),
             },
-        depends=['split_parties'])
+        context={
+            'company': Eval('company'),
+            },
+        depends=['split_parties', 'company'])
     start_period = fields.Many2One('account.period', 'Start Period',
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
