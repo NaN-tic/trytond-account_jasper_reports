@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d6f9a712-83ca-4bb9-a7ca-fa195ab39a4f">
 	<property name="TRYTON_RELATIONS" value="[&apos;invoice&apos;,&apos;invoice/move&apos;,&apos;invoice/move/period&apos;,&apos;tax&apos;,&apos;account&apos;]"/>
 	<property name="ireport.zoom" value="1.464100000000004"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="117"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="STANDARD_DIR" class="java.lang.String"/>
@@ -78,7 +78,7 @@
 		<variableExpression><![CDATA[$F{tax_amount}==null?$F{base_amount}:$F{base_amount}+$F{tax_amount}]]></variableExpression>
 	</variable>
 	<variable name="base_tax_total" class="java.lang.Number" resetType="Group" resetGroup="quarter" calculation="Sum">
-		<variableExpression><![CDATA[$F{state} != 'cancel'
+		<variableExpression><![CDATA[$P{partner_type} == 'customers' || ($P{partner_type} == 'suppliers' && $F{state} != 'cancel')
 ?
     $F{tax_amount}==null
     ?
@@ -89,21 +89,21 @@
     0.0]]></variableExpression>
 	</variable>
 	<variable name="tax_amount_1" class="java.lang.Number" resetType="Group" resetGroup="quarter" calculation="Sum">
-		<variableExpression><![CDATA[$F{state} != 'cancel'
+		<variableExpression><![CDATA[$P{partner_type} == 'customers' || ($P{partner_type} == 'suppliers' && $F{state} != 'cancel')
 ?
     $F{tax_amount}
 :
     0.0]]></variableExpression>
 	</variable>
 	<variable name="base_amount_1" class="java.lang.Number" resetType="Group" resetGroup="quarter" calculation="Sum">
-		<variableExpression><![CDATA[$F{state} != 'cancel'
+		<variableExpression><![CDATA[$P{partner_type} == 'customers' || ($P{partner_type} == 'suppliers' && $F{state} != 'cancel')
 ?
     $F{base_amount}
 :
     0.0]]></variableExpression>
 	</variable>
 	<variable name="cc_amount_total_1" class="java.lang.Number" resetType="Group" resetGroup="invoice_id" calculation="Sum">
-		<variableExpression><![CDATA[$F{state} != 'cancel'
+		<variableExpression><![CDATA[$P{partner_type} == 'customers' || ($P{partner_type} == 'suppliers' && $F{state} != 'cancel')
 ?
     $F{type}.equalsIgnoreCase("out_credit_note") || $F{type}.equalsIgnoreCase("in_credit_note")
     ?
@@ -122,33 +122,33 @@
     0.0]]></variableExpression>
 	</variable>
 	<variable name="total" class="java.math.BigDecimal" incrementType="Group" incrementGroup="invoice_id" calculation="Sum">
-		<variableExpression><![CDATA[$P{partner_type} == 'suppliers' && $F{state} == 'cancel'
+		<variableExpression><![CDATA[$P{partner_type} == 'customers' || ($P{partner_type} == 'suppliers' && $F{state} != 'cancel')
 ?
-    0.0
-:
     $F{type} == "out_credit_note" || $F{type} == "in_credit_note"
     ?
         -$F{invoice_total_amount}
     :
-        $F{invoice_total_amount}]]></variableExpression>
+        $F{invoice_total_amount}
+:
+    0.0]]></variableExpression>
 	</variable>
 	<variable name="total_base_tax" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$P{partner_type} == 'suppliers' && $F{state} == 'cancel'
+		<variableExpression><![CDATA[$P{partner_type} == 'customers' || ($P{partner_type} == 'suppliers' && $F{state} != 'cancel')
 ?
-    0.0
-:
     $F{tax_amount}==null
     ?
         $F{base_amount}
     :
-        $F{base_amount}+$F{tax_amount}]]></variableExpression>
+        $F{base_amount}+$F{tax_amount}
+:
+    0.0]]></variableExpression>
 	</variable>
 	<variable name="total_tax" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$P{partner_type} == 'suppliers' && $F{state} == 'cancel'
+		<variableExpression><![CDATA[$P{partner_type} == 'customers' || ($P{partner_type} == 'suppliers' && $F{state} != 'cancel')
 ?
-    0.0
+    $F{tax_amount}
 :
-    $F{tax_amount}]]></variableExpression>
+    0.0]]></variableExpression>
 	</variable>
 	<group name="quarter" isStartNewPage="true">
 		<groupExpression><![CDATA[$F{period}]]></groupExpression>
@@ -575,14 +575,14 @@
 				<textFieldExpression><![CDATA[$V{total_base_tax}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="458" y="0" width="157" height="16" uuid="464566cb-7374-45bf-9533-05fe7a2f8315"/>
+				<reportElement x="458" y="0" width="115" height="16" uuid="464566cb-7374-45bf-9533-05fe7a2f8315"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Total")]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
-				<reportElement x="615" y="0" width="55" height="16" uuid="eb5cc36a-e313-49af-9798-0d44b54e94d9"/>
+				<reportElement x="573" y="0" width="97" height="16" uuid="eb5cc36a-e313-49af-9798-0d44b54e94d9"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
