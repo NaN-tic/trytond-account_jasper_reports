@@ -50,7 +50,7 @@
 	<field name="period_balance" class="java.lang.String">
 		<fieldDescription><![CDATA[period_balance]]></fieldDescription>
 	</field>
-	<field name="initial_balance" class="java.lang.Number">
+	<field name="initial_balance" class="java.lang.String">
 		<fieldDescription><![CDATA[initial_balance]]></fieldDescription>
 	</field>
 	<field name="credit" class="java.lang.String">
