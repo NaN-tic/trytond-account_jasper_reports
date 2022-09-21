@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d6f9a712-83ca-4bb9-a7ca-fa195ab39a4f">
 	<property name="TRYTON_RELATIONS" value="[&apos;invoice&apos;,&apos;invoice/move&apos;,&apos;invoice/move/period&apos;,&apos;tax&apos;,&apos;account&apos;]"/>
-	<property name="ireport.zoom" value="1.331000000000003"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.zoom" value="2.5937424601000076"/>
+	<property name="ireport.x" value="212"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="STANDARD_DIR" class="java.lang.String"/>
@@ -144,7 +144,7 @@
     0.0]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00" isBlankWhenNull="false">
-					<reportElement x="669" y="0" width="69" height="16" uuid="b516390b-db04-443d-b2fe-4f0d322019b2"/>
+					<reportElement x="670" y="0" width="69" height="16" uuid="b516390b-db04-443d-b2fe-4f0d322019b2"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font size="8" isBold="true"/>
 					</textElement>
@@ -172,14 +172,14 @@
 	<pageHeader>
 		<band height="85">
 			<textField>
-				<reportElement positionType="Float" x="461" y="70" width="57" height="12" uuid="3add4ca4-3ef5-4c48-a750-4ffd64fe4af6"/>
+				<reportElement positionType="Float" x="461" y="70" width="58" height="12" uuid="3add4ca4-3ef5-4c48-a750-4ffd64fe4af6"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Invoice Date")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="572" y="70" width="97" height="12" uuid="0669953b-6439-4a25-a04e-e59d4582132f"/>
+				<reportElement positionType="Float" x="573" y="70" width="98" height="12" uuid="0669953b-6439-4a25-a04e-e59d4582132f"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
@@ -193,42 +193,42 @@
 				<textFieldExpression><![CDATA[tr($V{L},"Invoice Total")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="518" y="70" width="54" height="12" uuid="f78ff485-fcac-4a17-a31d-916ed3ac9a2b"/>
+				<reportElement positionType="Float" x="518" y="70" width="56" height="12" uuid="f78ff485-fcac-4a17-a31d-916ed3ac9a2b"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Base")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="392" y="70" width="69" height="12" uuid="f27594b3-5181-4c1e-aa67-9242412e3f3e"/>
+				<reportElement positionType="Float" x="393" y="70" width="69" height="12" uuid="f27594b3-5181-4c1e-aa67-9242412e3f3e"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Invoice")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="93" y="70" width="235" height="12" uuid="0097eeb4-b6b7-478a-8a49-002609c4bf10"/>
+				<reportElement positionType="Float" x="69" y="70" width="247" height="12" uuid="0097eeb4-b6b7-478a-8a49-002609c4bf10"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Account")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="328" y="70" width="64" height="12" uuid="8dfcbddc-e7a2-4e3b-9211-c81048878534"/>
+				<reportElement positionType="Float" x="315" y="70" width="79" height="12" uuid="8dfcbddc-e7a2-4e3b-9211-c81048878534"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"VAT")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="0" y="70" width="93" height="12" uuid="2f507c88-890c-4ab0-85c1-b9e5c257ccc2"/>
+				<reportElement positionType="Float" x="0" y="70" width="70" height="12" uuid="2f507c88-890c-4ab0-85c1-b9e5c257ccc2"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
 				<textFieldExpression><![CDATA[tr($V{L},"Move Date")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="669" y="70" width="69" height="12" uuid="a0e48cd0-7cac-4701-8c3e-98bb152e1f09"/>
+				<reportElement positionType="Float" x="670" y="70" width="69" height="12" uuid="a0e48cd0-7cac-4701-8c3e-98bb152e1f09"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true" pdfFontName="Helvetica"/>
 				</textElement>
@@ -333,21 +333,21 @@
 		<band height="13" splitType="Stretch">
 			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false && ($P{partner_type} == 'customers' || ($P{partner_type} == 'suppliers' && $F{state} != 'cancelled'))]]></printWhenExpression>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement x="461" y="0" width="56" height="12" uuid="f42d3245-aa77-4c9c-83e6-ae7ca64ceee4"/>
+				<reportElement x="461" y="0" width="58" height="12" uuid="f42d3245-aa77-4c9c-83e6-ae7ca64ceee4"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{date_invoice}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="93" y="0" width="57" height="12" uuid="a85255ce-5a7b-435c-a7b6-b9ee62a5ac5a"/>
+				<reportElement x="69" y="0" width="60" height="12" uuid="a85255ce-5a7b-435c-a7b6-b9ee62a5ac5a"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{account_code}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="393" y="0" width="68" height="12" uuid="c81b6493-7b68-4e34-a7cb-1eea95dd4886"/>
+				<reportElement x="393" y="0" width="69" height="12" uuid="c81b6493-7b68-4e34-a7cb-1eea95dd4886"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
@@ -373,28 +373,28 @@
         0.0]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="572" y="0" width="42" height="12" uuid="3c9e00e1-a5d7-4efe-8fbc-837af50c088f"/>
+				<reportElement x="573" y="0" width="43" height="12" uuid="3c9e00e1-a5d7-4efe-8fbc-837af50c088f"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{tax_name}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="150" y="0" width="178" height="12" uuid="92eb121b-e066-462f-9522-b0b857322560"/>
+				<reportElement x="128" y="0" width="188" height="12" uuid="92eb121b-e066-462f-9522-b0b857322560"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{partner_name}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="93" height="12" uuid="6bb8638c-37e3-4e35-ab80-dfc14040a29c"/>
+				<reportElement x="0" y="0" width="70" height="12" uuid="6bb8638c-37e3-4e35-ab80-dfc14040a29c"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{account_move_date}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
-				<reportElement x="614" y="0" width="55" height="12" uuid="c05743ac-9a74-4cd4-ac8f-ecd5a33e4542"/>
+				<reportElement x="615" y="0" width="56" height="12" uuid="c05743ac-9a74-4cd4-ac8f-ecd5a33e4542"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
@@ -406,14 +406,14 @@
         0.0)]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00" isBlankWhenNull="false">
-				<reportElement x="669" y="0" width="69" height="12" uuid="efcf3be5-1af7-4cc8-ae70-6c4902cb26f8"/>
+				<reportElement x="670" y="0" width="69" height="12" uuid="efcf3be5-1af7-4cc8-ae70-6c4902cb26f8"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{base_tax_line}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00" isBlankWhenNull="false">
-				<reportElement x="517" y="0" width="55" height="12" uuid="11176dbd-c32b-48b3-837e-ac8ada7525fc"/>
+				<reportElement x="518" y="0" width="56" height="12" uuid="11176dbd-c32b-48b3-837e-ac8ada7525fc"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
@@ -425,7 +425,7 @@
         0.0)]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="328" y="0" width="65" height="12" uuid="5551245c-dd89-4fd6-9a32-f6638482b163"/>
+				<reportElement x="315" y="0" width="79" height="12" uuid="5551245c-dd89-4fd6-9a32-f6638482b163"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
@@ -435,49 +435,49 @@
 		<band height="13" splitType="Stretch">
 			<printWhenExpression><![CDATA[$P{TOTALS_ONLY}==false && $P{partner_type} == 'suppliers' && $F{state} == 'cancelled']]></printWhenExpression>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement x="461" y="1" width="56" height="12" forecolor="#999999" uuid="09462963-9c4b-45cf-b8f0-003f4e8d104c"/>
+				<reportElement x="461" y="1" width="58" height="12" forecolor="#999999" uuid="09462963-9c4b-45cf-b8f0-003f4e8d104c"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{date_invoice}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="93" y="1" width="57" height="12" forecolor="#999999" uuid="d2b2e4a5-6295-4d79-849b-154d7d58c716"/>
+				<reportElement x="69" y="1" width="60" height="12" forecolor="#999999" uuid="d2b2e4a5-6295-4d79-849b-154d7d58c716"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{account_code}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="393" y="1" width="68" height="12" forecolor="#999999" uuid="18aca2c8-f08d-4e95-8920-b2f51e29f169"/>
+				<reportElement x="393" y="1" width="69" height="12" forecolor="#999999" uuid="18aca2c8-f08d-4e95-8920-b2f51e29f169"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{number}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="572" y="1" width="42" height="12" forecolor="#999999" uuid="a734a14e-2a99-4dd4-b614-392cb513cffe"/>
+				<reportElement x="573" y="1" width="43" height="12" forecolor="#999999" uuid="a734a14e-2a99-4dd4-b614-392cb513cffe"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{tax_name}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="150" y="1" width="178" height="12" forecolor="#999999" uuid="d4529444-3017-454b-9904-9ddeb5e9ae6d"/>
+				<reportElement x="128" y="1" width="188" height="12" forecolor="#999999" uuid="d4529444-3017-454b-9904-9ddeb5e9ae6d"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{partner_name}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement x="0" y="1" width="93" height="12" forecolor="#999999" uuid="4e82fea7-1edc-4c5b-ae3a-1506e9b48023"/>
+				<reportElement x="0" y="1" width="70" height="12" forecolor="#999999" uuid="4e82fea7-1edc-4c5b-ae3a-1506e9b48023"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{account_move_date}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
-				<reportElement x="614" y="1" width="55" height="12" forecolor="#999999" uuid="eb89edd2-cf01-47b3-b2ed-b0107852f019"/>
+				<reportElement x="615" y="1" width="56" height="12" forecolor="#999999" uuid="eb89edd2-cf01-47b3-b2ed-b0107852f019"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
@@ -489,14 +489,14 @@
         0.0)]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00" isBlankWhenNull="false">
-				<reportElement x="669" y="1" width="69" height="12" forecolor="#999999" uuid="bac5952a-72b7-4c96-8e21-963eaaafbca6"/>
+				<reportElement x="670" y="1" width="69" height="12" forecolor="#999999" uuid="bac5952a-72b7-4c96-8e21-963eaaafbca6"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{base_tax_line}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00" isBlankWhenNull="false">
-				<reportElement x="517" y="1" width="55" height="12" forecolor="#999999" uuid="c63cf790-81fc-42ea-8f3d-e03b55ddd391"/>
+				<reportElement x="518" y="1" width="56" height="12" forecolor="#999999" uuid="c63cf790-81fc-42ea-8f3d-e03b55ddd391"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
@@ -508,7 +508,7 @@
         0.0)]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="328" y="1" width="65" height="12" forecolor="#999999" uuid="ab299508-e498-4692-9a5f-bd069414b74e"/>
+				<reportElement x="315" y="1" width="79" height="12" forecolor="#999999" uuid="ab299508-e498-4692-9a5f-bd069414b74e"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
