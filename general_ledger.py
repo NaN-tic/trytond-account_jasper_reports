@@ -65,7 +65,7 @@ class PrintGeneralLedgerStart(ModelView):
         states={
             'invisible': Bool(Eval('periods')),
             'required': ((Eval('end_date') | Eval('start_date')) &
-                ~Bool(Eval('start_period') | Eval('end_period'))
+                ~Bool(Eval('start_period') | Eval('end_period')))
             },
         depends=['start_date'])
     accounts = fields.Many2Many('account.account', None, None, 'Accounts')
