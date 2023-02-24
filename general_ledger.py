@@ -51,9 +51,9 @@ class PrintGeneralLedgerStart(ModelView):
                 ()),
             ],
         states={
-            'invisible': Bool(Eval('periods')),
+            'invisible': Eval('start_period') | Eval('end_period'),
             'required': ((Eval('start_date') | Eval('end_date')) &
-                ~Bool(Eval('periods'))),
+                ~Bool(Eval('start_period') | Eval('end_period'))),
             },
         depends=['end_date'])
     end_date = fields.Date('Final posting date',
@@ -65,7 +65,7 @@ class PrintGeneralLedgerStart(ModelView):
         states={
             'invisible': Bool(Eval('periods')),
             'required': ((Eval('end_date') | Eval('start_date')) &
-                ~Bool(Eval('periods'))),
+                ~Bool(Eval('start_period') | Eval('end_period'))
             },
         depends=['start_date'])
     accounts = fields.Many2Many('account.account', None, None, 'Accounts')
