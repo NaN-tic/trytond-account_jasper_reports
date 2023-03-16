@@ -8,6 +8,7 @@ from trytond.pyson import Eval, If, Bool
 from trytond.modules.jasper_reports.jasper import JasperReport
 from datetime import timedelta
 from sql import Null
+from trytond.modules.account.exceptions import FiscalYearNotFoundError
 
 
 class PrintJournalStart(ModelView):
@@ -62,9 +63,14 @@ class PrintJournalStart(ModelView):
 
     @staticmethod
     def default_fiscalyear():
-        FiscalYear = Pool().get('account.fiscalyear')
-        return FiscalYear.find(
-            Transaction().context.get('company'), exception=False)
+        pool = Pool()
+        FiscalYear = pool.get('account.fiscalyear')
+        try:
+            fiscalyear = FiscalYear.find(
+                Transaction().context.get('company'), test_state=False)
+        except FiscalYearNotFoundError:
+            return None
+        return fiscalyear.id
 
     @staticmethod
     def default_company():

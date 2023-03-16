@@ -8,6 +8,7 @@ from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateReport, Button
 from trytond.pyson import Eval, Bool, If
 from trytond.modules.jasper_reports.jasper import JasperReport
+from trytond.modules.account.exceptions import FiscalYearNotFoundError
 import logging
 
 _ZERO = Decimal('0.00')
@@ -88,16 +89,26 @@ class PrintTrialBalanceStart(ModelView):
 
     @staticmethod
     def default_fiscalyear():
-        FiscalYear = Pool().get('account.fiscalyear')
-        return FiscalYear.find(
-            Transaction().context.get('company'), exception=False)
+        pool = Pool()
+        FiscalYear = pool.get('account.fiscalyear')
+        try:
+            fiscalyear = FiscalYear.find(
+                Transaction().context.get('company'), test_state=False)
+        except FiscalYearNotFoundError:
+            return None
+        return fiscalyear.id
 
     @staticmethod
     def default_start_period():
-        FiscalYear = Pool().get('account.fiscalyear')
-        Period = Pool().get('account.period')
-        fiscalyear = FiscalYear.find(
-            Transaction().context.get('company'), exception=False)
+        pool = Pool()
+        FiscalYear = pool.get('account.fiscalyear')
+        Period = pool.get('account.period')
+        try:
+            fiscalyear = FiscalYear.find(
+                Transaction().context.get('company'), test_state=False)
+        except FiscalYearNotFoundError:
+            return None
+
         clause = [
             ('fiscalyear', '=', fiscalyear),
             ]
@@ -108,10 +119,14 @@ class PrintTrialBalanceStart(ModelView):
 
     @staticmethod
     def default_end_period():
-        FiscalYear = Pool().get('account.fiscalyear')
-        Period = Pool().get('account.period')
-        fiscalyear = FiscalYear.find(
-            Transaction().context.get('company'), exception=False)
+        pool = Pool()
+        FiscalYear = pool.get('account.fiscalyear')
+        Period = pool.get('account.period')
+        try:
+            fiscalyear = FiscalYear.find(
+                Transaction().context.get('company'), test_state=False)
+        except FiscalYearNotFoundError:
+            return None
 
         Date = Pool().get('ir.date')
         date = Date.today()

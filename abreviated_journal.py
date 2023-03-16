@@ -11,6 +11,7 @@ from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateReport, Button
 from trytond.tools import reduce_ids, grouped_slice
 from trytond.modules.jasper_reports.jasper import JasperReport
+from trytond.modules.account.exceptions import FiscalYearNotFoundError
 
 
 class PrintAbreviatedJournalStart(ModelView):
@@ -32,9 +33,14 @@ class PrintAbreviatedJournalStart(ModelView):
 
     @staticmethod
     def default_fiscalyear():
-        FiscalYear = Pool().get('account.fiscalyear')
-        return FiscalYear.find(
-            Transaction().context.get('company'), exception=False)
+        pool = Pool()
+        FiscalYear = pool.get('account.fiscalyear')
+        try:
+            fiscalyear = FiscalYear.find(
+                Transaction().context.get('company'), test_state=False)
+        except FiscalYearNotFoundError:
+            return None
+        return fiscalyear.id
 
     @staticmethod
     def default_company():
