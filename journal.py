@@ -312,7 +312,7 @@ class JournalReport(JasperReport):
                         ('active', 'in', [True, False]),
                         ])
 
-            if fiscalyear_before and fiscalyear_before.state =='close':
+            if fiscalyear_before and fiscalyear_before.state == 'closed':
                 # check if the first month is the same of the start month on
                 #    fiscal year before
                 if (start_period.start_date and
