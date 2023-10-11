@@ -886,8 +886,6 @@ class AccountJasperReportsTestCase(CompanyTestMixin, ModuleTestCase):
         'Test fiscalyear not closed'
         pool = Pool()
         FiscalYear = pool.get('account.fiscalyear')
-        GeneralLedgerReport = pool.get(
-            'account_jasper_reports.general_ledger', type='report')
         PrintTrialBalance = pool.get(
             'account_jasper_reports.print_trial_balance', type='wizard')
         TrialBalanceReport = pool.get(
