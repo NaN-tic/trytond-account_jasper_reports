@@ -52,7 +52,7 @@ class PrintJournalStart(ModelView):
             'readonly': Bool(Eval('open_close_account_moves')),
             },
         context={
-            'company': Eval('company'),
+            'company': Eval('company', -1),
             },
         depends=['open_close_account_moves', 'company'])
     output_format = fields.Selection([
