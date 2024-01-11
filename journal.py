@@ -24,7 +24,7 @@ class PrintJournalStart(ModelView):
                 ('start_date', '<=', (Eval('end_period'), 'start_date')),
                 (),
                 )
-            ], depends=['fiscalyear', 'end_period'])
+            ])
     end_period = fields.Many2One('account.period', 'End Period',
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
@@ -42,11 +42,11 @@ class PrintJournalStart(ModelView):
     open_move_description = fields.Char('Open Move Description',
         states={
             'invisible': ~Bool(Eval('open_close_account_moves')),
-            }, depends=['open_close_account_moves'])
+            })
     close_move_description = fields.Char('Close Move Description',
         states={
             'invisible': ~Bool(Eval('open_close_account_moves')),
-            }, depends=['open_close_account_moves'])
+            })
     journals = fields.Many2Many('account.journal', None, None, 'Journals',
         states={
             'readonly': Bool(Eval('open_close_account_moves')),
