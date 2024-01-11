@@ -28,14 +28,12 @@ class PrintTrialBalanceStart(ModelView):
         states={
             'invisible': Bool(Eval('add_initial_balance') &
                 Eval('with_move_or_initial'))
-        },
-        depends=['with_move_or_initial'])
+        })
     with_move_or_initial = fields.Boolean(
         'Only Accounts With Moves or Initial Balance',
         states={
             'invisible': ~Bool(Eval('add_initial_balance'))
-        },
-        depends=['add_initial_balance'])
+        })
     accounts = fields.Many2Many('account.account', None, None, 'Accounts')
     split_parties = fields.Boolean('Split Parties')
     add_initial_balance = fields.Boolean('Add Initial Balance')
@@ -46,7 +44,7 @@ class PrintTrialBalanceStart(ModelView):
         context={
             'company': Eval('company', -1),
             },
-        depends=['split_parties', 'company'])
+        depends=['company'])
     start_period = fields.Many2One('account.period', 'Start Period',
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
@@ -54,9 +52,7 @@ class PrintTrialBalanceStart(ModelView):
                 ('start_date', '<=', (Eval('end_period'), 'start_date')),
                 (),
                 ),
-            ],
-        depends=['fiscalyear', 'end_period']
-        )
+            ])
     end_period = fields.Many2One('account.period', 'End Period',
         domain=[
             ('fiscalyear', '=', Eval('fiscalyear')),
@@ -64,23 +60,20 @@ class PrintTrialBalanceStart(ModelView):
                 ('start_date', '>=', (Eval('start_period'), 'start_date')),
                 (),
                 )
-            ],
-        depends=['fiscalyear', 'start_period'])
+            ])
 
     comparison_start_period = fields.Many2One('account.period', 'Start Period',
         domain=[
             ('fiscalyear', '=', Eval('comparison_fiscalyear')),
             ('start_date', '<=', (Eval('comparison_end_period'),
                     'start_date')),
-            ],
-        depends=['comparison_fiscalyear', 'comparison_end_period'])
+            ])
     comparison_end_period = fields.Many2One('account.period', 'End Period',
         domain=[
             ('fiscalyear', '=', Eval('comparison_fiscalyear')),
             ('start_date', '>=', (Eval('comparison_start_period'),
                     'start_date'))
-            ],
-        depends=['comparison_fiscalyear', 'comparison_start_period'])
+            ])
     output_format = fields.Selection([
             ('pdf', 'PDF'),
             ('xls', 'XLS'),

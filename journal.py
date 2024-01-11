@@ -32,8 +32,7 @@ class PrintJournalStart(ModelView):
                 ('start_date', '>=', (Eval('start_period'), 'start_date')),
                 (),
                 )
-            ],
-        depends=['fiscalyear', 'start_period'])
+            ])
     open_close_account_moves = fields.Boolean('Create Open/Close Moves',
         help="If this field is checked and Start Period is 01 and the fiscal "
         "year before are closed, an open move of this year will be created. "
@@ -54,7 +53,7 @@ class PrintJournalStart(ModelView):
         context={
             'company': Eval('company', -1),
             },
-        depends=['open_close_account_moves', 'company'])
+        depends=['company'])
     output_format = fields.Selection([
             ('pdf', 'PDF'),
             ('xls', 'XLS'),
