@@ -1,5 +1,6 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
+import re
 from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.model import ModelView, fields
@@ -129,10 +130,21 @@ class JournalReport(JasperReport):
         sequence = Sequence.search([
                 ('id', '=', move.period.post_move_sequence_used.id),
                 ])[0]
-        sequence_prefix = Sequence._process(sequence.prefix, date=move.date)
-        sequence_sufix = Sequence._process(sequence.suffix, date=move.date)
+        sequence_prefix = Sequence._process(sequence.prefix, date=move.post_date)
+        sequence_sufix = Sequence._process(sequence.suffix, date=move.post_date)
         number = move.post_number.replace(sequence_prefix, '').replace(
             sequence_sufix, '')
+
+        try:
+            number = int(number)
+        except ValueError:
+            pass
+        if not isinstance(number, int):
+            # In case sequence changed prefix or suffix and not equal from post_number
+            # try to extract number from post_number
+            match = re.search(r'\d+$', number)
+            number = match.group() if match else 0
+
         if _type == 'open':
             number = int(number) - 1
         else:
