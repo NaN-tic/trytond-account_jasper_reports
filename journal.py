@@ -1,11 +1,12 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
-import re
 from trytond.pool import Pool
 from trytond.transaction import Transaction
 from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateReport, Button
 from trytond.pyson import Eval, If, Bool
+from trytond.i18n import gettext
+from trytond.exceptions import UserError
 from trytond.modules.jasper_reports.jasper import JasperReport
 from datetime import timedelta
 from sql import Null
@@ -130,8 +131,8 @@ class JournalReport(JasperReport):
         sequence = Sequence.search([
                 ('id', '=', move.period.post_move_sequence_used.id),
                 ])[0]
-        sequence_prefix = Sequence._process(sequence.prefix, date=move.post_date)
-        sequence_sufix = Sequence._process(sequence.suffix, date=move.post_date)
+        sequence_prefix = Sequence._process(sequence.prefix, date=move.date)
+        sequence_sufix = Sequence._process(sequence.suffix, date=move.date)
         number = move.post_number.replace(sequence_prefix, '').replace(
             sequence_sufix, '')
 
@@ -141,9 +142,8 @@ class JournalReport(JasperReport):
             pass
         if not isinstance(number, int):
             # In case sequence changed prefix or suffix and not equal from post_number
-            # try to extract number from post_number
-            match = re.search(r'\d+$', number)
-            number = match.group() if match else 0
+            raise  UserError(gettext('account_jasper_reports.msg_renumber_move',
+                sequence=sequence.rec_name, move=move.rec_name))
 
         if _type == 'open':
             number = int(number) - 1
