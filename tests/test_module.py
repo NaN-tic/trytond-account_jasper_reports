@@ -80,19 +80,6 @@ class AccountJasperReportsTestCase(CompanyTestMixin, ModuleTestCase):
             accounts['payable'].code = '41'
             accounts['payable'].save()
 
-        # TODO
-        # cash, = Account.search([
-        # #        ('kind', '=', 'other'),
-        #         ('name', '=', 'Main Cash'),
-        #         ('company', '=', company.id),
-        #         ], limit=1)
-        # accounts['cash'] = cash
-        # tax, = Account.search([
-        # #        ('kind', '=', 'other'),
-        #         ('name', '=', 'Main Tax'),
-        #         ('company', '=', company.id),
-        #         ], limit=1)
-        # accounts['tax'] = tax
         views = Account.search([
                 ('name', '=', 'View'),
                 ('company', '=', company.id),
