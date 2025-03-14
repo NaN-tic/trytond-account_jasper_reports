@@ -341,7 +341,7 @@ class JournalReport(JasperReport):
                         data.get('open_move_description'), fiscalyear,
                         accounts, init_values, init_party_values, ids[0]))
 
-            if fiscalyear.state =='close':
+            if fiscalyear.state =='closed':
                 # check if the last month is the same of the end month on
                 #    fiscal year
                 if (end_period.end_date and end_period.end_date.month ==
