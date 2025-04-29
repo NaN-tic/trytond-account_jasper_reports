@@ -138,7 +138,7 @@ class JournalReport(JasperReport):
                 ])[0]
         sequence_prefix = Sequence._process(sequence.prefix, date=move.date)
         sequence_sufix = Sequence._process(sequence.suffix, date=move.date)
-        number = move.post_number.replace(sequence_prefix, '').replace(
+        number = move.number.replace(sequence_prefix, '').replace(
             sequence_sufix, '')
 
         try:
@@ -146,7 +146,7 @@ class JournalReport(JasperReport):
         except ValueError:
             pass
         if not isinstance(number, int):
-            # In case sequence changed prefix or suffix and not equal from post_number
+            # In case sequence changed prefix or suffix and not equal from number
             raise  UserError(gettext('account_jasper_reports.msg_renumber_move',
                 sequence=sequence.rec_name, move=move.rec_name))
 
@@ -155,7 +155,7 @@ class JournalReport(JasperReport):
         else:
             number = int(number) + 1
         number = '%%0%sd' % sequence.padding % number
-        move_post_number = '%s%s%s' % (
+        move_number = '%s%s%s' % (
             sequence_prefix,
             number,
             sequence_sufix,
@@ -173,14 +173,12 @@ class JournalReport(JasperReport):
             if _type == 'open':
                 main_value['date'] = fiscalyear.start_date.strftime("%Y-%m-%d")
                 main_value['month'] = fiscalyear.start_date.month
-                main_value['move_post_number'] =move_post_number
-                main_value['move_number'] = move_post_number
+                main_value['move_number'] = move_number
                 main_value['move_line_description'] = description
             else:
                 main_value['date'] = fiscalyear.end_date.strftime("%Y-%m-%d")
                 main_value['month'] = fiscalyear.end_date.month
-                main_value['move_post_number'] = move_post_number
-                main_value['move_number'] = move_post_number
+                main_value['move_number'] = move_number
                 main_value['move_line_description'] = description
             main_value['account_name'] = account.rec_name
             main_value['account_kind'] = account_type
@@ -290,7 +288,7 @@ class JournalReport(JasperReport):
                 %s
                 am.id=aml.move
             ORDER BY
-                am.date, am.post_number, aml.id
+                am.date, am.number, aml.id
         """ % (
                 journals_domain,
                 periods_domain,
@@ -370,7 +368,6 @@ class JournalReport(JasperReport):
                     'month': line.date.month,
                     'account_name': line.account.rec_name,
                     'move_number': line.move.number,
-                    'move_post_number': line.move.post_number,
                     'move_line_description': line.description,
                     'debit': line.debit,
                     'credit': line.credit,

@@ -48,9 +48,6 @@
 	<field name="move_number" class="java.lang.String">
 		<fieldDescription><![CDATA[move_number]]></fieldDescription>
 	</field>
-	<field name="move_post_number" class="java.lang.String">
-		<fieldDescription><![CDATA[move_post_number]]></fieldDescription>
-	</field>
 	<field name="move_line_description" class="java.lang.String">
 		<fieldDescription><![CDATA[move_line_description]]></fieldDescription>
 	</field>
@@ -73,10 +70,9 @@
 		<fieldDescription><![CDATA[id]]></fieldDescription>
 	</field>
 	<sortField name="date"/>
-	<sortField name="move_post_number"/>
+	<sortField name="move_number"/>
 	<sortField name="account_name"/>
 	<sortField name="id"/>
-	<sortField name="move_number"/>
 	<variable name="debit_1" class="java.lang.Number" resetType="Group" resetGroup="mes" calculation="Sum">
 		<variableExpression><![CDATA[$F{debit}]]></variableExpression>
 	</variable>
@@ -306,11 +302,7 @@
 					<font size="7" isBold="true"/>
 					<paragraph lineSpacing="Fixed"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{move_post_number} != null && $F{move_post_number} != ""
-?
-    $F{move_post_number}
-:
-    "(" + $F{move_number} + ")"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{move_number}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
