@@ -186,15 +186,15 @@ msgctxt "model:ir.action,name:wizard_print_trial_balance"
 msgid "Print Trial Balance"
 msgstr "Imprimeix balanç de sumes i saldos"
 
-msgctxt "model:ir.action.report,name:report_abreviated_journal"
+msgctxt "model:ir.action,name:report_abreviated_journal"
 msgid "Abreviated Journal"
 msgstr "Diari abreviat"
 
-msgctxt "model:ir.action.report,name:report_journal"
+msgctxt "model:ir.action,name:report_journal"
 msgid "Journal"
 msgstr "Diari"
 
-msgctxt "model:ir.action.report,name:report_trial_balance"
+msgctxt "model:ir.action,name:report_trial_balance"
 msgid "Trial Balance"
 msgstr "Balanç de sumes i saldos"
 
