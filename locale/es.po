@@ -64,74 +64,6 @@ msgctxt "field:account_jasper_reports.print_journal.start,start_period:"
 msgid "Start Period"
 msgstr "Período inicial"
 
-msgctxt "field:account_jasper_reports.print_trial_balance.start,accounts:"
-msgid "Accounts"
-msgstr "Cuentas"
-
-msgctxt ""
-"field:account_jasper_reports.print_trial_balance.start,add_initial_balance:"
-msgid "Add Initial Balance"
-msgstr "Añadir saldo inicial"
-
-msgctxt "field:account_jasper_reports.print_trial_balance.start,company:"
-msgid "Company"
-msgstr "Empresa"
-
-msgctxt ""
-"field:account_jasper_reports.print_trial_balance.start,comparison_end_period:"
-msgid "End Period"
-msgstr "Período final"
-
-msgctxt ""
-"field:account_jasper_reports.print_trial_balance.start,comparison_fiscalyear:"
-msgid "Fiscal Year"
-msgstr "Ejercicio fiscal"
-
-msgctxt ""
-"field:account_jasper_reports.print_trial_balance.start,comparison_start_period:"
-msgid "Start Period"
-msgstr "Período inicial"
-
-msgctxt "field:account_jasper_reports.print_trial_balance.start,end_period:"
-msgid "End Period"
-msgstr "Período final"
-
-msgctxt "field:account_jasper_reports.print_trial_balance.start,fiscalyear:"
-msgid "Fiscal Year"
-msgstr "Ejercicio fiscal"
-
-msgctxt ""
-"field:account_jasper_reports.print_trial_balance.start,output_format:"
-msgid "Output Format"
-msgstr "Tipo de fichero"
-
-msgctxt "field:account_jasper_reports.print_trial_balance.start,parties:"
-msgid "Parties"
-msgstr "Terceros"
-
-msgctxt "field:account_jasper_reports.print_trial_balance.start,show_digits:"
-msgid "Digits"
-msgstr "Dígitos"
-
-msgctxt ""
-"field:account_jasper_reports.print_trial_balance.start,split_parties:"
-msgid "Split Parties"
-msgstr "Separar terceros"
-
-msgctxt "field:account_jasper_reports.print_trial_balance.start,start_period:"
-msgid "Start Period"
-msgstr "Período inicial"
-
-msgctxt ""
-"field:account_jasper_reports.print_trial_balance.start,with_move_only:"
-msgid "Only Accounts With Move"
-msgstr "Solo cuentas con apuntes"
-
-msgctxt ""
-"field:account_jasper_reports.print_trial_balance.start,with_move_or_initial:"
-msgid "Only Accounts With Moves or Initial Balance"
-msgstr "Solo cuentas con apuntes o saldo inicial"
-
 msgctxt "help:account_jasper_reports.print_abreviated_journal.start,level:"
 msgid "Display accounts of this level"
 msgstr "Muestra las cuentas de este nivel."
@@ -157,10 +89,6 @@ msgctxt "model:account_jasper_reports.print_journal.start,name:"
 msgid "Print Journal"
 msgstr "Imprimir diario"
 
-msgctxt "model:account_jasper_reports.print_trial_balance.start,name:"
-msgid "Print Trial Balance Start"
-msgstr "Inicio imprimir balance de sumas y saldos"
-
 msgctxt "model:ir.action,name:report_abreviated_journal"
 msgid "Abreviated Journal"
 msgstr "Diario abreviado"
@@ -168,10 +96,6 @@ msgstr "Diario abreviado"
 msgctxt "model:ir.action,name:report_journal"
 msgid "Journal"
 msgstr "Diario"
-
-msgctxt "model:ir.action,name:report_trial_balance"
-msgid "Trial Balance"
-msgstr "Balance de sumas y saldos"
 
 msgctxt "model:ir.action,name:wizard_print_abreviated_journal"
 msgid "Print Abreviated Journal"
@@ -181,21 +105,9 @@ msgctxt "model:ir.action,name:wizard_print_journal"
 msgid "Print Journal"
 msgstr "Imprimir diario"
 
-msgctxt "model:ir.action,name:wizard_print_trial_balance"
+msgctxt "model:ir.action.wizard,name:"
 msgid "Print Trial Balance"
 msgstr "Imprimir balance de sumas y saldos"
-
-msgctxt "model:ir.action,name:report_abreviated_journal"
-msgid "Abreviated Journal"
-msgstr "Diario abreviado"
-
-msgctxt "model:ir.action,name:report_journal"
-msgid "Journal"
-msgstr "Diario"
-
-msgctxt "model:ir.action,name:report_trial_balance"
-msgid "Trial Balance"
-msgstr "Balance de sumas y saldos"
 
 msgctxt "model:ir.action.wizard,name:wizard_print_abreviated_journal"
 msgid "Print Abreviated Journal"
@@ -205,16 +117,14 @@ msgctxt "model:ir.action.wizard,name:wizard_print_journal"
 msgid "Print Journal"
 msgstr "Imprimir diario"
 
-msgctxt "model:ir.action.wizard,name:wizard_print_trial_balance"
-msgid "Print Trial Balance"
-msgstr "Imprimir balance de sumas y saldos"
-
+#, python-format
 msgctxt "model:ir.message,text:fiscalyear_end_date"
 msgid "The final posting date does not match the fiscal year \"%(fiscalyear)s\"."
 msgstr ""
 "La fecha de contabilización final no coincide con el ejercicio fiscal "
 "\"%(fiscalyear)s\"."
 
+#, python-format
 msgctxt "model:ir.message,text:fiscalyear_start_date"
 msgid ""
 "The initial posting date does not match the fiscal year \"%(fiscalyear)s\"."
@@ -222,6 +132,7 @@ msgstr ""
 "La fecha de contabilización inicial no coincide con el año fiscal "
 "\"%(fiscalyear)s\"."
 
+#, python-format
 msgctxt "model:ir.message,text:msg_renumber_move"
 msgid ""
 "We have noticed that the sequence \"%(sequence)s\" pattern does not match the post number of \"%(move)s\".\n"
@@ -237,10 +148,6 @@ msgstr "Imprimir diario abreviado"
 msgctxt "model:ir.ui.menu,name:menu_print_general_journal"
 msgid "Print Journal"
 msgstr "Imprimir diario"
-
-msgctxt "model:ir.ui.menu,name:menu_print_trial_balance"
-msgid "Print Trial Balance"
-msgstr "Imprimir balance de sumas y saldos"
 
 msgctxt "report:account_jasper_reports.abreviated_journal:"
 msgid "Abreviated Journal"
@@ -334,70 +241,6 @@ msgstr ""
 "Si el número de asiento aparece entre paréntesis indica que no tiene número "
 "confirmado y el número que se muestra es el provisional."
 
-msgctxt "report:account_jasper_reports.trial_balance:"
-msgid "Account"
-msgstr "Cuenta"
-
-msgctxt "report:account_jasper_reports.trial_balance:"
-msgid "Account Name"
-msgstr "Cuenta"
-
-msgctxt "report:account_jasper_reports.trial_balance:"
-msgid "Accounts"
-msgstr "Cuentas"
-
-msgctxt "report:account_jasper_reports.trial_balance:"
-msgid "All Accounts"
-msgstr "Todas las cuentas"
-
-msgctxt "report:account_jasper_reports.trial_balance:"
-msgid "All Parties"
-msgstr "Todos los terceros"
-
-msgctxt "report:account_jasper_reports.trial_balance:"
-msgid "Balance"
-msgstr "Saldo"
-
-msgctxt "report:account_jasper_reports.trial_balance:"
-msgid "Credit"
-msgstr "Haber"
-
-msgctxt "report:account_jasper_reports.trial_balance:"
-msgid "Debit"
-msgstr "Debe"
-
-msgctxt "report:account_jasper_reports.trial_balance:"
-msgid "First Balance"
-msgstr "Primer balance"
-
-msgctxt "report:account_jasper_reports.trial_balance:"
-msgid "From"
-msgstr "De"
-
-msgctxt "report:account_jasper_reports.trial_balance:"
-msgid "Initial"
-msgstr "Inicial"
-
-msgctxt "report:account_jasper_reports.trial_balance:"
-msgid "Parties"
-msgstr "Terceros"
-
-msgctxt "report:account_jasper_reports.trial_balance:"
-msgid "Second Balance"
-msgstr "Segundo balance"
-
-msgctxt "report:account_jasper_reports.trial_balance:"
-msgid "To"
-msgstr "Hasta"
-
-msgctxt "report:account_jasper_reports.trial_balance:"
-msgid "Trial Balance"
-msgstr "Balance de sumas y saldos"
-
-msgctxt "report:account_jasper_reports.trial_balance:"
-msgid "VAT"
-msgstr "NIF"
-
 msgctxt ""
 "selection:account_jasper_reports.print_abreviated_journal.start,display_account:"
 msgid "All"
@@ -426,16 +269,6 @@ msgctxt "selection:account_jasper_reports.print_journal.start,output_format:"
 msgid "XLS"
 msgstr "XLS"
 
-msgctxt ""
-"selection:account_jasper_reports.print_trial_balance.start,output_format:"
-msgid "PDF"
-msgstr "PDF"
-
-msgctxt ""
-"selection:account_jasper_reports.print_trial_balance.start,output_format:"
-msgid "XLS"
-msgstr "XLS"
-
 msgctxt "view:account_jasper_reports.print_abreviated_journal.start:"
 msgid "Journal Report"
 msgstr "Informe diario"
@@ -443,18 +276,6 @@ msgstr "Informe diario"
 msgctxt "view:account_jasper_reports.print_journal.start:"
 msgid "Left empty to select all journals by default"
 msgstr "Dejar en blanco para seleccionar todos los diarios"
-
-msgctxt "view:account_jasper_reports.print_trial_balance.start:"
-msgid "All accounts if Empty"
-msgstr "Todas las cuentas si se deja en blanco"
-
-msgctxt "view:account_jasper_reports.print_trial_balance.start:"
-msgid "All parties if Empty"
-msgstr "Todos los terceros si se deja en blanco"
-
-msgctxt "view:account_jasper_reports.print_trial_balance.start:"
-msgid "Comparison Period"
-msgstr "Período de comparación"
 
 msgctxt ""
 "wizard_button:account_jasper_reports.print_abreviated_journal,start,end:"
@@ -471,14 +292,5 @@ msgid "Cancel"
 msgstr "Cancelar"
 
 msgctxt "wizard_button:account_jasper_reports.print_journal,start,print_:"
-msgid "Print"
-msgstr "Imprimir"
-
-msgctxt "wizard_button:account_jasper_reports.print_trial_balance,start,end:"
-msgid "Cancel"
-msgstr "Cancelar"
-
-msgctxt ""
-"wizard_button:account_jasper_reports.print_trial_balance,start,print_:"
 msgid "Print"
 msgstr "Imprimir"
