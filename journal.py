@@ -315,6 +315,7 @@ class JournalReport(JasperReport):
 
             with Transaction().set_context(active_test=False):
                 accounts = Account.search([
+                        ('company', '=', company),
                         ('parent', '!=', None),
                         ('type', '!=', Null),
                         ('active', 'in', [True, False]),
