@@ -236,8 +236,14 @@ class JournalReport(JasperReport):
         Period = pool.get('account.period')
         Line = pool.get('account.move.line')
 
+        # Fiscalyear
+        fiscalyear = (FiscalYear(data['fiscalyear']) if data.get('fiscalyear')
+            else None)
+        if not fiscalyear:
+            raise UserError(gettext(
+                'account_jasper_reports.msg_missing_fiscalyear'))
+
         parameters = {}
-        fiscalyear = FiscalYear(data['fiscalyear'])
         start_period = None
         if data['start_period']:
             start_period = Period(data['start_period'])

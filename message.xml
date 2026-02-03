@@ -13,5 +13,8 @@ this repository contains the full copyright notices and license terms. -->
           <field name="text">We have noticed that the sequence "%(sequence)s" pattern does not match the post number of "%(move)s".
 Please proceed to renumber the records before consulting the journal report.</field>
       </record>
+      <record model="ir.message" id="msg_missing_fiscalyear">
+          <field name="text">The fiscalyear selected it is not valid.</field>
+      </record>
     </data>
 </tryton>
