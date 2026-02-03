@@ -10,6 +10,8 @@ from trytond.transaction import Transaction
 from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateReport, Button
 from trytond.tools import reduce_ids, grouped_slice
+from trytond.exceptions import UserError
+from trytond.i18n import gettext
 from trytond.modules.jasper_reports.jasper import JasperReport
 from trytond.modules.account.exceptions import FiscalYearNotFoundError
 
@@ -100,7 +102,13 @@ class AbreviatedJournalReport(JasperReport):
         table_a = Account.__table__()
         table_c = Account.__table__()
 
-        fiscalyear = FiscalYear(data['fiscalyear'])
+        # Fiscalyear
+        fiscalyear = (FiscalYear(data['fiscalyear']) if data.get('fiscalyear')
+            else None)
+        if not fiscalyear:
+            raise UserError(gettext(
+                'account_jasper_reports.msg_missing_fiscalyear'))
+
         transaction = Transaction()
         cursor = transaction.connection.cursor()
 
