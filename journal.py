@@ -311,7 +311,7 @@ class JournalReport(JasperReport):
             fiscalyear_before_start_date = fiscalyear.start_date.replace(
                 year = fiscalyear.start_date.year - 1)
             fiscalyear_before_end_date = fiscalyear.end_date.replace(
-                year = fiscalyear.start_date.year - 1)
+                year = fiscalyear.end_date.year - 1)
             fiscalyear_before = FiscalYear.search([
                     ('start_date', '=', fiscalyear_before_start_date),
                     ('end_date', '=', fiscalyear_before_end_date),
